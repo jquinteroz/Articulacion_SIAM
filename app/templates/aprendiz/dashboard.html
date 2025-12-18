@@ -1,0 +1,397 @@
+{% extends "aprendiz/base_aprendiz.html" %}
+
+{% block title %}Dashboard - Aprendiz{% endblock %}
+
+{% block page_title %}Mi Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-modern">
+    <!-- Bienvenida y Resumen -->
+    <div class="welcome-section">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Hola, {{ current_user.nombres }} 👋</h1>
+            <p class="welcome-subtitle">Este es el estado actual de tu proceso de matrícula</p>
+        </div>
+        {% if matricula %}
+        <div class="quick-download">
+            <a href="{{ url_for('aprendiz.descargar_resumen') }}" class="btn-download">
+                <i class="fas fa-file-pdf"></i>
+                <span>Descargar Reporte PDF</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Alerta Documento Desactualizado -->
+    {% if current_user.tiene_documento_desactualizado %}
+    <div class="alert-documento-desactualizado">
+        <div class="alert-doc-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-doc-content">
+            <h3 class="alert-doc-title">⚠️ Documento de Identidad Desactualizado</h3>
+            <p class="alert-doc-message">
+                Tienes <strong>{{ current_user.edad }} años</strong> pero aún tienes <strong>Tarjeta de Identidad (TI)</strong>.
+                Debes actualizar tu documento a <strong>Cédula de Ciudadanía (CC)</strong> en la Registraduría Nacional.
+            </p>
+            <p class="alert-doc-warning">
+                <i class="fas fa-ban"></i> La subida de documentos está deshabilitada hasta que actualices tu tipo de documento.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Indicadores Modernos -->
+    <div class="metrics-grid">
+        <div class="metric-card metric-primary">
+            <div class="metric-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">
+                    {% if matricula %}
+                    {{ matricula.estado }}
+                    {% else %}
+                    PENDIENTE
+                    {% endif %}
+                </div>
+                <div class="metric-label">Estado de Matrícula</div>
+            </div>
+            <div class="metric-trend">
+                {% if matricula and matricula.estado == 'PREMATRICULA' %}
+                <span class="trend-up"><i class="fas fa-check-circle"></i> Aprobado</span>
+                {% elif matricula and matricula.estado in ['ENVIADO', 'PENDIENTE'] %}
+                <span class="trend-neutral"><i class="fas fa-clock"></i> En revisión</span>
+                {% else %}
+                <span class="trend-pending"><i class="fas fa-hourglass-half"></i> Acción requerida</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="metric-card metric-success">
+            <div class="metric-icon">
+                <i class="fas fa-folder-open"></i>
+            </div>
+            <div class="metric-content">
+                {% set docs_requeridos = 5 if (current_user.tipo_documento == 'CC' and current_user.es_mayor_de_edad) else 8 %}
+                <div class="metric-value">{{ documentos_subidos }}<span class="metric-total">/{{ docs_requeridos }}</span></div>
+                <div class="metric-label">Documentos Cargados</div>
+            </div>
+            <div class="metric-progress">
+                {% set progreso_docs = (documentos_subidos / docs_requeridos * 100)|int %}
+                <div class="progress-mini">
+                    <div class="progress-mini-bar" style="width: {{ progreso_docs }}%"></div>
+                </div>
+                <span class="progress-text">{{ progreso_docs }}% completo</span>
+            </div>
+        </div>
+
+        <div class="metric-card metric-info">
+            <div class="metric-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="metric-content">
+                <div class="metric-value">
+                    {% if aprendiz.programa %}
+                    {{ aprendiz.programa.codigo }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+                <div class="metric-label">Programa Técnico</div>
+            </div>
+            <div class="metric-info-text">
+                {% if aprendiz.programa %}
+                {{ aprendiz.programa.nombre|truncate(40) }}
+                {% else %}
+                No asignado
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline de Progreso Horizontal -->
+    {% if matricula %}
+    <div class="progress-timeline">
+        <h3 class="section-title"><i class="fas fa-route"></i> Progreso de tu Matrícula</h3>
+        <div class="timeline-horizontal">
+            <!-- Paso 1: BORRADOR - Completar Datos -->
+            <div class="timeline-step {% if matricula.estado != 'BORRADOR' or (matricula.estado == 'BORRADOR' and aprendiz.perfil_completo and documentos_subidos >= docs_requeridos) %}active{% endif %} {% if matricula.estado != 'BORRADOR' %}completed{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Completar Datos</div>
+                    <div class="step-subtitle">Información y documentos</div>
+                    {% if matricula.estado == 'BORRADOR' %}
+                    <span class="step-status status-progress">En progreso</span>
+                    {% else %}
+                    <span class="step-status status-completed">✓ Completado</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-connector {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %}"></div>
+
+            <!-- Paso 2: ENVIADO - Matrícula Enviada -->
+            <div class="timeline-step {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %} {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}completed{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Matrícula Enviada</div>
+                    <div class="step-subtitle">Para revisión docente</div>
+                    {% if matricula.estado == 'ENVIADO' %}
+                    <span class="step-status status-progress">Enviado</span>
+                    {% elif matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}
+                    <span class="step-status status-completed">✓ Recibido</span>
+                    {% else %}
+                    <span class="step-status status-pending">Pendiente</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-connector {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %}"></div>
+
+            <!-- Paso 3: PENDIENTE - Revisión Docente -->
+            <div class="timeline-step {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %} {% if matricula.estado in ['COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}completed{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Revisión Docente</div>
+                    <div class="step-subtitle">Validación documentos</div>
+                    {% if matricula.estado == 'PENDIENTE' %}
+                    <span class="step-status status-progress">En revisión</span>
+                    {% elif matricula.estado in ['COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}
+                    <span class="step-status status-completed">✓ Aprobado</span>
+                    {% else %}
+                    <span class="step-status status-pending">Esperando</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-connector {% if matricula.estado in ['COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %}"></div>
+
+            <!-- Paso 4: COMPLETO - Revisión Admin -->
+            <div class="timeline-step {% if matricula.estado in ['COMPLETO', 'PREMATRICULA', 'MATRICULADO'] %}active{% endif %} {% if matricula.estado in ['PREMATRICULA', 'MATRICULADO'] %}completed{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Revisión Admin</div>
+                    <div class="step-subtitle">Validación final</div>
+                    {% if matricula.estado == 'COMPLETO' %}
+                    <span class="step-status status-progress">En revisión</span>
+                    {% elif matricula.estado in ['PREMATRICULA', 'MATRICULADO'] %}
+                    <span class="step-status status-completed">✓ Aprobado</span>
+                    {% else %}
+                    <span class="step-status status-pending">Esperando</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-connector {% if matricula.estado in ['PREMATRICULA', 'MATRICULADO'] %}active{% endif %}"></div>
+
+            <!-- Paso 5: PREMATRICULA - Pre-matrícula -->
+            <div class="timeline-step {% if matricula.estado in ['PREMATRICULA', 'MATRICULADO'] %}active{% endif %} {% if matricula.estado == 'MATRICULADO' %}completed{% elif matricula.estado == 'PREMATRICULA' %}active{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Pre-matrícula</div>
+                    <div class="step-subtitle">Documentos aprobados</div>
+                    {% if matricula.estado == 'PREMATRICULA' %}
+                    <span class="step-status status-completed">✓ Aprobado</span>
+                    {% elif matricula.estado == 'MATRICULADO' %}
+                    <span class="step-status status-completed">✓ Completado</span>
+                    {% else %}
+                    <span class="step-status status-pending">Bloqueado</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="timeline-connector {% if matricula.estado == 'MATRICULADO' %}active{% endif %}"></div>
+
+            <!-- Paso 6: MATRICULADO - Matrícula Finalizada -->
+            <div class="timeline-step {% if matricula.estado == 'MATRICULADO' %}active completed{% endif %}">
+                <div class="step-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="step-content">
+                    <div class="step-title">Matriculado</div>
+                    <div class="step-subtitle">¡Proceso completo!</div>
+                    {% if matricula.estado == 'MATRICULADO' %}
+                    <span class="step-status status-completed">✓ ¡Felicitaciones!</span>
+                    {% else %}
+                    <span class="step-status status-pending">Bloqueado</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Estado de Documentos -->
+    {% if documentos %}
+    <div class="documents-status-section">
+        <h3 class="section-title"><i class="fas fa-file-check"></i> Estado de tus Documentos</h3>
+
+        <!-- Resumen de estados -->
+        <div class="docs-summary-grid">
+            <div class="summary-card summary-approved">
+                <div class="summary-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="summary-content">
+                    <div class="summary-value">{{ docs_aprobados }}</div>
+                    <div class="summary-label">Aprobados</div>
+                </div>
+            </div>
+            <div class="summary-card summary-pending">
+                <div class="summary-icon"><i class="fas fa-clock"></i></div>
+                <div class="summary-content">
+                    <div class="summary-value">{{ docs_pendientes }}</div>
+                    <div class="summary-label">En Revisión</div>
+                </div>
+            </div>
+            <div class="summary-card summary-rejected">
+                <div class="summary-icon"><i class="fas fa-times-circle"></i></div>
+                <div class="summary-content">
+                    <div class="summary-value">{{ docs_rechazados }}</div>
+                    <div class="summary-label">Rechazados</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de documentos -->
+        <div class="docs-status-list">
+            {% for documento in documentos %}
+            <div class="doc-status-item doc-status-{{ documento.estado|lower }}">
+                <div class="doc-status-icon">
+                    {% if documento.estado == 'APROBADO' %}
+                    <i class="fas fa-check-circle"></i>
+                    {% elif documento.estado == 'RECHAZADO' %}
+                    <i class="fas fa-times-circle"></i>
+                    {% else %}
+                    <i class="fas fa-clock"></i>
+                    {% endif %}
+                </div>
+                <div class="doc-status-content">
+                    <div class="doc-status-title">{{ documento.tipo_documento.replace('_', ' ').title() }}</div>
+                    <div class="doc-status-filename">{{ documento.nombre_archivo }}</div>
+                    {% if documento.observaciones %}
+                    <div class="doc-status-observations">
+                        <i class="fas fa-comment-dots"></i> {{ documento.observaciones }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="doc-status-badge badge-{{ documento.estado|lower }}">
+                    {{ documento.estado }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if docs_rechazados > 0 %}
+        <div class="docs-action-alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>Acción requerida:</strong> Tienes {{ docs_rechazados }} documento(s) rechazado(s).
+                <a href="{{ url_for('aprendiz.documentos') }}">Ir a reemplazarlos</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Acciones Rápidas Modernas -->
+    <div class="actions-section">
+        <h3 class="section-title"><i class="fas fa-bolt"></i> Acciones Rápidas</h3>
+        <div class="actions-grid">
+            <a href="{{ url_for('aprendiz.matricula') }}" class="action-card">
+                <div class="action-icon action-icon-primary">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Completar Datos</h4>
+                    <p>Actualiza tu información personal y académica</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('aprendiz.documentos') }}" class="action-card">
+                <div class="action-icon action-icon-success">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Subir Documentos</h4>
+                    <p>Carga los documentos requeridos para tu matrícula</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('aprendiz.perfil') }}" class="action-card">
+                <div class="action-icon action-icon-info">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Mi Perfil</h4>
+                    <p>Consulta y edita tu información personal</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            {% if matricula and documentos_subidos > 0 %}
+            <a href="{{ url_for('aprendiz.descargar_documentos_pdf') }}" class="action-card">
+                <div class="action-icon action-icon-warning">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="action-content">
+                    <h4>Descargar PDF</h4>
+                    <p>Descarga todos tus documentos unificados en PDF</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-download"></i>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Observaciones (si existen) -->
+    {% if matricula and (matricula.observaciones_docente or matricula.observaciones_admin) %}
+    <div class="notifications-section">
+        <h3 class="section-title"><i class="fas fa-bell"></i> Notificaciones y Observaciones</h3>
+
+        {% if matricula.observaciones_docente %}
+        <div class="notification-card notification-info">
+            <div class="notification-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <div class="notification-content">
+                <h4>Observaciones del Docente Enlace</h4>
+                <p>{{ matricula.observaciones_docente }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if matricula.observaciones_admin %}
+        <div class="notification-card notification-warning">
+            <div class="notification-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="notification-content">
+                <h4>Observaciones del Administrador</h4>
+                <p>{{ matricula.observaciones_admin }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

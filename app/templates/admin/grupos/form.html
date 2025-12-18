@@ -1,0 +1,494 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ 'Editar' if action == 'editar' else 'Crear' }} Grupo - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-form">
+    <div class="header-content-form">
+        <nav class="breadcrumb-form">
+            <a href="{{ url_for('admin.dashboard') }}" class="breadcrumb-link-form">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-form">/</span>
+            <a href="{{ url_for('admin.grupos') }}" class="breadcrumb-link-form">
+                Grupos
+            </a>
+            <span class="breadcrumb-sep-form">/</span>
+            <span class="breadcrumb-active-form">{{ 'Editar' if action == 'editar' else 'Crear' }}</span>
+        </nav>
+        <h1 class="page-title-form">
+            <i class="fas fa-{{ 'edit' if action == 'editar' else 'plus' }}"></i>
+            {{ 'Editar' if action == 'editar' else 'Crear Nuevo' }} Grupo
+        </h1>
+        <p class="page-subtitle-form">
+            {{ 'Modifique la información del grupo' if action == 'editar' else 'Complete la información para crear un nuevo grupo' }}
+        </p>
+    </div>
+</div>
+
+<!-- Form Card -->
+<div class="form-container">
+    <div class="card-form">
+        <div class="card-header-form">
+            <i class="fas fa-info-circle"></i> Información del Grupo
+        </div>
+        <div class="card-body-form">
+            <form method="POST">
+                <div class="form-grid">
+                    <!-- Número del Grupo -->
+                    <div class="form-group-full">
+                        <label class="form-label-form" for="nombre">
+                            <i class="fas fa-hashtag"></i> Número del Grupo *
+                        </label>
+                        <input type="text"
+                               class="form-input-form"
+                               id="nombre"
+                               name="nombre"
+                               value="{{ grupo.nombre if grupo else '' }}"
+                               placeholder="Ej: 2345678, 2345679"
+                               pattern="[0-9]+"
+                               required>
+                        <small class="form-hint">Ingrese el número identificador del grupo (solo dígitos). Este número será generado por el administrador y asociado a un programa de formación.</small>
+                    </div>
+
+                    <!-- Colegio -->
+                    <div class="form-group-half">
+                        <label class="form-label-form" for="colegio_id">
+                            <i class="fas fa-school"></i> Colegio *
+                        </label>
+                        <select class="form-select-form" id="colegio_id" name="colegio_id" required>
+                            <option value="">-- Seleccione un colegio --</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}"
+                                    {% if grupo and grupo.colegio_id == colegio.id %}selected{% endif %}>
+                                {{ colegio.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Programa -->
+                    <div class="form-group-half">
+                        <label class="form-label-form" for="programa_id">
+                            <i class="fas fa-graduation-cap"></i> Programa *
+                        </label>
+                        <select class="form-select-form" id="programa_id" name="programa_id" required>
+                            <option value="">-- Seleccione un programa --</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}"
+                                    {% if grupo and grupo.programa_id == programa.id %}selected{% endif %}>
+                                {{ programa.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Jornada -->
+                    <div class="form-group-half">
+                        <label class="form-label-form" for="jornada">
+                            <i class="fas fa-clock"></i> Jornada *
+                        </label>
+                        <select class="form-select-form" id="jornada" name="jornada" required>
+                            <option value="">-- Seleccione una jornada --</option>
+                            <option value="MAÑANA" {% if grupo and grupo.jornada == 'MAÑANA' %}selected{% endif %}>Mañana</option>
+                            <option value="TARDE" {% if grupo and grupo.jornada == 'TARDE' %}selected{% endif %}>Tarde</option>
+                            <option value="NOCHE" {% if grupo and grupo.jornada == 'NOCHE' %}selected{% endif %}>Noche</option>
+                            <option value="UNICA" {% if grupo and grupo.jornada == 'UNICA' %}selected{% endif %}>Única</option>
+                        </select>
+                    </div>
+
+                    <!-- Año Lectivo -->
+                    <div class="form-group-half">
+                        <label class="form-label-form" for="año_lectivo">
+                            <i class="fas fa-calendar-alt"></i> Año Lectivo *
+                        </label>
+                        <input type="number"
+                               class="form-input-form"
+                               id="año_lectivo"
+                               name="año_lectivo"
+                               value="{{ grupo.año_lectivo if grupo else 2025 }}"
+                               min="2020"
+                               max="2099"
+                               required>
+                    </div>
+
+                    <!-- Estado (solo al editar) -->
+                    {% if action == 'editar' %}
+                    <div class="form-group-full">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox"
+                                   id="activo"
+                                   name="activo"
+                                   class="checkbox-input"
+                                   {% if grupo.activo %}checked{% endif %}>
+                            <label for="activo" class="checkbox-label">
+                                <i class="fas fa-check-circle"></i> Grupo Activo
+                            </label>
+                        </div>
+                        <small class="form-hint">Los grupos inactivos no aparecerán en los selectores del sistema</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <a href="{{ url_for('admin.grupos') }}" class="btn-secondary-form">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-primary-form">
+                        <i class="fas fa-save"></i> {{ 'Actualizar' if action == 'editar' else 'Crear' }} Grupo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="card-form">
+        <div class="card-header-form">
+            <i class="fas fa-info-circle"></i> Información Importante
+        </div>
+        <div class="card-body-form">
+            <div class="info-item">
+                <i class="fas fa-lightbulb text-warning"></i>
+                <div>
+                    <strong>Número del Grupo</strong>
+                    <p>El número del grupo es generado por el administrador y debe contener solo dígitos. Ejemplo: 2345678, 2345679</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-link text-info"></i>
+                <div>
+                    <strong>Asociación con Programa</strong>
+                    <p>Cada grupo debe estar asociado a un colegio y a un programa de formación específico. Los aprendices seleccionarán este grupo al matricularse.</p>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <i class="fas fa-users text-success"></i>
+                <div>
+                    <strong>Aprendices</strong>
+                    <p>Los aprendices podrán seleccionar este grupo al completar su matrícula</p>
+                </div>
+            </div>
+
+            {% if action == 'editar' and grupo.aprendices|length > 0 %}
+            <div class="info-item warning-item">
+                <i class="fas fa-exclamation-triangle text-danger"></i>
+                <div>
+                    <strong>Advertencia</strong>
+                    <p>Este grupo tiene {{ grupo.aprendices|length }} aprendiz(es) asociado(s). No puede ser eliminado.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --form-primary: #667eea;
+    --form-primary-dark: #5568d3;
+    --form-success: #39A900;
+    --form-danger: #D32F2F;
+    --form-warning: #FFA000;
+    --form-info: #1976D2;
+    --form-text: #1a202c;
+    --form-text-secondary: #4a5568;
+    --form-text-muted: #718096;
+    --form-bg: #f7fafc;
+    --form-border: #e2e8f0;
+    --form-white: #ffffff;
+}
+
+/* Header Section */
+.header-section-form {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content-form {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.breadcrumb-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link-form {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link-form:hover {
+    color: white;
+}
+
+.breadcrumb-sep-form {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-form {
+    color: white;
+    font-weight: 500;
+}
+
+.page-title-form {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-title-form i {
+    margin-right: 0.75rem;
+}
+
+.page-subtitle-form {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .form-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card Styles */
+.card-form {
+    background: var(--form-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.card-header-form {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-header-form i {
+    margin-right: 0.5rem;
+}
+
+.card-body-form {
+    padding: 2rem;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-group-full {
+    grid-column: 1 / -1;
+}
+
+.form-group-half {
+    grid-column: span 1;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group-half {
+        grid-column: 1;
+    }
+}
+
+/* Form Elements */
+.form-label-form {
+    display: block;
+    color: var(--form-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-label-form i {
+    color: var(--form-primary);
+    margin-right: 0.5rem;
+}
+
+.form-input-form, .form-select-form {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--form-border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-input-form:focus, .form-select-form:focus {
+    outline: none;
+    border-color: var(--form-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-hint {
+    display: block;
+    color: var(--form-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Checkbox */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--form-bg);
+    border-radius: 8px;
+}
+
+.checkbox-input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    font-weight: 600;
+    color: var(--form-text);
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--form-border);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+}
+
+.btn-primary-form, .btn-secondary-form {
+    flex: 1;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary-form {
+    background: linear-gradient(135deg, var(--form-primary) 0%, var(--form-primary-dark) 100%);
+    color: white;
+}
+
+.btn-primary-form:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary-form {
+    background: white;
+    color: var(--form-text-secondary);
+    border: 2px solid var(--form-border);
+}
+
+.btn-secondary-form:hover {
+    background: var(--form-bg);
+    border-color: var(--form-text-muted);
+}
+
+/* Info Items */
+.info-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--form-bg);
+}
+
+.info-item + .info-item {
+    margin-top: 1rem;
+}
+
+.info-item i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.info-item strong {
+    display: block;
+    color: var(--form-text);
+    margin-bottom: 0.25rem;
+}
+
+.info-item p {
+    margin: 0;
+    color: var(--form-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.warning-item {
+    background: #FFF3E0;
+    border-left: 4px solid var(--form-warning);
+}
+
+.text-warning { color: var(--form-warning); }
+.text-info { color: var(--form-info); }
+.text-success { color: var(--form-success); }
+.text-danger { color: var(--form-danger); }
+</style>
+
+<script>
+// Import datetime for Jinja2 context
+const datetime = {
+    now: () => ({ year: new Date().getFullYear() })
+};
+</script>
+
+{% endblock %}

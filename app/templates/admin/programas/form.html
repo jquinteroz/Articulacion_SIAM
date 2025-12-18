@@ -1,0 +1,181 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ 'Editar' if programa else 'Nuevo' }} Programa - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-home"></i> Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.programas') }}">Programas</a></li>
+            <li class="breadcrumb-item active">{{ 'Editar' if programa else 'Nuevo' }}</li>
+        </ol>
+    </nav>
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <h2><i class="fas fa-graduation-cap"></i> {{ 'Editar' if programa else 'Nuevo' }} Programa</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> Formulario de Programa</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <!-- Informacion Basica -->
+                        <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle"></i> Informacion del Programa</h6>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="codigo"><strong>Codigo del Programa</strong></label>
+                                    <input type="text" name="codigo" id="codigo" class="form-control"
+                                           value="{{ programa.codigo if programa else '' }}"
+                                           placeholder="Ej: TEC123">
+                                    <small class="form-text text-muted">Codigo unico (opcional)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="nombre"><strong>Nombre del Programa <span class="text-danger">*</span></strong></label>
+                                    <input type="text" name="nombre" id="nombre" class="form-control"
+                                           value="{{ programa.nombre if programa else '' }}"
+                                           placeholder="Ej: Tecnologo en Analisis y Desarrollo de Software"
+                                           required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descripcion"><strong>Descripcion</strong></label>
+                            <textarea name="descripcion" id="descripcion" class="form-control" rows="4"
+                                      placeholder="Descripcion del programa academico...">{{ programa.descripcion if programa else '' }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duracion_horas"><strong>Duracion en Horas</strong></label>
+                            <input type="number" name="duracion_horas" id="duracion_horas" class="form-control"
+                                   value="{{ programa.duracion_horas if programa else '' }}"
+                                   placeholder="Ej: 2640"
+                                   min="0"
+                                   step="1">
+                            <small class="form-text text-muted">Duracion total del programa en horas</small>
+                        </div>
+
+                        <!-- Estado (solo para edicion) -->
+                        {% if programa %}
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="fas fa-toggle-on"></i> Estado</h6>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" name="activo" class="custom-control-input" id="activo"
+                                       {{ 'checked' if programa.activo else '' }}>
+                                <label class="custom-control-label" for="activo">Programa Activo</label>
+                            </div>
+                            <small class="form-text text-muted">Los programas inactivos no se muestran en el registro</small>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('admin.programas') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Programa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informacion adicional (solo en edicion) -->
+            {% if programa %}
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estadisticas del Programa</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Grupos Asociados:</strong></p>
+                            <p class="text-muted">{{ programa.grupos|length }} grupo(s)</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Aprendices Matriculados:</strong></p>
+                            <p class="text-muted">{{ programa.aprendices|length }} aprendiz(es)</p>
+                        </div>
+                    </div>
+                    {% if programa.grupos %}
+                    <hr>
+                    <p><strong>Grupos:</strong></p>
+                    <ul class="mb-0">
+                        {% for grupo in programa.grupos %}
+                        <li>{{ grupo.nombre }} ({{ grupo.aprendices|length }} aprendices)</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    list-style: none;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.breadcrumb-item {
+    display: inline-block;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    color: #6c757d;
+    content: "/";
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Form styling */
+h6 {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.custom-switch {
+    padding-left: 2.5rem;
+}
+
+.custom-control-label {
+    font-weight: 500;
+}
+</style>
+{% endblock %}

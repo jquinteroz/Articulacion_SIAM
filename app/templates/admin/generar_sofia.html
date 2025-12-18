@@ -1,0 +1,161 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Generar Formato SOFIA Plus - Panel Admin{% endblock %}
+
+{% block content %}
+<div class="container-admin">
+    <div class="header-admin">
+        <h1><i class="fas fa-file-excel"></i> Generar Formato SOFIA Plus</h1>
+        <p class="subtitle-admin">Exporte datos de aprendices al formato SOFIA Plus para carga masiva</p>
+    </div>
+
+    <div class="card-admin">
+        <form method="POST" id="formSofia">
+            <div class="form-grid-admin">
+                <!-- Tipo de Filtro -->
+                <div class="form-group-admin">
+                    <label class="label-admin">
+                        <i class="fas fa-filter"></i> Filtrar por
+                        <span class="required-admin">*</span>
+                    </label>
+                    <select class="input-admin" name="filtro_tipo" id="filtro_tipo" required>
+                        <option value="">Seleccione tipo de filtro...</option>
+                        <option value="todos">Todos los aprendices</option>
+                        <option value="colegio">Por Colegio</option>
+                        <option value="ficha">Por Ficha</option>
+                        <option value="programa">Por Programa</option>
+                    </select>
+                </div>
+
+                <!-- Selector de Colegio -->
+                <div class="form-group-admin" id="selector_colegio" style="display: none;">
+                    <label class="label-admin">
+                        <i class="fas fa-school"></i> Colegio
+                    </label>
+                    <select class="input-admin" name="filtro_id_colegio" id="filtro_id_colegio">
+                        <option value="">Seleccione un colegio...</option>
+                        {% for colegio in colegios %}
+                        <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Selector de Ficha -->
+                <div class="form-group-admin" id="selector_ficha" style="display: none;">
+                    <label class="label-admin">
+                        <i class="fas fa-users"></i> Ficha
+                    </label>
+                    <select class="input-admin" name="filtro_id_ficha" id="filtro_id_ficha">
+                        <option value="">Seleccione una ficha...</option>
+                        {% for grupo in grupos %}
+                        <option value="{{ grupo.id }}">{{ grupo.nombre }} - {{ grupo.colegio.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Selector de Programa -->
+                <div class="form-group-admin" id="selector_programa" style="display: none;">
+                    <label class="label-admin">
+                        <i class="fas fa-book"></i> Programa
+                    </label>
+                    <select class="input-admin" name="filtro_id_programa" id="filtro_id_programa">
+                        <option value="">Seleccione un programa...</option>
+                        {% for programa in programas %}
+                        <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group-admin">
+                <button type="submit" class="btn-primary-admin">
+                    <i class="fas fa-download"></i> Generar y Descargar
+                </button>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn-secondary-admin">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="info-box-admin">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <h3>Información sobre el formato SOFIA Plus</h3>
+            <p>Este formato permite realizar carga masiva de aprendices en la plataforma SOFIA Plus del SENA.</p>
+            <ul>
+                <li>El archivo se genera en formato Excel (.xls)</li>
+                <li>Incluye: Tipo y número de identificación, código de ficha, tipo de población</li>
+                <li>Solo incluye aprendices con perfil completo y grupo asignado</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filtroTipo = document.getElementById('filtro_tipo');
+    const selectorColegio = document.getElementById('selector_colegio');
+    const selectorFicha = document.getElementById('selector_ficha');
+    const selectorPrograma = document.getElementById('selector_programa');
+    const form = document.getElementById('formSofia');
+
+    // Manejar cambio de tipo de filtro
+    filtroTipo.addEventListener('change', function() {
+        // Ocultar todos los selectores
+        selectorColegio.style.display = 'none';
+        selectorFicha.style.display = 'none';
+        selectorPrograma.style.display = 'none';
+
+        // Limpiar valores
+        document.getElementById('filtro_id_colegio').value = '';
+        document.getElementById('filtro_id_ficha').value = '';
+        document.getElementById('filtro_id_programa').value = '';
+
+        // Mostrar el selector correspondiente
+        if (this.value === 'colegio') {
+            selectorColegio.style.display = 'block';
+        } else if (this.value === 'ficha') {
+            selectorFicha.style.display = 'block';
+        } else if (this.value === 'programa') {
+            selectorPrograma.style.display = 'block';
+        }
+    });
+
+    // Manejar envío del formulario
+    form.addEventListener('submit', function(e) {
+        const filtro = filtroTipo.value;
+
+        // Crear campo oculto con el filtro_id correcto
+        const existingInput = document.getElementById('filtro_id');
+        if (existingInput) {
+            existingInput.remove();
+        }
+
+        let filtroId = '';
+        if (filtro === 'colegio') {
+            filtroId = document.getElementById('filtro_id_colegio').value;
+        } else if (filtro === 'ficha') {
+            filtroId = document.getElementById('filtro_id_ficha').value;
+        } else if (filtro === 'programa') {
+            filtroId = document.getElementById('filtro_id_programa').value;
+        }
+
+        // Si no es "todos" y no hay filtro_id, prevenir envío
+        if (filtro !== 'todos' && !filtroId) {
+            e.preventDefault();
+            alert('Por favor seleccione un valor para el filtro');
+            return false;
+        }
+
+        // Agregar filtro_id al formulario
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'filtro_id';
+        input.id = 'filtro_id';
+        input.value = filtroId;
+        form.appendChild(input);
+    });
+});
+</script>
+{% endblock %}

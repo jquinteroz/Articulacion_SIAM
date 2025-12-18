@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+
+{% block title %}Iniciar Sesión - SIAM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="login-modern-container">
+    <!-- Left Side - Branding & Info -->
+    <div class="login-left-side">
+        <div class="login-branding">
+            <div class="login-logo-siam">
+                <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" style="width: 100%; height: auto; max-width: 200px;">
+            </div>
+            <h1 class="login-brand-title">SIAM</h1>
+            <p class="login-brand-subtitle">Sistema Integrado de Articulación y Media Técnica</p>
+            <p class="login-brand-description">SENA CGMLTI</p>
+        </div>
+
+        <div class="login-features">
+            <div class="login-feature">
+                <div class="feature-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Proceso Rápido</h3>
+                    <p>Completa tu matrícula en minutos</p>
+                </div>
+            </div>
+
+            <div class="login-feature">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Seguro y Confiable</h3>
+                    <p>Tus datos están protegidos</p>
+                </div>
+            </div>
+
+            <div class="login-feature">
+                <div class="feature-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Soporte 24/7</h3>
+                    <p>Asistencia cuando la necesites</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-decoration">
+            <div class="decoration-circle decoration-1"></div>
+            <div class="decoration-circle decoration-2"></div>
+            <div class="decoration-circle decoration-3"></div>
+        </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="login-right-side">
+        <div class="login-form-container">
+            <div class="login-form-header">
+                <h2 class="login-form-title">Bienvenido de nuevo</h2>
+                <p class="login-form-subtitle">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('public.login') }}" class="login-form">
+                <!-- Documento Field -->
+                <div class="form-group-modern">
+                    <label for="documento" class="form-label-modern">
+                        <i class="fas fa-id-card"></i> Documento de Identidad
+                    </label>
+                    <div class="input-wrapper-modern">
+                        <input type="text"
+                               id="documento"
+                               name="documento"
+                               class="form-input-modern"
+                               placeholder="Ingresa tu número de documento"
+                               required
+                               autofocus>
+                        <div class="input-focus-border"></div>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="form-group-modern">
+                    <label for="password" class="form-label-modern">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <div class="input-wrapper-modern password-wrapper">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               class="form-input-modern"
+                               placeholder="Ingresa tu contraseña"
+                               required>
+                        <i class="fas fa-eye password-toggle-modern"
+                           onclick="togglePasswordInput('password', this)"></i>
+                        <div class="input-focus-border"></div>
+                    </div>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="form-options-modern">
+                    <label class="checkbox-modern">
+                        <input type="checkbox" id="remember" name="remember" value="true">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-label">Recordarme</span>
+                    </label>
+                    <a href="#" class="forgot-password-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-login-modern">
+                    <span class="btn-text">Iniciar Sesión</span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
+            </form>
+
+            <!-- Register Link -->
+            <div class="login-footer">
+                <p class="register-text">
+                    ¿No tienes cuenta?
+                    <a href="{{ url_for('public.registro') }}" class="register-link">Regístrate aquí</a>
+                </p>
+            </div>
+
+            <!-- Test Credentials -->
+            <div class="test-credentials-modern">
+                <button class="credentials-toggle" onclick="toggleCredentials()">
+                    <i class="fas fa-key"></i> Ver Credenciales de Prueba
+                    <i class="fas fa-chevron-down credentials-chevron"></i>
+                </button>
+
+                <div class="credentials-content" id="credentialsContent">
+                    <div class="credentials-grid">
+                        <div class="credential-card credential-admin">
+                            <div class="credential-header">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Administrador</span>
+                            </div>
+                            <div class="credential-body">
+                                <div class="credential-row">
+                                    <span class="credential-label">Usuario:</span>
+                                    <code class="credential-value">1000000000</code>
+                                </div>
+                                <div class="credential-row">
+                                    <span class="credential-label">Contraseña:</span>
+                                    <code class="credential-value">Admin123!</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="credential-card credential-docente">
+                            <div class="credential-header">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Docente Enlace</span>
+                            </div>
+                            <div class="credential-body">
+                                <div class="credential-row">
+                                    <span class="credential-label">Usuario:</span>
+                                    <code class="credential-value">1000000001</code>
+                                </div>
+                                <div class="credential-row">
+                                    <span class="credential-label">Contraseña:</span>
+                                    <code class="credential-value">Docente123!</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="credential-card credential-aprendiz">
+                            <div class="credential-header">
+                                <i class="fas fa-user-graduate"></i>
+                                <span>Aprendiz</span>
+                            </div>
+                            <div class="credential-body">
+                                <div class="credential-row">
+                                    <span class="credential-label">Usuario:</span>
+                                    <code class="credential-value">1000000002</code>
+                                </div>
+                                <div class="credential-row">
+                                    <span class="credential-label">Contraseña:</span>
+                                    <code class="credential-value">Aprendiz123!</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div class="login-spinner-overlay" id="loginSpinner">
+    <div class="login-spinner-container">
+        <div class="login-spinner-logo">
+            <div class="login-spinner-ring"></div>
+            <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Cargando...">
+        </div>
+        <div class="login-spinner-text">Iniciando sesión...</div>
+        <div class="login-spinner-subtext">Por favor espera</div>
+    </div>
+</div>
+
+<script>
+function togglePasswordInput(inputId, iconElement) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        iconElement.classList.remove('fa-eye');
+        iconElement.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        iconElement.classList.remove('fa-eye-slash');
+        iconElement.classList.add('fa-eye');
+    }
+}
+
+function toggleCredentials() {
+    const content = document.getElementById('credentialsContent');
+    const toggle = document.querySelector('.credentials-toggle');
+
+    content.classList.toggle('active');
+    toggle.classList.toggle('active');
+}
+
+// Add smooth scroll behavior
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus animation
+    const firstInput = document.querySelector('.form-input-modern');
+    if (firstInput) {
+        setTimeout(() => {
+            firstInput.focus();
+        }, 500);
+    }
+
+    // Show spinner on form submit
+    const loginForm = document.querySelector('.login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            // Mostrar spinner
+            const spinner = document.getElementById('loginSpinner');
+            spinner.classList.add('active');
+        });
+    }
+});
+</script>
+{% endblock %}

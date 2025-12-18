@@ -1,0 +1,125 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gesti�n de Colegios - Admin{% endblock %}
+
+{% block page_title %}<i class="fas fa-school"></i> Gesti�n de Colegios{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Colegios</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('admin.crear_colegio') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Colegio
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Filtros -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar colegio...">
+            </div>
+            <div class="col-md-3">
+                <select id="tipoFilter" class="form-control">
+                    <option value="">Todos los tipos</option>
+                    <option value="PUBLICO">P�blico</option>
+                    <option value="PRIVADO">Privado</option>
+                    <option value="MIXTO">Mixto</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="estadoFilter" class="form-control">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Activos</option>
+                    <option value="false">Inactivos</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="table table-hover" id="colegiosTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Direcci�n</th>
+                        <th>Tel�fono</th>
+                        <th>Email</th>
+                        <th>Grupos</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for colegio in colegios %}
+                    <tr data-tipo="{{ colegio.tipo_colegio }}" data-activo="{{ colegio.activo }}">
+                        <td><strong>{{ colegio.nombre }}</strong></td>
+                        <td><span class="badge badge-{{ 'primary' if colegio.tipo_colegio == 'PUBLICO' else 'info' }}">{{ colegio.tipo_colegio }}</span></td>
+                        <td>{{ colegio.direccion or '-' }}</td>
+                        <td>{{ colegio.telefono or '-' }}</td>
+                        <td>{{ colegio.email or '-' }}</td>
+                        <td>
+                            <span class="badge badge-secondary">{{ colegio.grupos|length }} grupos</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if colegio.activo else 'secondary' }}">
+                                {{ 'Activo' if colegio.activo else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.editar_colegio', colegio_id=colegio.id) }}"
+                               class="btn btn-sm btn-info" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if colegio.grupos|length == 0 %}
+                            <form method="POST" action="{{ url_for('admin.eliminar_colegio', colegio_id=colegio.id) }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de eliminar este colegio?')">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not colegios %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No hay colegios registrados
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('tipoFilter').addEventListener('change', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const tipoFilter = document.getElementById('tipoFilter').value;
+    const estadoFilter = document.getElementById('estadoFilter').value;
+    const rows = document.querySelectorAll('#colegiosTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const tipo = row.dataset.tipo;
+        const activo = row.dataset.activo;
+
+        const matchesSearch = text.includes(searchTerm);
+        const matchesTipo = !tipoFilter || tipo === tipoFilter;
+        const matchesEstado = !estadoFilter || activo === estadoFilter;
+
+        row.style.display = matchesSearch && matchesTipo && matchesEstado ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

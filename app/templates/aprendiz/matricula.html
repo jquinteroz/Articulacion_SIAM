@@ -1,0 +1,993 @@
+{% extends "aprendiz/base_aprendiz.html" %}
+
+{% block title %}Completar Matrícula - Aprendiz{% endblock %}
+
+{% block page_title %}Completar Datos de Matrícula{% endblock %}
+
+{% block content %}
+<!-- Modern Matricula Header -->
+<div class="matricula-header-apr">
+    <div class="header-content-mat">
+        <div class="header-text-mat">
+            <h1 class="header-title-mat">Completar Matrícula</h1>
+            <p class="header-subtitle-mat">Completa tu información para continuar con el proceso</p>
+        </div>
+        <div class="header-icon-mat">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Timeline - Horizontal -->
+<div class="progress-timeline-apr">
+    <div class="timeline-step-apr {% if matricula.estado in ['BORRADOR', 'ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %} {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}completed{% endif %}">
+        <div class="step-icon-apr">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <div class="step-content-apr">
+            <div class="step-title-apr">Datos Personales</div>
+            <div class="step-subtitle-apr">Completa tu información</div>
+            {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}
+            <span class="step-status-apr status-completed-apr">✓ Completado</span>
+            {% else %}
+            <span class="step-status-apr status-pending-apr">Pendiente</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="timeline-connector-apr {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %}"></div>
+
+    {% set docs_requeridos = 5 if (current_user.tipo_documento == 'CC' and current_user.es_mayor_de_edad) else 8 %}
+    {% set documentos_count = matricula.documentos|length if matricula else 0 %}
+    <div class="timeline-step-apr {% if documentos_count >= docs_requeridos %}active completed{% endif %}">
+        <div class="step-icon-apr">
+            <i class="fas fa-file-upload"></i>
+        </div>
+        <div class="step-content-apr">
+            <div class="step-title-apr">Cargar Documentos</div>
+            <div class="step-subtitle-apr">Sube los {{ docs_requeridos }} documentos</div>
+            {% if documentos_count >= docs_requeridos %}
+            <span class="step-status-apr status-completed-apr">✓ {{ documentos_count }}/{{ docs_requeridos }} documentos</span>
+            {% else %}
+            <span class="step-status-apr status-progress-apr">{{ documentos_count }}/{{ docs_requeridos }} documentos</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="timeline-connector-apr {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %}"></div>
+
+    <div class="timeline-step-apr {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %} {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}completed{% endif %}">
+        <div class="step-icon-apr">
+            <i class="fas fa-paper-plane"></i>
+        </div>
+        <div class="step-content-apr">
+            <div class="step-title-apr">Enviar Matrícula</div>
+            <div class="step-subtitle-apr">Envía para revisión</div>
+            {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}
+            <span class="step-status-apr status-completed-apr">✓ Enviado</span>
+            {% elif matricula.estado == 'ENVIADO' %}
+            <span class="step-status-apr status-pending-apr">⏳ Pendiente</span>
+            {% else %}
+            <span class="step-status-apr status-pending-apr">Pendiente</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="timeline-connector-apr {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %}"></div>
+
+    <div class="timeline-step-apr {% if matricula.estado in ['PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}active{% endif %} {% if matricula.estado in ['COMPLETO', 'PREMATRICULA'] %}completed{% endif %}">
+        <div class="step-icon-apr">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="step-content-apr">
+            <div class="step-title-apr">Revisión Docente</div>
+            <div class="step-subtitle-apr">El docente revisa</div>
+            {% if matricula.estado in ['COMPLETO', 'PREMATRICULA'] %}
+            <span class="step-status-apr status-completed-apr">✓ Aprobado</span>
+            {% elif matricula.estado == 'PENDIENTE' %}
+            <span class="step-status-apr status-waiting-apr">⏳ Esperando</span>
+            {% else %}
+            <span class="step-status-apr status-pending-apr">Esperando</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="timeline-connector-apr {% if matricula.estado in ['COMPLETO', 'PREMATRICULA'] %}active{% endif %}"></div>
+
+    <div class="timeline-step-apr {% if matricula.estado in ['COMPLETO', 'PREMATRICULA'] %}active completed{% endif %}">
+        <div class="step-icon-apr">
+            <i class="fas fa-star"></i>
+        </div>
+        <div class="step-content-apr">
+            <div class="step-title-apt">Pre-matrícula</div>
+            <div class="step-subtitle-apr">¡Proceso completado!</div>
+            {% if matricula.estado in ['COMPLETO', 'PREMATRICULA'] %}
+            <span class="step-status-apr status-completed-apr">✓ Completado</span>
+            {% else %}
+            <span class="step-status-apr status-locked-apr">🔒 Bloqueado</span>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Info Alert -->
+<div class="info-alert-mat">
+    <div class="alert-icon-mat">
+        <i class="fas fa-info-circle"></i>
+    </div>
+    <div class="alert-content-mat">
+        <h4 class="alert-title-mat">Información Importante</h4>
+        <p class="alert-text-mat">
+            Completa todos los datos requeridos para continuar con el proceso de matrícula.
+            Esta información es necesaria para tu formación en el SENA.
+        </p>
+    </div>
+</div>
+
+<!-- Formulario de Matrícula -->
+<form method="POST" action="{{ url_for('aprendiz.guardar_matricula') }}" id="matriculaForm" class="matricula-form-apr">
+
+    <!-- Datos Personales -->
+    <div class="form-card-mat">
+        <div class="card-header-mat card-readonly-mat">
+            <div class="header-icon-wrapper-mat">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="header-title-wrapper-mat">
+                <h3 class="card-title-mat">Datos Personales</h3>
+                <p class="card-subtitle-mat">Información de solo lectura</p>
+            </div>
+        </div>
+        <div class="card-body-mat">
+            <div class="form-grid-mat">
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-id-card"></i> Nombres
+                    </label>
+                    <input type="text" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.nombres }}" readonly>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-id-card"></i> Apellidos
+                    </label>
+                    <input type="text" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.apellidos }}" readonly>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-fingerprint"></i> Tipo Documento
+                    </label>
+                    <input type="text" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.tipo_documento }}" readonly>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-fingerprint"></i> Documento
+                    </label>
+                    <input type="text" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.documento }}" readonly>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-phone"></i> Teléfono
+                    </label>
+                    <input type="text" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.telefono }}" readonly>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" class="form-input-mat input-readonly-mat"
+                           value="{{ aprendiz.usuario.email }}" readonly>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del Acudiente -->
+    <div class="form-card-mat">
+        <div class="card-header-mat card-info-mat">
+            <div class="header-icon-wrapper-mat">
+                <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="header-title-wrapper-mat">
+                <h3 class="card-title-mat">Datos del Acudiente</h3>
+                <p class="card-subtitle-mat">Información del responsable</p>
+            </div>
+        </div>
+        <div class="card-body-mat">
+            <div class="form-grid-mat">
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_nombres">
+                        <i class="fas fa-user"></i> Nombres del Acudiente
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="acudiente_nombres" name="acudiente_nombres"
+                           value="{{ aprendiz.acudiente_nombres or '' }}" required
+                           placeholder="Nombres completos">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_apellidos">
+                        <i class="fas fa-user"></i> Apellidos del Acudiente
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="acudiente_apellidos" name="acudiente_apellidos"
+                           value="{{ aprendiz.acudiente_apellidos or '' }}" required
+                           placeholder="Apellidos completos">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_tipo_doc">
+                        <i class="fas fa-id-card"></i> Tipo de Documento
+                        <span class="required-mat">*</span>
+                    </label>
+                    <select class="form-select-mat" id="acudiente_tipo_doc" name="acudiente_tipo_doc" required>
+                        <option value="">Seleccione...</option>
+                        <option value="CC" {% if aprendiz.acudiente_tipo_doc == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                        <option value="TI" {% if aprendiz.acudiente_tipo_doc == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                        <option value="CE" {% if aprendiz.acudiente_tipo_doc == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                        <option value="PEP" {% if aprendiz.acudiente_tipo_doc == 'PEP' %}selected{% endif %}>PEP</option>
+                        <option value="PPT" {% if aprendiz.acudiente_tipo_doc == 'PPT' %}selected{% endif %}>PPT</option>
+                    </select>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_documento">
+                        <i class="fas fa-fingerprint"></i> Número de Documento
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="acudiente_documento" name="acudiente_documento"
+                           value="{{ aprendiz.acudiente_documento or '' }}" required
+                           placeholder="Número de documento">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_lugar_expedicion">
+                        <i class="fas fa-map-marked-alt"></i> Lugar de Expedición
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="acudiente_lugar_expedicion" name="acudiente_lugar_expedicion"
+                           value="{{ aprendiz.acudiente_lugar_expedicion or '' }}" required
+                           placeholder="Ciudad donde se expidió el documento">
+                </div>
+
+                <div class="form-group-mat form-full-width-mat">
+                    <label class="form-label-mat" for="acudiente_direccion">
+                        <i class="fas fa-map-marker-alt"></i> Dirección de Residencia
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="acudiente_direccion" name="acudiente_direccion"
+                           value="{{ aprendiz.acudiente_direccion or '' }}" required
+                           placeholder="Calle, número, barrio">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_telefono">
+                        <i class="fas fa-phone"></i> Teléfono
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="tel" class="form-input-mat" id="acudiente_telefono" name="acudiente_telefono"
+                           value="{{ aprendiz.acudiente_telefono or '' }}" required
+                           placeholder="Teléfono de contacto">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="acudiente_email">
+                        <i class="fas fa-envelope"></i> Email del Acudiente
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="email" class="form-input-mat" id="acudiente_email" name="acudiente_email"
+                           value="{{ aprendiz.acudiente_email or '' }}" required
+                           placeholder="correo@ejemplo.com">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="ciudad">
+                        <i class="fas fa-city"></i> Ciudad de Residencia
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="ciudad" name="ciudad"
+                           value="{{ aprendiz.ciudad or '' }}" required
+                           placeholder="Nombre de la ciudad">
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="departamento">
+                        <i class="fas fa-map"></i> Departamento de Residencia
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" id="departamento" name="departamento"
+                           value="{{ aprendiz.departamento or '' }}" required
+                           placeholder="Nombre del departamento">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos Académicos -->
+    <div class="form-card-mat">
+        <div class="card-header-mat card-warning-mat">
+            <div class="header-icon-wrapper-mat">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="header-title-wrapper-mat">
+                <h3 class="card-title-mat">Datos Académicos</h3>
+                <p class="card-subtitle-mat">Información educativa</p>
+            </div>
+        </div>
+        <div class="card-body-mat">
+            <div class="form-grid-mat">
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="colegio_id">
+                        <i class="fas fa-school"></i> Colegio
+                        <span class="required-mat">*</span>
+                    </label>
+                    <input type="text" class="form-input-mat" style="background-color: #f3f4f6; cursor: not-allowed;"
+                           value="{% for colegio in colegios %}{% if aprendiz.colegio_id == colegio.id %}{{ colegio.nombre }}{% endif %}{% endfor %}"
+                           readonly>
+                    <input type="hidden" id="colegio_id" name="colegio_id" value="{{ aprendiz.colegio_id }}">
+                    <small class="form-hint-mat">
+                        <i class="fas fa-info-circle"></i> El colegio fue seleccionado en el registro
+                    </small>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="programa_id">
+                        <i class="fas fa-book"></i> Técnica/Programa
+                        <span class="required-mat">*</span>
+                    </label>
+                    <select class="form-select-mat" id="programa_id" name="programa_id" required>
+                        <option value="">Seleccione una técnica...</option>
+                        {% for programa in programas %}
+                        <option value="{{ programa.id }}" {% if aprendiz.programa_id == programa.id %}selected{% endif %}>
+                            {{ programa.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-hint-mat">
+                        <i class="fas fa-info-circle"></i> Seleccione la técnica que desea estudiar
+                    </small>
+                </div>
+
+                <div class="form-group-mat">
+                    <label class="form-label-mat" for="grupo_id">
+                        <i class="fas fa-users"></i> Grupo/Ficha
+                        <span class="required-mat">*</span>
+                    </label>
+                    <select class="form-select-mat" id="grupo_id" name="grupo_id" required>
+                        <option value="">Seleccione un grupo...</option>
+                        {% for grupo in grupos %}
+                        <option value="{{ grupo.id }}"
+                                data-colegio="{{ grupo.colegio_id }}"
+                                {% if aprendiz.grupo_id == grupo.id %}selected{% endif %}>
+                            {{ grupo.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="form-hint-mat">
+                        <i class="fas fa-info-circle"></i> Seleccione el grupo al que pertenecerá
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions-mat">
+        <a href="{{ url_for('aprendiz.dashboard') }}" class="btn-action-mat btn-secondary-mat">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+        <button type="submit" class="btn-action-mat btn-primary-mat" onclick="showSpinner2('Guardando matrícula...')">
+            <i class="fas fa-save"></i> Guardar Datos de Matrícula
+        </button>
+    </div>
+</form>
+
+<style>
+/* Color Scheme */
+:root {
+    --mat-primary: #39A900;
+    --mat-primary-dark: #2d8700;
+    --mat-success: #10b981;
+    --mat-warning: #f59e0b;
+    --mat-info: #3b82f6;
+    --mat-gray: #6b7280;
+}
+
+/* Matricula Header */
+.matricula-header-apr {
+    background: linear-gradient(135deg, #39A900 0%, #66BB6A 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(57, 169, 0, 0.2);
+}
+
+.header-content-mat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text-mat {
+    flex: 1;
+}
+
+.header-title-mat {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-subtitle-mat {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+}
+
+.header-icon-mat {
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.2);
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Progress Timeline - Horizontal */
+.progress-timeline-apr {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow-x: auto;
+}
+
+.timeline-step-apr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 150px;
+    position: relative;
+}
+
+.timeline-connector-apr {
+    flex: 1;
+    height: 4px;
+    background: #e5e7eb;
+    margin: 30px 10px 0 10px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.timeline-connector-apr.active {
+    background: linear-gradient(90deg, var(--mat-primary), var(--mat-success));
+}
+
+.step-icon-apr {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: 3px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.timeline-step-apr.active .step-icon-apr {
+    background: linear-gradient(135deg, var(--mat-primary), var(--mat-success));
+    border-color: var(--mat-primary);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.timeline-step-apr.completed .step-icon-apr {
+    background: linear-gradient(135deg, var(--mat-success), #34d399);
+    border-color: var(--mat-success);
+    color: white;
+}
+
+.step-content-apr {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.step-title-apr,
+.step-title-apt {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.step-subtitle-apr {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.step-status-apr {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    margin-top: 0.5rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-completed-apr {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-progress-apr {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-pending-apr {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+.status-waiting-apr {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-locked-apr {
+    background: #f3f4f6;
+    color: #9ca3af;
+}
+
+/* Info Alert */
+.info-alert-mat {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+    border-left: 4px solid var(--mat-info);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.alert-icon-mat {
+    font-size: 2rem;
+    color: var(--mat-info);
+}
+
+.alert-content-mat {
+    flex: 1;
+}
+
+.alert-title-mat {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 0 0 0.5rem 0;
+}
+
+.alert-text-mat {
+    font-size: 0.95rem;
+    color: #1e3a8a;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Form */
+.matricula-form-apr {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Form Cards */
+.form-card-mat {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.form-card-mat:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-header-mat {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-readonly-mat {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+}
+
+.card-success-mat {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.card-info-mat {
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
+}
+
+.card-warning-mat {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.header-icon-wrapper-mat {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.header-title-wrapper-mat {
+    flex: 1;
+}
+
+.card-title-mat {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.25rem 0;
+}
+
+.card-subtitle-mat {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.card-body-mat {
+    padding: 2rem;
+}
+
+/* Form Grid */
+.form-grid-mat {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.form-full-width-mat {
+    grid-column: 1 / -1;
+}
+
+/* Form Groups */
+.form-group-mat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label-mat {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label-mat i {
+    color: var(--mat-primary);
+}
+
+.required-mat {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.form-input-mat,
+.form-select-mat {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-input-mat:focus,
+.form-select-mat:focus {
+    outline: none;
+    border-color: var(--mat-primary);
+    box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.1);
+}
+
+.input-readonly-mat {
+    background: #f9fafb;
+    cursor: not-allowed;
+    color: #6b7280;
+}
+
+.form-input-mat.is-invalid {
+    border-color: #ef4444;
+}
+
+.form-hint-mat {
+    display: block;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Form Actions */
+.form-actions-mat {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 15px;
+    flex-wrap: wrap;
+}
+
+.btn-action-mat {
+    padding: 0.9rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-primary-mat {
+    background: linear-gradient(135deg, var(--mat-primary), var(--mat-primary-dark));
+    color: white;
+}
+
+.btn-primary-mat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+}
+
+.btn-secondary-mat {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary-mat:hover {
+    background: #e5e7eb;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.05); }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .form-grid-mat {
+        grid-template-columns: 1fr;
+    }
+
+    .form-full-width-mat {
+        grid-column: 1;
+    }
+
+    .progress-timeline-apr {
+        overflow-x: auto;
+        padding: 1.5rem;
+    }
+
+    .timeline-step-apr {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-title-mat {
+        font-size: 2rem;
+    }
+
+    .header-subtitle-mat {
+        font-size: 1rem;
+    }
+
+    .header-icon-mat {
+        font-size: 3rem;
+    }
+
+    .progress-timeline-apr {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .timeline-connector-apr {
+        width: 4px;
+        height: 30px;
+        margin: 10px auto;
+        background: linear-gradient(180deg, var(--mat-primary), var(--mat-success));
+    }
+
+    .timeline-connector-apr.active {
+        background: linear-gradient(180deg, var(--mat-primary), var(--mat-success));
+    }
+
+    .timeline-step-apr {
+        min-width: auto;
+        flex-direction: row;
+        text-align: left;
+        gap: 1rem;
+    }
+
+    .step-icon-apr {
+        margin-bottom: 0;
+    }
+
+    .card-body-mat {
+        padding: 1.5rem;
+    }
+
+    .form-actions-mat {
+        flex-direction: column;
+    }
+
+    .btn-action-mat {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title-mat {
+        font-size: 1.5rem;
+    }
+
+    .matricula-header-apr {
+        padding: 1.5rem;
+    }
+
+    .card-header-mat {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .step-icon-apr {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+}
+</style>
+
+<script>
+document.getElementById('matriculaForm').addEventListener('submit', function(e) {
+    const requiredFields = this.querySelectorAll('[required]');
+    let allFilled = true;
+
+    requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+            allFilled = false;
+            field.classList.add('is-invalid');
+        } else {
+            field.classList.remove('is-invalid');
+        }
+    });
+
+    if (!allFilled) {
+        e.preventDefault();
+        alert('Por favor, complete todos los campos obligatorios marcados con *');
+        // Scroll to first invalid field
+        const firstInvalid = this.querySelector('.is-invalid');
+        if (firstInvalid) {
+            firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstInvalid.focus();
+        }
+    }
+});
+
+// Remove invalid class on input
+document.querySelectorAll('.form-input-mat, .form-select-mat').forEach(field => {
+    field.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+});
+
+// ============================================
+// FILTRADO DINÁMICO DE PROGRAMAS Y GRUPOS
+// ============================================
+const colegioInput = document.getElementById('colegio_id');
+const programaSelect = document.getElementById('programa_id');
+const grupoSelect = document.getElementById('grupo_id');
+
+// Guardar todos los programas y grupos originales
+const todosProgramas = programaSelect ? Array.from(programaSelect.options).filter(opt => opt.value !== '') : [];
+const todosGrupos = grupoSelect ? Array.from(grupoSelect.options).filter(opt => opt.value !== '') : [];
+
+function filtrarProgramasYGrupos() {
+    const colegioId = colegioInput ? colegioInput.value : null;
+
+    if (!colegioId) {
+        // Si no hay colegio, limpiar programas y grupos
+        if (programaSelect) programaSelect.innerHTML = '<option value="">Seleccione una técnica...</option>';
+        if (grupoSelect) grupoSelect.innerHTML = '<option value="">Seleccione un grupo...</option>';
+        return;
+    }
+
+    // Filtrar programas por colegio usando API
+    if (programaSelect) {
+        fetch(`/admin/api/programas-por-colegio/${colegioId}`)
+            .then(res => res.json())
+            .then(data => {
+                // Actualizar programas
+                programaSelect.innerHTML = '<option value="">Seleccione una técnica...</option>';
+                data.programas.forEach(prog => {
+                    const option = document.createElement('option');
+                    option.value = prog.id;
+                    option.textContent = prog.nombre;
+                    // Mantener selección si existe
+                    if ({{ aprendiz.programa_id or 0 }} == prog.id) {
+                        option.selected = true;
+                    }
+                    programaSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error('Error al cargar programas:', err);
+                // Si falla, mostrar todos
+                programaSelect.innerHTML = '<option value="">Seleccione una técnica...</option>';
+                todosProgramas.forEach(opt => programaSelect.appendChild(opt.cloneNode(true)));
+            });
+    }
+
+    // Filtrar grupos por colegio
+    if (grupoSelect) {
+        grupoSelect.innerHTML = '<option value="">Seleccione un grupo...</option>';
+        todosGrupos.forEach(opt => {
+            const optColegio = opt.getAttribute('data-colegio');
+            if (optColegio == colegioId) {
+                grupoSelect.appendChild(opt.cloneNode(true));
+            }
+        });
+
+        // Mantener selección de grupo si existe
+        if ({{ aprendiz.grupo_id or 0 }} > 0) {
+            grupoSelect.value = {{ aprendiz.grupo_id }};
+        }
+    }
+}
+
+// Ejecutar al cargar la página si hay colegio seleccionado
+if (colegioInput && colegioInput.value) {
+    // Esperar un momento para que el DOM esté completamente cargado
+    setTimeout(filtrarProgramasYGrupos, 100);
+}
+</script>
+{% endblock %}

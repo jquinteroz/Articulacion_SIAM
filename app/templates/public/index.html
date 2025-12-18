@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero-minimal">
+    <div class="container-minimal">
+        <div class="siam-logo-hero">
+            <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" style="width: 100%; height: auto; max-width: 200px;">
+        </div>
+        <h1 class="siam-title-hero">SIAM</h1>
+        <p class="siam-subtitle-hero">CENTRO DE GESTIÓN DE MERCADOS LOGISTICA Y TECNOLOGIAS DE LA INFORMACIÓN</p>
+        <div class="sena-logo-container" style="margin: 1.5rem 0;">
+            <img src="{{ url_for('static', filename='img/sena.png') }}" alt="Logo SENA" style="max-width: 150px; height: auto;">
+        </div>
+        <p class="siam-description">Sistema Integrado de Articulación y Media Técnica</p>
+        <div class="actions-hero">
+            <a href="{{ url_for('public.login') }}" class="btn-hero btn-primary-hero">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
+            <a href="{{ url_for('public.registro') }}" class="btn-hero btn-secondary-hero">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="programas-section">
+    <div class="container-minimal">
+        <h2 class="section-title-minimal">Programas Disponibles</h2>
+        <div class="programas-grid-minimal">
+            <div class="programa-card-minimal">
+                <i class="fas fa-laptop-code"></i>
+                <h3>Programación</h3>
+            </div>
+            <div class="programa-card-minimal">
+                <i class="fas fa-network-wired"></i>
+                <h3>Sistemas</h3>
+            </div>
+            <div class="programa-card-minimal">
+                <i class="fas fa-tools"></i>
+                <h3>Mantenimiento</h3>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

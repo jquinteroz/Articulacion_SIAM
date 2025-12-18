@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <!-- Meta Tags -->
+    <meta name="description" content="SIAM - Sistema Integrado de Articulación y Media Técnica. SENA CGMLTI">
+    <meta name="keywords" content="SENA, Matrícula, Articulación, Media Técnica, CGMLTI, SIAM">
+    <meta name="author" content="SENA">
+    <meta name="theme-color" content="#39A900">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('public.index') }}" class="navbar-brand">
+                <img src="{{ url_for('static', filename='img/siam.png') }}" alt="SIAM" class="navbar-logo">
+                SIAM
+            </a>
+
+            <ul class="navbar-menu">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin() %}
+                        <li><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="{{ url_for('admin.usuarios') }}"><i class="fas fa-users"></i> Usuarios</a></li>
+                        <li><a href="{{ url_for('admin.matriculas') }}"><i class="fas fa-clipboard-list"></i> Matrículas</a></li>
+                    {% elif current_user.is_docente() %}
+                        <li><a href="{{ url_for('docente.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a href="{{ url_for('docente.matriculas') }}"><i class="fas fa-clipboard-list"></i> Matrículas</a></li>
+                    {% elif current_user.is_aprendiz() %}
+                        <li><a href="{{ url_for('aprendiz.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Mi Dashboard</a></li>
+                        <li><a href="{{ url_for('aprendiz.matricula') }}"><i class="fas fa-edit"></i> Matrícula</a></li>
+                        <li><a href="{{ url_for('aprendiz.documentos') }}"><i class="fas fa-file-upload"></i> Documentos</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('public.logout') }}" onclick="event.preventDefault(); showSpinner2('Cerrando sesión...'); setTimeout(() => window.location.href='{{ url_for('public.logout') }}', 300);"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('public.index') }}"><i class="fas fa-home"></i> Inicio</a></li>
+                    <li><a href="{{ url_for('public.programas') }}"><i class="fas fa-book"></i> Programas</a></li>
+                    <li><a href="{{ url_for('public.contacto') }}"><i class="fas fa-envelope"></i> Contacto</a></li>
+                    <li><a href="{{ url_for('public.login') }}"><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</a></li>
+                    <li><a href="{{ url_for('public.registro') }}" class="btn btn-primary">Registrarse</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Mensajes flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-info-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{ current_year() }} SENA - Servicio Nacional de Aprendizaje</p>
+            <p>SIAM - Sistema Integrado de Articulación y Media Técnica</p>
+        </div>
+    </footer>
+
+    <!-- Global Loading Spinner -->
+    <div class="global-spinner-overlay" id="globalSpinner">
+        <div class="global-spinner-container">
+            <div class="global-spinner-logo">
+                <div class="global-spinner-ring"></div>
+                <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Cargando...">
+            </div>
+            <div class="global-spinner-text" id="spinnerText">Procesando...</div>
+            <div class="global-spinner-subtext">Por favor espera</div>
+        </div>
+    </div>
+
+    <!-- Spinner2 - Alternative spinner with spinner2.png -->
+    <div class="spinner2-overlay" id="spinner2">
+        <div class="spinner2-container">
+            <div class="spinner2-logo">
+                <img src="{{ url_for('static', filename='img/spinner2.png') }}" alt="Cargando..." class="spinner2-image">
+            </div>
+            <div class="spinner2-text" id="spinner2Text">Procesando...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    // Funciones globales para el spinner
+    function showSpinner(message = 'Procesando...') {
+        const spinner = document.getElementById('globalSpinner');
+        const spinnerText = document.getElementById('spinnerText');
+        if (spinnerText) spinnerText.textContent = message;
+        if (spinner) spinner.classList.add('active');
+    }
+
+    function hideSpinner() {
+        const spinner = document.getElementById('globalSpinner');
+        if (spinner) spinner.classList.remove('active');
+    }
+
+    // Funciones para spinner2
+    function showSpinner2(message = 'Procesando...') {
+        const spinner = document.getElementById('spinner2');
+        const spinnerText = document.getElementById('spinner2Text');
+        if (spinnerText) spinnerText.textContent = message;
+        if (spinner) spinner.classList.add('active');
+    }
+
+    function hideSpinner2() {
+        const spinner = document.getElementById('spinner2');
+        if (spinner) spinner.classList.remove('active');
+    }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

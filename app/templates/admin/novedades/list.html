@@ -1,0 +1,123 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Novedades - Admin{% endblock %}
+
+{% block page_title %}<i class="fas fa-bell"></i> Gestión de Novedades{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Novedades</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('admin.crear_novedad') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nueva Novedad
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <!-- Filtros -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar novedad...">
+            </div>
+            <div class="col-md-3">
+                <select id="tipoFilter" class="form-control">
+                    <option value="">Todos los tipos</option>
+                    <option value="INFORMACION">Información</option>
+                    <option value="IMPORTANTE">Importante</option>
+                    <option value="URGENTE">Urgente</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select id="estadoFilter" class="form-control">
+                    <option value="">Todos los estados</option>
+                    <option value="true">Activas</option>
+                    <option value="false">Inactivas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="table table-hover" id="novedadesTable">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Descripción</th>
+                        <th>Fecha Creación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for novedad in novedades %}
+                    <tr data-tipo="{{ novedad.tipo }}" data-activo="{{ novedad.activo }}">
+                        <td><strong>{{ novedad.titulo }}</strong></td>
+                        <td>{{ novedad.contenido[:80] }}...</td>
+                        <td>{{ novedad.fecha_publicacion.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if novedad.activo else 'secondary' }}">
+                                {{ 'Activa' if novedad.activo else 'Inactiva' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.editar_novedad', novedad_id=novedad.id) }}"
+                               class="btn btn-sm btn-info" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('admin.eliminar_novedad', novedad_id=novedad.id) }}"
+                                  style="display:inline;" onsubmit="return confirm('¿Está seguro de eliminar esta novedad?')">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not novedades %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No hay novedades registradas
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('tipoFilter').addEventListener('change', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const tipo = document.getElementById('tipoFilter').value;
+    const estado = document.getElementById('estadoFilter').value;
+    const rows = document.querySelectorAll('#novedadesTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowTipo = row.dataset.tipo;
+        const rowActivo = row.dataset.activo;
+
+        const matchSearch = text.includes(search);
+        const matchTipo = !tipo || rowTipo === tipo;
+        const matchEstado = !estado || rowActivo === estado;
+
+        row.style.display = matchSearch && matchTipo && matchEstado ? '' : 'none';
+    });
+}
+</script>
+
+<style>
+.badge-info { background-color: #17a2b8; }
+.badge-warning { background-color: #ffc107; color: #000; }
+.badge-danger { background-color: #dc3545; }
+</style>
+{% endblock %}

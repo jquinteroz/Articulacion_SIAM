@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ programa.nombre }} - SIAM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/programas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="programa-detalle-container">
+    <div class="programa-detalle-wrapper">
+        <!-- Header con título y botón volver -->
+        <div class="programa-detalle-header">
+            <div class="programa-detalle-top">
+                <h1 class="programa-detalle-titulo">{{ programa.nombre }}</h1>
+                <a href="{{ url_for('public.programas') }}" class="btn-volver-programas">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </a>
+            </div>
+
+            <div class="programa-detalle-badges">
+                {% if programa.activo %}
+                <span class="badge-detalle badge-activo">
+                    <i class="fas fa-check-circle"></i> Activo
+                </span>
+                {% else %}
+                <span class="badge-detalle badge-inactivo">
+                    <i class="fas fa-times-circle"></i> Inactivo
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Body con información -->
+        <div class="programa-detalle-body">
+            <!-- Sección de Información -->
+            <div class="programa-info-section">
+                <h3><i class="fas fa-info-circle"></i> Información General</h3>
+                <ul class="programa-info-list">
+                    <li>
+                        <i class="fas fa-barcode"></i>
+                        <div>
+                            <strong>Código del Programa</strong>
+                            <span>{{ programa.codigo }}</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>Duración Total</strong>
+                            <span>{{ programa.duracion_horas }} horas</span>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-graduation-cap"></i>
+                        <div>
+                            <strong>Nivel de Formación</strong>
+                            <span>Técnico</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Sección de Descripción -->
+            <div class="programa-info-section programa-descripcion-section">
+                <h3><i class="fas fa-align-left"></i> Descripción del Programa</h3>
+                <p class="programa-descripcion-text">{{ programa.descripcion }}</p>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        {% if not current_user.is_authenticated %}
+        <div class="programa-cta-section">
+            <h3>¿Interesado en este programa?</h3>
+            <p>Regístrate ahora y comienza tu camino hacia la formación técnica con el SENA</p>
+            <a href="{{ url_for('public.registro') }}" class="btn-registrarse-programa">
+                <i class="fas fa-user-plus"></i> Registrarse Ahora
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

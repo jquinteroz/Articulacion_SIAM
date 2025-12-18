@@ -1,0 +1,703 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Reportes - Administrador{% endblock %}
+
+{% block page_title %}<i class="fas fa-chart-bar"></i> Reportes y Estadísticas{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Reportes</span>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="reports-header">
+    <div class="header-content">
+        <div class="header-text">
+            <h1 class="header-title">Generar Reportes</h1>
+            <p class="header-subtitle">Genere y descargue reportes personalizados en formato Excel</p>
+        </div>
+        <div class="header-icon">
+            <i class="fas fa-file-excel"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Main Grid -->
+<div class="reports-grid">
+    <!-- Generator Form Card -->
+    <div class="generator-card">
+        <div class="card-modern-rep">
+            <div class="card-header-rep">
+                <h2 class="card-title-rep">
+                    <i class="fas fa-sliders-h"></i> Configurar Reporte Personalizado
+                </h2>
+            </div>
+            <div class="card-body-rep">
+                <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                    <!-- Tipo de Reporte -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-file-alt"></i> Tipo de Reporte *
+                        </label>
+                        <select name="tipo_reporte" id="tipo_reporte" class="form-select-rep" required>
+                            <option value="">-- Seleccione un tipo --</option>
+                            <option value="matriculas">📋 Matrículas</option>
+                            <option value="aprendices">👨‍🎓 Aprendices</option>
+                            <option value="documentos">📁 Estado de Documentos</option>
+                            <option value="colegios">🏫 Por Colegio</option>
+                            <option value="programas">📚 Por Programa</option>
+                            <option value="sofia">🟧 Formato SENA (SOFIA Plus)</option>
+                            <option value="completo">📊 Reporte Completo</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Colegio -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-school"></i> Colegio
+                        </label>
+                        <select name="colegio_id" id="colegio_id" class="form-select-rep">
+                            <option value="">Todos los colegios</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Programa -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-graduation-cap"></i> Programa
+                        </label>
+                        <select name="programa_id" id="programa_id" class="form-select-rep">
+                            <option value="">Todos los programas</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Grupo -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-users"></i> Grupo
+                        </label>
+                        <select name="grupo_id" id="grupo_id" class="form-select-rep">
+                            <option value="">Todos los grupos</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}">{{ grupo.nombre }} - {{ grupo.programa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Estado -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-flag"></i> Estado
+                        </label>
+                        <select name="estado" id="estado" class="form-select-rep">
+                            <option value="">Todos los estados</option>
+                            <option value="BORRADOR">Borrador</option>
+                            <option value="ENVIADO">Enviado</option>
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="COMPLETO">Completo</option>
+                            <option value="PREMATRICULA">Pre-matrícula</option>
+                            <option value="MATRICULADO">Matriculado</option>
+                            <option value="RECHAZADO">Rechazado</option>
+                        </select>
+                    </div>
+
+                    <!-- Rango de Fechas -->
+                    <div class="form-group-rep">
+                        <label class="form-label-rep">
+                            <i class="fas fa-calendar"></i> Rango de Fechas
+                        </label>
+                        <div class="date-range-grid">
+                            <input type="date" name="fecha_desde" class="form-input-rep" placeholder="Desde">
+                            <input type="date" name="fecha_hasta" class="form-input-rep" placeholder="Hasta">
+                        </div>
+                    </div>
+
+                    <!-- Botón de Generar -->
+                    <button type="submit" class="btn-generate">
+                        <i class="fas fa-file-excel"></i> Generar Reporte Excel
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Reports Section -->
+    <div class="quick-reports-section">
+        <!-- Quick Reports Header -->
+        <div class="card-modern-rep">
+            <div class="card-header-rep">
+                <h2 class="card-title-rep">
+                    <i class="fas fa-bolt"></i> Reportes Rápidos
+                </h2>
+            </div>
+            <div class="card-body-rep">
+                <div class="quick-reports-grid">
+                    <!-- Todas las Matrículas -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-primary">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Todas las Matrículas</h3>
+                                <p>Listado completo</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <button type="submit" class="btn-quick-report btn-qr-primary">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Matrículas Pendientes -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-warning">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Pendientes</h3>
+                                <p>Requieren revisión</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <input type="hidden" name="estado" value="PENDIENTE">
+                            <button type="submit" class="btn-quick-report btn-qr-warning">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Matrículas Completas -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Completas</h3>
+                                <p>Proceso finalizado</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <input type="hidden" name="estado" value="COMPLETO">
+                            <button type="submit" class="btn-quick-report btn-qr-success">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Todos los Aprendices -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-info">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Aprendices</h3>
+                                <p>Base de datos completa</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="aprendices">
+                            <button type="submit" class="btn-quick-report btn-qr-info">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Estado de Documentos -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-secondary">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Documentos</h3>
+                                <p>Estado por matrícula</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="documentos">
+                            <button type="submit" class="btn-quick-report btn-qr-secondary">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Por Colegios -->
+                    <div class="quick-report-item">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-dark">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Por Colegio</h3>
+                                <p>Estadísticas institucionales</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="colegios">
+                            <button type="submit" class="btn-quick-report btn-qr-dark">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reporte SENA -->
+                    <div class="quick-report-item quick-report-sena" style="grid-column: span 2;">
+                        <div class="quick-report-header">
+                            <div class="quick-report-icon qr-sena">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div class="quick-report-info">
+                                <h3>Formato SENA (SOFIA Plus)</h3>
+                                <p>Seleccione colegio o grupo específico</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}" style="width: 100%;">
+                            <input type="hidden" name="tipo_reporte" value="sofia">
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                                <!-- Filtro Colegio -->
+                                <div class="form-group-rep" style="margin: 0;">
+                                    <label class="form-label-rep" style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-school"></i> Colegio
+                                    </label>
+                                    <select name="colegio_id" id="colegio_sena" class="form-select-rep" onchange="filterGruposSena(this.value)">
+                                        <option value="">Todos los colegios</option>
+                                        {% for colegio in colegios %}
+                                        <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Filtro Programa -->
+                                <div class="form-group-rep" style="margin: 0;">
+                                    <label class="form-label-rep" style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-graduation-cap"></i> Programa
+                                    </label>
+                                    <select name="programa_id" id="programa_sena" class="form-select-rep">
+                                        <option value="">Todos los programas</option>
+                                        {% for programa in programas %}
+                                        <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Filtro Grupo -->
+                                <div class="form-group-rep" style="margin: 0;">
+                                    <label class="form-label-rep" style="font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                        <i class="fas fa-users"></i> Grupo/Ficha
+                                    </label>
+                                    <select name="grupo_id" id="grupo_sena" class="form-select-rep">
+                                        <option value="">Todos los grupos</option>
+                                        {% for grupo in grupos %}
+                                        <option value="{{ grupo.id }}" data-colegio="{{ grupo.colegio_id }}">
+                                            {{ grupo.nombre }} - {{ grupo.programa.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-quick-report btn-qr-sena" style="width: 100%;">
+                                <i class="fas fa-download"></i> Generar Formato SOFIA
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card-modern-rep info-card">
+            <div class="card-header-rep">
+                <h2 class="card-title-rep">
+                    <i class="fas fa-info-circle"></i> Información
+                </h2>
+            </div>
+            <div class="card-body-rep">
+                <ul class="info-list">
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Los reportes se generan en formato Excel (.xlsx)</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Puede aplicar múltiples filtros para personalizar el reporte</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Los reportes rápidos generan datos sin configuración adicional</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Use el rango de fechas para limitar por período</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check"></i>
+                        <span>Los datos incluyen toda la información disponible</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --rep-primary: #667eea;
+    --rep-success: #39A900;
+    --rep-warning: #FFA000;
+    --rep-danger: #D32F2F;
+    --rep-info: #1976D2;
+    --rep-secondary: #6c757d;
+    --rep-dark: #424242;
+    --rep-sena: #FF6B35;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --bg-light: #f7fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Header Section */
+.reports-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text {
+    flex: 1;
+}
+
+.header-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.header-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.header-icon {
+    font-size: 4rem;
+    opacity: 0.2;
+}
+
+/* Main Grid */
+.reports-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 2rem;
+}
+
+/* Modern Card */
+.card-modern-rep {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.card-header-rep {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-title-rep {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-body-rep {
+    padding: 1.5rem;
+}
+
+/* Form Elements */
+.form-group-rep {
+    margin-bottom: 1.5rem;
+}
+
+.form-label-rep {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-select-rep,
+.form-input-rep {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.form-select-rep:focus,
+.form-input-rep:focus {
+    outline: none;
+    border-color: var(--rep-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.date-range-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.btn-generate {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--rep-success) 0%, #2d8a00 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(57, 169, 0, 0.3);
+}
+
+/* Quick Reports Grid */
+.quick-reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.quick-report-item {
+    background: var(--bg-light);
+    padding: 1.25rem;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.quick-report-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--qr-color);
+}
+
+.quick-report-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.quick-report-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.qr-primary { background: var(--rep-primary); --qr-color: var(--rep-primary); }
+.qr-warning { background: var(--rep-warning); --qr-color: var(--rep-warning); }
+.qr-success { background: var(--rep-success); --qr-color: var(--rep-success); }
+.qr-info { background: var(--rep-info); --qr-color: var(--rep-info); }
+.qr-secondary { background: var(--rep-secondary); --qr-color: var(--rep-secondary); }
+.qr-dark { background: var(--rep-dark); --qr-color: var(--rep-dark); }
+.qr-sena { background: var(--rep-sena); --qr-color: var(--rep-sena); }
+
+.quick-report-info {
+    flex: 1;
+}
+
+.quick-report-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.quick-report-info p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.btn-quick-report {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-quick-report:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-qr-primary { background: var(--rep-primary); }
+.btn-qr-warning { background: var(--rep-warning); }
+.btn-qr-success { background: var(--rep-success); }
+.btn-qr-info { background: var(--rep-info); }
+.btn-qr-secondary { background: var(--rep-secondary); }
+.btn-qr-dark { background: var(--rep-dark); }
+.btn-qr-sena { background: var(--rep-sena); }
+
+/* Destacar reporte SENA */
+.quick-report-sena {
+    border: 2px solid var(--rep-sena);
+    background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);
+}
+
+.quick-report-sena:hover {
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.25);
+}
+
+/* Info Card */
+.info-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.info-list li i {
+    color: var(--rep-success);
+    font-size: 1rem;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.info-list li span {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+    }
+
+    .header-icon {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .quick-reports-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .date-range-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+<script>
+function filterGruposSena(colegioId) {
+    const grupoSelect = document.getElementById('grupo_sena');
+    const options = grupoSelect.querySelectorAll('option');
+
+    options.forEach(option => {
+        if (option.value === '') {
+            option.style.display = '';
+            return;
+        }
+
+        const optionColegioId = option.getAttribute('data-colegio');
+        if (!colegioId || optionColegioId === colegioId) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+
+    grupoSelect.value = '';
+}
+</script>

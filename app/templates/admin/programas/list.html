@@ -1,0 +1,98 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Programas - Admin{% endblock %}
+
+{% block page_title %}<i class="fas fa-book"></i> Gestión de Programas{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Programas</span>
+{% endblock %}
+
+{% block topbar_actions %}
+<a href="{{ url_for('admin.crear_programa') }}" class="btn btn-primary">
+    <i class="fas fa-plus"></i> Nuevo Programa
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar programa...">
+            </div>
+            <div class="col-md-4">
+                <select id="estadoFilter" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="true">Activos</option>
+                    <option value="false">Inactivos</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover" id="programasTable">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Duración</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for programa in programas %}
+                    <tr data-activo="{{ programa.activo }}">
+                        <td><code>{{ programa.codigo }}</code></td>
+                        <td><strong>{{ programa.nombre }}</strong></td>
+                        <td>{{ programa.descripcion[:80] if programa.descripcion else '-' }}...</td>
+                        <td><span class="badge badge-info">{{ programa.duracion_horas }} hrs</span></td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if programa.activo else 'secondary' }}">
+                                {{ 'Activo' if programa.activo else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.editar_programa', programa_id=programa.id) }}" class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form method="POST" action="{{ url_for('admin.eliminar_programa', programa_id=programa.id) }}" style="display:inline;" onsubmit="return confirm('¿Eliminar este programa?')">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not programas %}
+        <div class="alert alert-info">No hay programas registrados</div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const estado = document.getElementById('estadoFilter').value;
+    const rows = document.querySelectorAll('#programasTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const activo = row.dataset.activo;
+        const matchSearch = text.includes(search);
+        const matchEstado = !estado || activo === estado;
+        row.style.display = matchSearch && matchEstado ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

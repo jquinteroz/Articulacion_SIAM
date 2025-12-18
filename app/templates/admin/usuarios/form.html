@@ -1,0 +1,872 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ 'Editar' if usuario else 'Crear' }} Usuario - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-form-usr">
+    <div class="header-content-form-usr">
+        <nav class="breadcrumb-form-usr">
+            <a href="{{ url_for('admin.dashboard') }}" class="breadcrumb-link-form-usr">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-form-usr">/</span>
+            <a href="{{ url_for('admin.usuarios') }}" class="breadcrumb-link-form-usr">
+                Usuarios
+            </a>
+            <span class="breadcrumb-sep-form-usr">/</span>
+            <span class="breadcrumb-active-form-usr">{{ 'Editar' if usuario else 'Crear' }}</span>
+        </nav>
+        <h1 class="page-title-form-usr">
+            <i class="fas fa-{% if usuario %}user-edit{% else %}user-plus{% endif %}"></i>
+            {{ 'Editar Usuario' if usuario else 'Crear Nuevo Usuario' }}
+        </h1>
+        <p class="page-subtitle-form-usr">
+            {% if usuario %}
+            Modifique la información del usuario en el sistema
+            {% else %}
+            Complete el formulario para agregar un nuevo usuario
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Form Container -->
+<div class="form-container-usr">
+    <form method="POST" id="usuarioForm" class="user-form-usr">
+
+        <!-- Sección: Información Personal -->
+        <div class="form-card-usr">
+            <div class="form-card-header-usr">
+                <div class="form-card-icon-usr">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3 class="form-card-title-usr">Información Personal</h3>
+            </div>
+            <div class="form-card-body-usr">
+                <div class="form-row-usr">
+                    <div class="form-group-usr">
+                        <label for="tipo_documento" class="form-label-usr">
+                            <i class="fas fa-id-card"></i> Tipo de Documento
+                            <span class="required-usr">*</span>
+                        </label>
+                        <select name="tipo_documento" id="tipo_documento" class="form-select-usr" required>
+                            <option value="CC" {% if usuario and usuario.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                            <option value="TI" {% if usuario and usuario.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                            <option value="CE" {% if usuario and usuario.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                            <option value="PEP" {% if usuario and usuario.tipo_documento == 'PEP' %}selected{% endif %}>PEP</option>
+                            <option value="PPT" {% if usuario and usuario.tipo_documento == 'PPT' %}selected{% endif %}>PPT</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="documento" class="form-label-usr">
+                            <i class="fas fa-hashtag"></i> Número de Documento
+                            <span class="required-usr">*</span>
+                        </label>
+                        <input type="text"
+                               name="documento"
+                               id="documento"
+                               class="form-input-usr {% if usuario %}readonly-usr{% endif %}"
+                               value="{{ usuario.documento if usuario else '' }}"
+                               required
+                               maxlength="20"
+                               {% if usuario %}readonly{% endif %}>
+                        {% if usuario %}
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i> El documento no se puede modificar
+                        </small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row-usr">
+                    <div class="form-group-usr">
+                        <label for="nombres" class="form-label-usr">
+                            <i class="fas fa-signature"></i> Nombres
+                            <span class="required-usr">*</span>
+                        </label>
+                        <input type="text"
+                               name="nombres"
+                               id="nombres"
+                               class="form-input-usr"
+                               value="{{ usuario.nombres if usuario else '' }}"
+                               required
+                               maxlength="100"
+                               placeholder="Nombres completos">
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="apellidos" class="form-label-usr">
+                            <i class="fas fa-signature"></i> Apellidos
+                            <span class="required-usr">*</span>
+                        </label>
+                        <input type="text"
+                               name="apellidos"
+                               id="apellidos"
+                               class="form-input-usr"
+                               value="{{ usuario.apellidos if usuario else '' }}"
+                               required
+                               maxlength="100"
+                               placeholder="Apellidos completos">
+                    </div>
+                </div>
+
+                <div class="form-row-usr">
+                    <div class="form-group-usr">
+                        <label for="fecha_nacimiento" class="form-label-usr">
+                            <i class="fas fa-calendar-alt"></i> Fecha de Nacimiento
+                            {% if usuario and usuario.rol == 'APRENDIZ' %}<span class="required-usr">*</span>{% endif %}
+                        </label>
+                        <input type="date"
+                               name="fecha_nacimiento"
+                               id="fecha_nacimiento"
+                               class="form-input-usr"
+                               value="{{ usuario.fecha_nacimiento.strftime('%Y-%m-%d') if usuario and usuario.fecha_nacimiento else '' }}"
+                               max="{{ today }}"
+                               {% if usuario and usuario.rol == 'APRENDIZ' %}required{% endif %}
+                               placeholder="Seleccione la fecha">
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i> {% if usuario %}Solo admin/docente pueden modificar este campo{% else %}Requerido para aprendices{% endif %}
+                        </small>
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="email" class="form-label-usr">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                            <span class="required-usr">*</span>
+                        </label>
+                        <input type="email"
+                               name="email"
+                               id="email"
+                               class="form-input-usr"
+                               value="{{ usuario.email if usuario else '' }}"
+                               required
+                               maxlength="150"
+                               placeholder="correo@ejemplo.com">
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="telefono" class="form-label-usr">
+                            <i class="fas fa-phone"></i> Teléfono
+                        </label>
+                        <input type="tel"
+                               name="telefono"
+                               id="telefono"
+                               class="form-input-usr"
+                               value="{{ usuario.telefono if usuario else '' }}"
+                               maxlength="20"
+                               placeholder="3001234567">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Rol y Acceso -->
+        <div class="form-card-usr">
+            <div class="form-card-header-usr">
+                <div class="form-card-icon-usr">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="form-card-title-usr">Rol y Acceso</h3>
+            </div>
+            <div class="form-card-body-usr">
+                <div class="form-row-usr">
+                    <div class="form-group-usr">
+                        <label for="rol" class="form-label-usr">
+                            <i class="fas fa-user-tag"></i> Rol del Usuario
+                            <span class="required-usr">*</span>
+                        </label>
+                        <select name="rol" id="rol" class="form-select-usr" required>
+                            <option value="">Seleccione un rol...</option>
+                            <option value="APRENDIZ" {% if usuario and usuario.rol == 'APRENDIZ' %}selected{% endif %}>
+                                👨‍🎓 Aprendiz
+                            </option>
+                            <option value="DOCENTE" {% if usuario and usuario.rol == 'DOCENTE' %}selected{% endif %}>
+                                👨‍🏫 Docente Enlace
+                            </option>
+                            <option value="ADMINISTRADOR" {% if usuario and usuario.rol == 'ADMINISTRADOR' %}selected{% endif %}>
+                                🛡️ Administrador
+                            </option>
+                            <option value="RECTOR" {% if usuario and usuario.rol == 'RECTOR' %}selected{% endif %}>
+                                👔 Rector
+                            </option>
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            Aprendiz: Estudiante | Docente: Profesor enlace | Admin: Control total | Rector: Dirección
+                        </small>
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="activo" class="form-label-usr">
+                            <i class="fas fa-toggle-on"></i> Estado del Usuario
+                        </label>
+                        <div class="toggle-container-usr">
+                            <label class="toggle-switch-usr">
+                                <input type="checkbox"
+                                       name="activo"
+                                       id="activo"
+                                       {% if not usuario or usuario.activo %}checked{% endif %}>
+                                <span class="toggle-slider-usr"></span>
+                            </label>
+                            <span class="toggle-label-usr" id="toggleLabel">
+                                {{ 'Usuario Activo' if not usuario or usuario.activo else 'Usuario Inactivo' }}
+                            </span>
+                        </div>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            Los usuarios inactivos no pueden acceder al sistema
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Campos para APRENDIZ (Colegio, Grupo, Programa) -->
+                {% if usuario and usuario.rol == 'APRENDIZ' %}
+                <div class="form-row-usr" id="aprendizInfoRow" style="margin-top: 1rem;">
+                    <div class="form-group-usr">
+                        <label for="colegio_id" class="form-label-usr">
+                            <i class="fas fa-school"></i> Colegio Asignado
+                        </label>
+                        <select name="colegio_id" id="colegio_id" class="form-select-usr">
+                            <option value="">Sin asignar</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}"
+                                {% if usuario.aprendiz and usuario.aprendiz.colegio_id == colegio.id %}selected{% endif %}>
+                                {{ colegio.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            El colegio al que pertenece el aprendiz
+                        </small>
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="programa_id" class="form-label-usr">
+                            <i class="fas fa-book"></i> Programa Asignado
+                        </label>
+                        <select name="programa_id" id="programa_id" class="form-select-usr">
+                            <option value="">Sin asignar</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}"
+                                {% if usuario.aprendiz and usuario.aprendiz.programa_id == programa.id %}selected{% endif %}>
+                                {{ programa.nombre }} ({{ programa.codigo }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            El programa de formación del aprendiz
+                        </small>
+                    </div>
+                </div>
+
+                <div class="form-row-usr" id="grupoAprendizRow" style="margin-top: 0;">
+                    <div class="form-group-usr">
+                        <label for="grupo_id" class="form-label-usr">
+                            <i class="fas fa-users"></i> Grupo/Ficha Asignada
+                        </label>
+                        <select name="grupo_id" id="grupo_id" class="form-select-usr">
+                            <option value="">Sin asignar</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}"
+                                data-colegio="{{ grupo.colegio_id }}"
+                                {% if usuario.aprendiz and usuario.aprendiz.grupo_id == grupo.id %}selected{% endif %}>
+                                {{ grupo.nombre }} - {{ grupo.colegio.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            La ficha o grupo al que pertenece el aprendiz
+                        </small>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Campo de Colegio (para DOCENTE) -->
+                <div class="form-row-usr" id="colegioDocenteRow" style="margin-top: 1rem; display: none;">
+                    <div class="form-group-usr">
+                        <label for="colegio_docente_id" class="form-label-usr">
+                            <i class="fas fa-school"></i> Colegio Asignado (Docente Enlace)
+                        </label>
+                        {% if usuario %}
+                        {% set colegio_actual = colegios | selectattr('docente_enlace_id', 'equalto', usuario.id) | first %}
+                        {% endif %}
+                        <select name="colegio_docente_id" id="colegio_docente_id" class="form-select-usr">
+                            <option value="">Sin asignar</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}"
+                                {% if usuario and colegio_actual and colegio.id == colegio_actual.id %}selected{% endif %}>
+                                {{ colegio.nombre }}
+                                {% if usuario and colegio.docente_enlace_id and colegio.docente_enlace_id != usuario.id %}
+                                    (Ya tiene docente enlace asignado)
+                                {% elif not usuario and colegio.docente_enlace_id %}
+                                    (Ya tiene docente enlace asignado)
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            El colegio donde este docente será el enlace con el SENA
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Campo de Colegio (para RECTOR) -->
+                <div class="form-row-usr" id="colegioRectorRow" style="margin-top: 1rem; display: none;">
+                    <div class="form-group-usr">
+                        <label for="colegio_rector_id" class="form-label-usr">
+                            <i class="fas fa-school"></i> Colegio Asignado (Rector)
+                        </label>
+                        {% if usuario %}
+                        {% set colegio_actual_rector = colegios | selectattr('rector_id', 'equalto', usuario.id) | first %}
+                        {% endif %}
+                        <select name="colegio_rector_id" id="colegio_rector_id" class="form-select-usr">
+                            <option value="">Sin asignar</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}"
+                                {% if usuario and colegio_actual_rector and colegio.id == colegio_actual_rector.id %}selected{% endif %}>
+                                {{ colegio.nombre }}
+                                {% if usuario and colegio.rector_id and colegio.rector_id != usuario.id %}
+                                    (Ya tiene rector asignado)
+                                {% elif not usuario and colegio.rector_id %}
+                                    (Ya tiene rector asignado)
+                                {% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-usr">
+                            <i class="fas fa-info-circle"></i>
+                            El colegio donde esta persona es rector(a)
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Contraseña -->
+        <div class="form-card-usr">
+            <div class="form-card-header-usr">
+                <div class="form-card-icon-usr">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3 class="form-card-title-usr">
+                    {% if usuario %}
+                    Cambiar Contraseña (Opcional)
+                    {% else %}
+                    Contraseña
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="form-card-body-usr">
+                {% if usuario %}
+                <div class="alert-info-usr">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Deja estos campos en blanco si no deseas cambiar la contraseña actual</span>
+                </div>
+                {% endif %}
+
+                <div class="form-row-usr">
+                    <div class="form-group-usr">
+                        <label for="password" class="form-label-usr">
+                            <i class="fas fa-lock"></i> {{ 'Nueva ' if usuario else '' }}Contraseña
+                            {% if not usuario %}<span class="required-usr">*</span>{% endif %}
+                        </label>
+                        <input type="password"
+                               name="password"
+                               id="password"
+                               class="form-input-usr"
+                               {% if not usuario %}required{% endif %}
+                               minlength="6"
+                               placeholder="Mínimo 6 caracteres">
+                        <small class="form-hint-usr">
+                            <i class="fas fa-shield-alt"></i> Mínimo 6 caracteres
+                        </small>
+                    </div>
+
+                    <div class="form-group-usr">
+                        <label for="password_confirm" class="form-label-usr">
+                            <i class="fas fa-lock"></i> Confirmar {{ 'Nueva ' if usuario else '' }}Contraseña
+                            {% if not usuario %}<span class="required-usr">*</span>{% endif %}
+                        </label>
+                        <input type="password"
+                               name="password_confirm"
+                               id="password_confirm"
+                               class="form-input-usr"
+                               {% if not usuario %}required{% endif %}
+                               minlength="6"
+                               placeholder="Repita la contraseña">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions-usr">
+            <button type="submit" class="btn-submit-usr">
+                <i class="fas fa-save"></i>
+                {{ 'Actualizar Usuario' if usuario else 'Crear Usuario' }}
+            </button>
+            <a href="{{ url_for('admin.usuarios') }}" class="btn-cancel-usr">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Toggle activo/inactivo text
+document.getElementById('activo').addEventListener('change', function() {
+    const label = document.getElementById('toggleLabel');
+    label.textContent = this.checked ? 'Usuario Activo' : 'Usuario Inactivo';
+});
+
+// Mostrar/ocultar selector de colegio según el rol
+const rolSelect = document.getElementById('rol');
+const colegioDocenteRow = document.getElementById('colegioDocenteRow');
+const colegioRectorRow = document.getElementById('colegioRectorRow');
+
+function actualizarCamposColegio() {
+    const rolSeleccionado = rolSelect.value;
+
+    // Ocultar todos por defecto
+    if (colegioDocenteRow) colegioDocenteRow.style.display = 'none';
+    if (colegioRectorRow) colegioRectorRow.style.display = 'none';
+
+    // Mostrar según el rol
+    if (rolSeleccionado === 'DOCENTE' && colegioDocenteRow) {
+        colegioDocenteRow.style.display = 'block';
+    } else if (rolSeleccionado === 'RECTOR' && colegioRectorRow) {
+        colegioRectorRow.style.display = 'block';
+    }
+}
+
+// Ejecutar al cargar la página
+if (rolSelect) {
+    actualizarCamposColegio();
+    rolSelect.addEventListener('change', actualizarCamposColegio);
+}
+
+// Filtrar programas por colegio seleccionado
+const colegioSelect = document.getElementById('colegio_id');
+const programaSelect = document.getElementById('programa_id');
+
+if (colegioSelect && programaSelect) {
+    const todosProgramas = Array.from(programaSelect.options).filter(opt => opt.value !== '');
+
+    colegioSelect.addEventListener('change', function() {
+        const colegioId = this.value;
+
+        // Limpiar programas
+        programaSelect.innerHTML = '<option value="">Sin asignar</option>';
+
+        if (colegioId) {
+            // Filtrar programas por colegio
+            fetch(`/admin/api/programas-por-colegio/${colegioId}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.programas.forEach(prog => {
+                        const option = document.createElement('option');
+                        option.value = prog.id;
+                        option.textContent = `${prog.nombre} (${prog.codigo})`;
+                        programaSelect.appendChild(option);
+                    });
+                })
+                .catch(err => {
+                    console.error('Error al cargar programas:', err);
+                    // Si falla, mostrar todos
+                    todosProgramas.forEach(opt => programaSelect.appendChild(opt.cloneNode(true)));
+                });
+        } else {
+            // Si no hay colegio, mostrar todos los programas
+            todosProgramas.forEach(opt => programaSelect.appendChild(opt.cloneNode(true)));
+        }
+    });
+}
+
+// Validar que las contraseñas coincidan
+document.getElementById('usuarioForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const passwordConfirm = document.getElementById('password_confirm').value;
+
+    {% if not usuario %}
+    // Para crear usuario, las contraseñas son obligatorias
+    if (password !== passwordConfirm) {
+        e.preventDefault();
+        alert('❌ Las contraseñas no coinciden. Por favor, verifique e intente nuevamente.');
+        document.getElementById('password_confirm').focus();
+        return false;
+    }
+    if (password.length < 6) {
+        e.preventDefault();
+        alert('❌ La contraseña debe tener al menos 6 caracteres.');
+        document.getElementById('password').focus();
+        return false;
+    }
+    {% else %}
+    // Para editar, solo validar si se ingresó una contraseña
+    if (password || passwordConfirm) {
+        if (password !== passwordConfirm) {
+            e.preventDefault();
+            alert('❌ Las contraseñas no coinciden. Por favor, verifique e intente nuevamente.');
+            document.getElementById('password_confirm').focus();
+            return false;
+        }
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('❌ La contraseña debe tener al menos 6 caracteres.');
+            document.getElementById('password').focus();
+            return false;
+        }
+    }
+    {% endif %}
+});
+</script>
+
+<style>
+:root {
+    --usr-form-primary: #667eea;
+    --usr-form-primary-dark: #5568d3;
+    --usr-form-secondary: #764ba2;
+    --usr-form-success: #48bb78;
+    --usr-form-danger: #f56565;
+    --usr-form-text: #1a202c;
+    --usr-form-text-secondary: #4a5568;
+    --usr-form-text-muted: #718096;
+    --usr-form-bg: #f7fafc;
+    --usr-form-border: #e2e8f0;
+    --usr-form-white: #ffffff;
+}
+
+/* Header Section */
+.header-section-form-usr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content-form-usr {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.breadcrumb-form-usr {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link-form-usr {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link-form-usr:hover {
+    color: white;
+}
+
+.breadcrumb-sep-form-usr {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-form-usr {
+    color: white;
+    font-weight: 500;
+}
+
+.page-title-form-usr {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-title-form-usr i {
+    margin-right: 0.75rem;
+}
+
+.page-subtitle-form-usr {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* Form Container */
+.form-container-usr {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.user-form-usr {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* Form Cards */
+.form-card-usr {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.form-card-header-usr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.form-card-icon-usr {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.form-card-title-usr {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.form-card-body-usr {
+    padding: 2rem 1.5rem;
+}
+
+/* Form Rows */
+.form-row-usr {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-row-usr:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Groups */
+.form-group-usr {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label-usr {
+    color: var(--usr-form-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label-usr i {
+    color: var(--usr-form-primary);
+    font-size: 0.9rem;
+}
+
+.required-usr {
+    color: var(--usr-form-danger);
+    font-weight: 700;
+}
+
+/* Form Inputs */
+.form-input-usr,
+.form-select-usr {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--usr-form-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-input-usr:focus,
+.form-select-usr:focus {
+    outline: none;
+    border-color: var(--usr-form-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input-usr.readonly-usr {
+    background: var(--usr-form-bg);
+    color: var(--usr-form-text-muted);
+    cursor: not-allowed;
+}
+
+.form-hint-usr {
+    display: block;
+    color: var(--usr-form-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.form-hint-usr i {
+    margin-right: 0.25rem;
+}
+
+/* Toggle Switch */
+.toggle-container-usr {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.toggle-switch-usr {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch-usr input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider-usr {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 34px;
+}
+
+.toggle-slider-usr:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider-usr {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+input:checked + .toggle-slider-usr:before {
+    transform: translateX(26px);
+}
+
+.toggle-label-usr {
+    font-weight: 600;
+    color: var(--usr-form-text);
+}
+
+/* Alert Info */
+.alert-info-usr {
+    background: linear-gradient(135deg, #e6f7ff, #cceeff);
+    border-left: 4px solid #4299e1;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-info-usr i {
+    color: #4299e1;
+    font-size: 1.25rem;
+}
+
+.alert-info-usr span {
+    color: #2c5282;
+    font-size: 0.95rem;
+}
+
+/* Form Actions */
+.form-actions-usr {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+}
+
+.btn-submit-usr,
+.btn-cancel-usr {
+    padding: 0.875rem 2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-submit-usr {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+}
+
+.btn-submit-usr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.btn-cancel-usr {
+    background: linear-gradient(135deg, #cbd5e0, #a0aec0);
+    color: var(--usr-form-text);
+    box-shadow: 0 2px 8px rgba(160, 174, 192, 0.2);
+}
+
+.btn-cancel-usr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(160, 174, 192, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-row-usr {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .form-actions-usr {
+        flex-direction: column;
+    }
+
+    .btn-submit-usr,
+    .btn-cancel-usr {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+{% endblock %}

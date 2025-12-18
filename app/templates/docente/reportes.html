@@ -1,0 +1,588 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Reportes - Docente Enlace{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-rep">
+    <div class="header-content-rep">
+        <nav class="breadcrumb-rep">
+            <a href="{{ url_for('docente.dashboard') }}" class="breadcrumb-link-rep">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-rep">/</span>
+            <span class="breadcrumb-active-rep">Reportes</span>
+        </nav>
+        <h1 class="page-title-rep">
+            <i class="fas fa-chart-bar"></i> Reportes y Estadísticas
+        </h1>
+        <p class="page-subtitle-rep">Genere y descargue reportes de matrículas y aprendices de {{ colegio.nombre }}</p>
+    </div>
+</div>
+
+<div class="content-wrapper-rep">
+    <div class="row-rep">
+        <!-- Filtros de Reporte -->
+        <div class="filters-column-rep">
+            <div class="card-rep">
+                <div class="card-header-rep">
+                    <i class="fas fa-filter"></i> Filtros de Reporte
+                </div>
+                <div class="card-body-rep">
+                    <form method="POST" action="{{ url_for('docente.generar_reporte_pdf') }}" id="reporteForm">
+                        <!-- Tipo de Reporte -->
+                        <div class="form-group-rep">
+                            <label class="form-label-rep">
+                                <i class="fas fa-clipboard-list"></i> Tipo de Reporte
+                            </label>
+                            <select name="filtro_tipo" id="filtro_tipo" class="form-select-rep" required>
+                                <option value="">-- Seleccione --</option>
+                                <option value="matriculas">Matrículas por Estado</option>
+                                <option value="programa">Matrículas por Programa</option>
+                                <option value="grupo">Matrículas por Grupo</option>
+                                <option value="documentos">Estado de Documentos</option>
+                                <option value="sofia">🟧 Formato SENA (SOFIA Plus)</option>
+                                <option value="completo">Reporte Completo</option>
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Programa -->
+                        <div class="form-group-rep">
+                            <label class="form-label-rep">
+                                <i class="fas fa-graduation-cap"></i> Programa
+                            </label>
+                            <select name="programa_id" id="programa_id" class="form-select-rep">
+                                <option value="">Todos los programas</option>
+                                {% for programa in programas %}
+                                <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Grupo -->
+                        <div class="form-group-rep">
+                            <label class="form-label-rep">
+                                <i class="fas fa-users"></i> Grupo
+                            </label>
+                            <select name="grupo_id" id="grupo_id" class="form-select-rep">
+                                <option value="">Todos los grupos</option>
+                                {% for grupo in grupos %}
+                                <option value="{{ grupo.id }}">{{ grupo.nombre }} - {{ grupo.programa.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Filtro por Estado -->
+                        <div class="form-group-rep">
+                            <label class="form-label-rep">
+                                <i class="fas fa-flag"></i> Estado
+                            </label>
+                            <select name="estado" id="estado" class="form-select-rep">
+                                <option value="">Todos los estados</option>
+                                <option value="BORRADOR">Borrador</option>
+                                <option value="ENVIADO">Enviado</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="COMPLETO">Completo</option>
+                                <option value="PREMATRICULA">Pre-matrícula</option>
+                                <option value="MATRICULADO">Matriculado</option>
+                            </select>
+                        </div>
+
+                        <!-- Rango de Fechas -->
+                        <div class="form-group-rep">
+                            <label class="form-label-rep">
+                                <i class="fas fa-calendar-alt"></i> Rango de Fechas
+                            </label>
+                            <div class="date-range-rep">
+                                <input type="date" name="fecha_desde" class="form-date-rep" placeholder="Desde">
+                                <span class="date-separator-rep">hasta</span>
+                                <input type="date" name="fecha_hasta" class="form-date-rep" placeholder="Hasta">
+                            </div>
+                        </div>
+
+                        <!-- Botones de Generar -->
+                        <button type="submit" class="btn-generate-rep btn-pdf-rep">
+                            <i class="fas fa-file-pdf"></i> Generar Reporte PDF
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('docente.generar_reporte_excel') }}" class="mt-rep">
+                        <input type="hidden" name="filtro_tipo" value="completo">
+                        <input type="hidden" name="programa_id" id="programa_id_excel">
+                        <input type="hidden" name="grupo_id" id="grupo_id_excel">
+                        <input type="hidden" name="estado" id="estado_excel">
+                        <input type="hidden" name="fecha_desde" id="fecha_desde_excel">
+                        <input type="hidden" name="fecha_hasta" id="fecha_hasta_excel">
+
+                        <button type="submit" class="btn-generate-rep btn-excel-rep">
+                            <i class="fas fa-file-excel"></i> Generar Reporte Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas y Vista Previa -->
+        <div class="preview-column-rep">
+            <!-- Estadísticas Rápidas -->
+            <div class="stats-grid-rep">
+                <div class="stat-card-rep stat-total-rep">
+                    <div class="stat-icon-rep">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <div class="stat-content-rep">
+                        <div class="stat-value-rep">{{ stats.total }}</div>
+                        <div class="stat-label-rep">Total Matrículas</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-rep stat-pending-rep">
+                    <div class="stat-icon-rep">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content-rep">
+                        <div class="stat-value-rep">{{ stats.pendientes }}</div>
+                        <div class="stat-label-rep">Pendientes</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-rep stat-complete-rep">
+                    <div class="stat-icon-rep">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content-rep">
+                        <div class="stat-value-rep">{{ stats.completas }}</div>
+                        <div class="stat-label-rep">Completas</div>
+                    </div>
+                </div>
+
+                <div class="stat-card-rep stat-prematricula-rep">
+                    <div class="stat-icon-rep">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-content-rep">
+                        <div class="stat-value-rep">{{ stats.prematriculas }}</div>
+                        <div class="stat-label-rep">Pre-matrículas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de Reportes -->
+            <div class="card-rep">
+                <div class="card-header-rep">
+                    <i class="fas fa-info-circle"></i> Tipos de Reportes Disponibles
+                </div>
+                <div class="card-body-rep">
+                    <div class="report-type-rep">
+                        <div class="report-type-icon-rep">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Matrículas por Estado</h4>
+                            <p>Genera un reporte detallado de todas las matrículas agrupadas por su estado actual</p>
+                        </div>
+                    </div>
+
+                    <div class="report-type-rep">
+                        <div class="report-type-icon-rep">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Matrículas por Programa</h4>
+                            <p>Visualiza las matrículas organizadas por programa de formación</p>
+                        </div>
+                    </div>
+
+                    <div class="report-type-rep">
+                        <div class="report-type-icon-rep">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Matrículas por Grupo</h4>
+                            <p>Reporte específico de matrículas por grupo académico</p>
+                        </div>
+                    </div>
+
+                    <div class="report-type-rep">
+                        <div class="report-type-icon-rep">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Estado de Documentos</h4>
+                            <p>Análisis detallado del estado de validación de documentos</p>
+                        </div>
+                    </div>
+
+                    <div class="report-type-rep">
+                        <div class="report-type-icon-rep">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Reporte Completo</h4>
+                            <p>Reporte comprehensivo con toda la información de matrículas</p>
+                        </div>
+                    </div>
+
+                    <div class="report-type-rep report-type-sena">
+                        <div class="report-type-icon-rep icon-sena">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="report-type-content-rep">
+                            <h4>Formato SENA (SOFIA Plus)</h4>
+                            <p>Archivo Excel para carga masiva en plataforma SOFIA Plus del SENA. Incluye tipo y número de documento, código de ficha y tipo de población.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Sincronizar valores para el form de Excel
+document.getElementById('reporteForm').addEventListener('change', function() {
+    document.getElementById('programa_id_excel').value = document.getElementById('programa_id').value;
+    document.getElementById('grupo_id_excel').value = document.getElementById('grupo_id').value;
+    document.getElementById('estado_excel').value = document.getElementById('estado').value;
+    document.getElementById('fecha_desde_excel').value = document.querySelector('input[name="fecha_desde"]').value;
+    document.getElementById('fecha_hasta_excel').value = document.querySelector('input[name="fecha_hasta"]').value;
+});
+</script>
+
+<style>
+:root {
+    --rep-primary: #667eea;
+    --rep-primary-dark: #5568d3;
+    --rep-success: #39A900;
+    --rep-success-dark: #2d8000;
+    --rep-warning: #FFA000;
+    --rep-info: #1976D2;
+    --rep-text: #1a202c;
+    --rep-text-secondary: #4a5568;
+    --rep-text-muted: #718096;
+    --rep-bg: #f7fafc;
+    --rep-border: #e2e8f0;
+    --rep-white: #ffffff;
+}
+
+/* Header Section */
+.header-section-rep {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content-rep {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb-rep {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link-rep {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link-rep:hover {
+    color: white;
+}
+
+.breadcrumb-sep-rep {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-rep {
+    color: white;
+    font-weight: 500;
+}
+
+.page-title-rep {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-title-rep i {
+    margin-right: 0.75rem;
+}
+
+.page-subtitle-rep {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* Content Wrapper */
+.content-wrapper-rep {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.row-rep {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .row-rep {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card Styles */
+.card-rep {
+    background: var(--rep-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.card-header-rep {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-header-rep i {
+    margin-right: 0.5rem;
+}
+
+.card-body-rep {
+    padding: 1.5rem;
+}
+
+/* Form Styles */
+.form-group-rep {
+    margin-bottom: 1.25rem;
+}
+
+.form-label-rep {
+    display: block;
+    color: var(--rep-text);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-label-rep i {
+    color: var(--rep-primary);
+    margin-right: 0.5rem;
+}
+
+.form-select-rep, .form-date-rep {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--rep-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-select-rep:focus, .form-date-rep:focus {
+    outline: none;
+    border-color: var(--rep-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.date-range-rep {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.date-separator-rep {
+    color: var(--rep-text-muted);
+    font-size: 0.9rem;
+}
+
+.mt-rep {
+    margin-top: 1rem;
+}
+
+/* Generate Buttons */
+.btn-generate-rep {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-pdf-rep {
+    background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+    color: white;
+}
+
+.btn-pdf-rep:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+}
+
+.btn-excel-rep {
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+    color: white;
+}
+
+.btn-excel-rep:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(56, 161, 105, 0.3);
+}
+
+/* Stats Grid */
+.stats-grid-rep {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .stats-grid-rep {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card-rep {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-left: 4px solid var(--stat-color);
+    transition: transform 0.2s;
+}
+
+.stat-card-rep:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total-rep { --stat-color: var(--rep-primary); }
+.stat-pending-rep { --stat-color: var(--rep-warning); }
+.stat-complete-rep { --stat-color: var(--rep-success); }
+.stat-prematricula-rep { --stat-color: var(--rep-info); }
+
+.stat-icon-rep {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--stat-color) 0%, var(--stat-color) 100%);
+    opacity: 0.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--stat-color);
+    position: relative;
+}
+
+.stat-icon-rep i {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+}
+
+.stat-content-rep {
+    flex: 1;
+}
+
+.stat-value-rep {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--rep-text);
+    line-height: 1;
+}
+
+.stat-label-rep {
+    font-size: 0.85rem;
+    color: var(--rep-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Report Types */
+.report-type-rep {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.report-type-rep:hover {
+    background: var(--rep-bg);
+}
+
+.report-type-rep + .report-type-rep {
+    border-top: 1px solid var(--rep-border);
+}
+
+.report-type-icon-rep {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--rep-primary) 0%, var(--rep-primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.report-type-content-rep h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--rep-text);
+    margin: 0 0 0.25rem 0;
+}
+
+.report-type-content-rep p {
+    font-size: 0.875rem;
+    color: var(--rep-text-secondary);
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Estilo especial para formato SENA */
+.report-type-sena {
+    background: linear-gradient(135deg, #fff5f2 0%, #ffe8df 100%);
+    border: 2px solid #FF6B35;
+}
+
+.report-type-sena .icon-sena {
+    background: linear-gradient(135deg, #FF6B35 0%, #ff5722 100%);
+}
+
+.report-type-sena h4 {
+    color: #FF6B35;
+}
+</style>
+
+{% endblock %}

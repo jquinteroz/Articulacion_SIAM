@@ -1,0 +1,380 @@
+{% extends "aprendiz/base_aprendiz.html" %}
+
+{% block title %}Mis Documentos - Aprendiz{% endblock %}
+
+{% block page_title %}Mis Documentos{% endblock %}
+
+{% block content %}
+<!-- Modern Documents Header -->
+<div class="documents-header-apr">
+    <div class="header-content-docs">
+        <div class="header-text-docs">
+            <h1 class="header-title-docs">Mis Documentos</h1>
+            <p class="header-subtitle-docs">Gestiona y sube los documentos requeridos para tu matrícula</p>
+        </div>
+        <div class="header-icon-docs">
+            <i class="fas fa-folder-open"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Alerta Documento Desactualizado -->
+{% if current_user.tiene_documento_desactualizado %}
+<div class="alert-documento-desactualizado-docs">
+    <div class="alert-doc-icon-docs">
+        <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="alert-doc-content-docs">
+        <h3 class="alert-doc-title-docs">⚠️ Documento de Identidad Desactualizado</h3>
+        <p class="alert-doc-message-docs">
+            Tienes <strong>{{ current_user.edad }} años</strong> pero aún tienes <strong>Tarjeta de Identidad (TI)</strong>.
+            Debes actualizar tu documento a <strong>Cédula de Ciudadanía (CC)</strong> en la Registraduría Nacional.
+        </p>
+        <p class="alert-doc-warning-docs">
+            <i class="fas fa-ban"></i> <strong>La subida de documentos está deshabilitada.</strong>
+            Contacta al administrador o docente enlace para que actualice tu tipo de documento una vez tengas tu CC.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- Progress Stats -->
+{% set total_documentos = tipos_requeridos|length %}
+{% set documentos_subidos = documentos|length %}
+{% set progreso = (documentos_subidos / total_documentos * 100)|int if total_documentos > 0 else 0 %}
+
+<div class="progress-stats-docs">
+    <div class="stat-item-docs">
+        <div class="stat-icon-docs stat-total-docs">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-content-docs">
+            <div class="stat-value-docs">{{ total_documentos }}</div>
+            <div class="stat-label-docs">Total Requeridos</div>
+        </div>
+    </div>
+
+    <div class="stat-item-docs">
+        <div class="stat-icon-docs stat-uploaded-docs">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content-docs">
+            <div class="stat-value-docs">{{ documentos_subidos }}</div>
+            <div class="stat-label-docs">Documentos Subidos</div>
+        </div>
+    </div>
+
+    <div class="stat-item-docs">
+        <div class="stat-icon-docs stat-pending-docs">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content-docs">
+            <div class="stat-value-docs">{{ total_documentos - documentos_subidos }}</div>
+            <div class="stat-label-docs">Pendientes</div>
+        </div>
+    </div>
+
+    <div class="stat-item-docs">
+        <div class="stat-icon-docs stat-progress-docs">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="stat-content-docs">
+            <div class="stat-value-docs">{{ progreso }}%</div>
+            <div class="stat-label-docs">Progreso</div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-card-docs">
+    <div class="progress-header-docs">
+        <div class="progress-info-docs">
+            <h3 class="progress-title-docs">Progreso de Documentos</h3>
+            <p class="progress-subtitle-docs">{{ documentos_subidos }} de {{ total_documentos }} documentos completados</p>
+        </div>
+        {% if documentos_subidos > 0 %}
+        <a href="{{ url_for('aprendiz.descargar_documentos_pdf') }}" class="btn-download-zip-docs">
+            <i class="fas fa-file-pdf"></i> Descargar PDF
+        </a>
+        {% endif %}
+    </div>
+    <div class="progress-bar-container-docs">
+        <div class="progress-bar-fill-docs" style="width: {{ progreso }}%">
+            <span class="progress-text-docs">{{ progreso }}%</span>
+        </div>
+    </div>
+    {% if progreso == 100 %}
+    <div class="progress-success-msg-docs">
+        <i class="fas fa-check-circle"></i>
+        ¡Excelente! Has completado todos los documentos requeridos
+    </div>
+    {% endif %}
+</div>
+
+<!-- Formatos Auto-generados -->
+<div class="formatos-section-docs">
+    <div class="formatos-header-docs">
+        <div class="formatos-header-content-docs">
+            <div class="formatos-icon-docs">
+                <i class="fas fa-file-download"></i>
+            </div>
+            <div class="formatos-text-docs">
+                <h3 class="formatos-title-docs">Formatos Auto-generados</h3>
+                <p class="formatos-subtitle-docs">Descarga los formatos oficiales con tus datos pre-llenados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="formatos-grid-docs">
+        <div class="formato-card-docs">
+            <div class="formato-icon-wrapper-docs">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="formato-content-docs">
+                <h4 class="formato-name-docs">Tratamiento de Datos</h4>
+                <p class="formato-desc-docs">GFPI-F-129 - Formato de autorización para tratamiento de datos personales</p>
+                <a href="{{ url_for('aprendiz.descargar_formato_tratamiento_datos') }}" class="btn-download-formato-docs" onclick="showSpinner('Generando Tratamiento de Datos...')">
+                    <i class="fas fa-download"></i> Descargar Formato
+                </a>
+            </div>
+        </div>
+
+        <div class="formato-card-docs">
+            <div class="formato-icon-wrapper-docs">
+                <i class="fas fa-handshake"></i>
+            </div>
+            <div class="formato-content-docs">
+                <h4 class="formato-name-docs">Compromiso del Aprendiz</h4>
+                <p class="formato-desc-docs">GFPI-F-015 - Formato de compromiso y acuerdo del aprendiz</p>
+                <a href="{{ url_for('aprendiz.descargar_formato_compromiso_aprendiz') }}" class="btn-download-formato-docs" onclick="showSpinner('Generando Compromiso del Aprendiz...')">
+                    <i class="fas fa-download"></i> Descargar Formato
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="formatos-info-docs">
+        <i class="fas fa-info-circle"></i>
+        <p>Estos formatos se generan automáticamente con tu información personal y la de tu acudiente. Descárgalos, fírmalos y súbelos en la sección correspondiente.</p>
+    </div>
+</div>
+
+<!-- Documents Grid -->
+<div class="documents-grid-docs">
+    {% for codigo, nombre in tipos_requeridos %}
+    {% set doc_subido = documentos|selectattr('tipo_documento', 'equalto', codigo)|first if documentos else None %}
+
+    <div class="document-card-docs {% if doc_subido %}
+        {% if doc_subido.estado == 'APROBADO' %}card-approved-docs
+        {% elif doc_subido.estado == 'RECHAZADO' %}card-rejected-docs
+        {% elif doc_subido.estado == 'PENDIENTE' %}card-pending-docs
+        {% endif %}
+    {% else %}card-empty-docs{% endif %}">
+
+        <!-- Card Header -->
+        <div class="document-header-docs">
+            <div class="document-number-docs">{{ loop.index }}</div>
+            <div class="document-status-icon-docs">
+                {% if doc_subido %}
+                    {% if doc_subido.estado == 'APROBADO' %}
+                    <i class="fas fa-check-circle"></i>
+                    {% elif doc_subido.estado == 'RECHAZADO' %}
+                    <i class="fas fa-times-circle"></i>
+                    {% elif doc_subido.estado == 'PENDIENTE' %}
+                    <i class="fas fa-clock"></i>
+                    {% endif %}
+                {% else %}
+                <i class="fas fa-cloud-upload-alt"></i>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="document-body-docs">
+            <h4 class="document-title-docs">{{ nombre }}</h4>
+
+            {% if doc_subido %}
+            <!-- Uploaded Document -->
+            <div class="document-info-docs">
+                <div class="info-row-docs">
+                    <i class="fas fa-file-pdf"></i>
+                    <span class="info-text-docs">{{ doc_subido.nombre_archivo }}</span>
+                </div>
+                <div class="info-row-docs">
+                    <i class="fas fa-calendar"></i>
+                    <span class="info-text-docs">{{ doc_subido.fecha_subida.strftime('%d/%m/%Y %H:%M') }}</span>
+                </div>
+                <div class="status-badge-wrapper-docs">
+                    <span class="status-badge-docs status-{{ doc_subido.estado.lower() }}-badge">
+                        {{ doc_subido.estado }}
+                    </span>
+                </div>
+
+                {% if doc_subido.observaciones %}
+                <div class="observations-docs">
+                    <strong>Observaciones:</strong>
+                    <p>{{ doc_subido.observaciones }}</p>
+                </div>
+                {% endif %}
+
+                {% if doc_subido.estado == 'RECHAZADO' %}
+                <div class="observations-docs" style="background: #fee2e2; border-left-color: #dc2626;">
+                    <strong style="color: #991b1b;">Documento Rechazado</strong>
+                    <p style="color: #991b1b;">Debes reemplazar este documento. Haz clic en el botón "Reemplazar" para subir una nueva versión.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="document-actions-docs">
+                <a href="{{ url_for('aprendiz.ver_documento', documento_id=doc_subido.id) }}"
+                   class="btn-doc-action-docs btn-view-docs" target="_blank">
+                    <i class="fas fa-eye"></i> Ver Documento
+                </a>
+                {% if doc_subido.estado in ['RECHAZADO'] %}
+                <button type="button" class="btn-doc-action-docs btn-replace-docs"
+                        data-toggle="modal"
+                        data-target="#reemplazarModal{{ doc_subido.id }}">
+                    <i class="fas fa-sync-alt"></i> Reemplazar
+                </button>
+                {% endif %}
+            </div>
+
+            {% else %}
+            <!-- Empty Document -->
+            <div class="empty-document-docs">
+                <i class="fas fa-cloud-upload-alt empty-icon-docs"></i>
+                <p class="empty-text-docs">No has subido este documento</p>
+
+                {% if current_user.tiene_documento_desactualizado %}
+                <div class="disabled-upload-message-docs">
+                    <i class="fas fa-ban"></i>
+                    <p>Subida deshabilitada: Debes actualizar tu tipo de documento a CC</p>
+                </div>
+                {% else %}
+                <form method="POST" action="{{ url_for('aprendiz.subir_documento') }}"
+                      enctype="multipart/form-data" class="upload-form-docs">
+                    <input type="hidden" name="tipo_documento" value="{{ codigo }}">
+
+                    <div class="file-input-wrapper-docs">
+                        <input type="file" class="file-input-docs"
+                               id="archivo_{{ codigo }}"
+                               name="archivo"
+                               accept=".pdf"
+                               required
+                               onchange="updateFileName(this, '{{ codigo }}')">
+                        <label for="archivo_{{ codigo }}" class="file-label-docs">
+                            <i class="fas fa-paperclip"></i>
+                            <span id="fileName_{{ codigo }}">Seleccionar PDF...</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn-upload-docs">
+                        <i class="fas fa-upload"></i> Subir Documento
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal para Reemplazar -->
+    {% if doc_subido %}
+    <div class="modal fade" id="reemplazarModal{{ doc_subido.id }}" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content modal-modern-docs">
+                <div class="modal-header-docs">
+                    <div class="modal-title-wrapper-docs">
+                        <i class="fas fa-sync-alt"></i>
+                        <h5 class="modal-title-docs">Reemplazar Documento</h5>
+                    </div>
+                    <button type="button" class="close-modal-docs" data-dismiss="modal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form method="POST" action="{{ url_for('aprendiz.reemplazar_documento', documento_id=doc_subido.id) }}"
+                      enctype="multipart/form-data">
+                    <div class="modal-body-docs">
+                        <div class="replace-info-docs">
+                            <p>Vas a reemplazar:</p>
+                            <strong>{{ nombre }}</strong>
+                        </div>
+                        <div class="file-input-wrapper-docs">
+                            <input type="file" class="file-input-docs"
+                                   id="archivo_reemplazo_{{ doc_subido.id }}"
+                                   name="archivo"
+                                   accept=".pdf"
+                                   required
+                                   onchange="updateFileNameReplace(this, '{{ doc_subido.id }}')">
+                            <label for="archivo_reemplazo_{{ doc_subido.id }}" class="file-label-docs">
+                                <i class="fas fa-paperclip"></i>
+                                <span id="fileNameReplace_{{ doc_subido.id }}">Seleccionar nuevo PDF...</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer-docs">
+                        <button type="button" class="btn-modal-docs btn-cancel-docs" data-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-modal-docs btn-confirm-docs">
+                            <i class="fas fa-sync-alt"></i> Reemplazar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+<!-- Submit Enrollment Section -->
+{% if progreso == 100 and matricula and matricula.estado == 'BORRADOR' %}
+<div class="submit-section-docs">
+    <div class="submit-icon-docs">
+        <i class="fas fa-paper-plane"></i>
+    </div>
+    <div class="submit-content-docs">
+        <h3 class="submit-title-docs">¿Listo para enviar tu matrícula?</h3>
+        <p class="submit-text-docs">
+            Has completado todos los documentos requeridos. Al enviar tu matrícula, esta será revisada por el docente enlace.
+        </p>
+        <form method="POST" action="{{ url_for('aprendiz.enviar_matricula') }}"
+              onsubmit="return confirm('¿Estás seguro de enviar tu matrícula? Una vez enviada, no podrás modificar tus documentos hasta que sea revisada.');">
+            <button type="submit" class="btn-submit-enrollment-docs">
+                <i class="fas fa-paper-plane"></i> Enviar Matrícula para Revisión
+            </button>
+        </form>
+    </div>
+</div>
+{% elif matricula and matricula.estado != 'BORRADOR' %}
+<div class="status-alert-docs status-{{ matricula.estado.lower() }}-alert">
+    <i class="fas fa-info-circle"></i>
+    <div class="alert-content-status-docs">
+        <strong>Estado de tu matrícula:</strong> {{ matricula.estado }}
+        {% if matricula.estado == 'ENVIADO' %}
+        - Tu matrícula está en espera de revisión por parte del docente enlace.
+        {% elif matricula.estado == 'PENDIENTE' %}
+        - El docente está revisando tus documentos.
+        {% elif matricula.estado == 'COMPLETO' %}
+        - Tu matrícula ha sido validada por el docente.
+        {% elif matricula.estado == 'PREMATRICULA' %}
+        - ¡Felicitaciones! Todos tus documentos han sido aprobados.
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+function updateFileName(input, codigo) {
+    const fileName = input.files[0] ? input.files[0].name : 'Seleccionar PDF...';
+    document.getElementById('fileName_' + codigo).textContent = fileName;
+}
+
+function updateFileNameReplace(input, docId) {
+    const fileName = input.files[0] ? input.files[0].name : 'Seleccionar nuevo PDF...';
+    document.getElementById('fileNameReplace_' + docId).textContent = fileName;
+}
+</script>
+{% endblock %}

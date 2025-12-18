@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto - SIAM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/contacto.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="contacto-modern-container">
+    <!-- Left Side - Branding & Info -->
+    <div class="contacto-left-side">
+        <div class="contacto-branding">
+            <div class="contacto-logo-siam">
+                <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM">
+            </div>
+            <h1 class="contacto-brand-title">SIAM</h1>
+            <p class="contacto-brand-subtitle">Sistema Integrado de Articulación y Media Técnica</p>
+        </div>
+
+        <div class="contacto-info">
+            <div class="contacto-info-item">
+                <div class="contacto-info-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="contacto-info-text">
+                    <h4>Ubicación</h4>
+                    <p>SENA CGMLTI - Centro de Gestión de Mercados, Logística y Tecnologías de la Información</p>
+                </div>
+            </div>
+
+            <div class="contacto-info-item">
+                <div class="contacto-info-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="contacto-info-text">
+                    <h4>Teléfono</h4>
+                    <p>Línea gratuita nacional 018000 910682</p>
+                </div>
+            </div>
+
+            <div class="contacto-info-item">
+                <div class="contacto-info-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="contacto-info-text">
+                    <h4>Correo Electrónico</h4>
+                    <p>articulacion@sena.edu.co</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contacto-decoration">
+            <div class="decoration-circle decoration-1"></div>
+            <div class="decoration-circle decoration-2"></div>
+            <div class="decoration-circle decoration-3"></div>
+        </div>
+    </div>
+
+    <!-- Right Side - Contact Form -->
+    <div class="contacto-right-side">
+        <div class="contacto-form-container">
+            <div class="contacto-form-header">
+                <h2 class="contacto-form-title">Contáctenos</h2>
+                <p class="contacto-form-subtitle">Si tiene alguna pregunta o necesita asistencia, complete el formulario</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('public.contacto') }}" class="contacto-form" onsubmit="showSpinner('Enviando mensaje...')">
+                <div class="form-row-contacto">
+                    <div class="form-group-contacto">
+                        <label for="nombre" class="form-label-contacto">
+                            <i class="fas fa-user"></i> Nombre Completo
+                        </label>
+                        <input type="text"
+                               id="nombre"
+                               name="nombre"
+                               class="form-input-contacto"
+                               placeholder="Tu nombre completo"
+                               required>
+                    </div>
+
+                    <div class="form-group-contacto">
+                        <label for="email" class="form-label-contacto">
+                            <i class="fas fa-envelope"></i> Correo Electrónico
+                        </label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="form-input-contacto"
+                               placeholder="correo@ejemplo.com"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-row-contacto">
+                    <div class="form-group-contacto">
+                        <label for="telefono" class="form-label-contacto">
+                            <i class="fas fa-phone"></i> Teléfono
+                        </label>
+                        <input type="tel"
+                               id="telefono"
+                               name="telefono"
+                               class="form-input-contacto"
+                               placeholder="3001234567">
+                    </div>
+
+                    <div class="form-group-contacto">
+                        <label for="asunto" class="form-label-contacto">
+                            <i class="fas fa-tag"></i> Asunto
+                        </label>
+                        <input type="text"
+                               id="asunto"
+                               name="asunto"
+                               class="form-input-contacto"
+                               placeholder="¿Sobre qué nos escribes?"
+                               required>
+                    </div>
+                </div>
+
+                <div class="form-group-contacto">
+                    <label for="mensaje" class="form-label-contacto">
+                        <i class="fas fa-comment-alt"></i> Mensaje
+                    </label>
+                    <textarea id="mensaje"
+                              name="mensaje"
+                              class="form-textarea-contacto"
+                              placeholder="Escribe tu mensaje aquí..."
+                              required></textarea>
+                </div>
+
+                <button type="submit" class="btn-enviar-contacto">
+                    <span>Enviar Mensaje</span>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

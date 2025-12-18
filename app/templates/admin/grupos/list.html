@@ -1,0 +1,754 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Grupos - Admin{% endblock %}
+
+{% block page_title %}<i class="fas fa-users"></i> Gestión de Grupos{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Grupos</span>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-grp">
+    <div class="header-content-grp">
+        <nav class="breadcrumb-grp">
+            <a href="{{ url_for('admin.dashboard') }}" class="breadcrumb-link-grp">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-grp">/</span>
+            <span class="breadcrumb-active-grp">Grupos</span>
+        </nav>
+        <div class="header-title-row-grp">
+            <div>
+                <h1 class="page-title-grp">
+                    <i class="fas fa-users"></i> Gestión de Grupos
+                </h1>
+                <p class="page-subtitle-grp">Administre los grupos académicos asociados a programas y colegios</p>
+            </div>
+            <a href="{{ url_for('admin.crear_grupo') }}" class="btn-new-grp">
+                <i class="fas fa-plus"></i> Nuevo Grupo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid-grp">
+    <div class="stat-card-grp stat-total-grp">
+        <div class="stat-icon-grp">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content-grp">
+            <div class="stat-value-grp">{{ grupos|length }}</div>
+            <div class="stat-label-grp">Total Grupos</div>
+        </div>
+    </div>
+
+    <div class="stat-card-grp stat-active-grp">
+        <div class="stat-icon-grp">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content-grp">
+            <div class="stat-value-grp">{{ grupos|selectattr('activo', 'equalto', True)|list|length }}</div>
+            <div class="stat-label-grp">Grupos Activos</div>
+        </div>
+    </div>
+
+    <div class="stat-card-grp stat-students-grp">
+        <div class="stat-icon-grp">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="stat-content-grp">
+            {% set total_aprendices = namespace(count=0) %}
+            {% for grupo in grupos %}
+                {% set total_aprendices.count = total_aprendices.count + grupo.aprendices|length %}
+            {% endfor %}
+            <div class="stat-value-grp">{{ total_aprendices.count }}</div>
+            <div class="stat-label-grp">Total Aprendices</div>
+        </div>
+    </div>
+
+    <div class="stat-card-grp stat-colegios-grp">
+        <div class="stat-icon-grp">
+            <i class="fas fa-school"></i>
+        </div>
+        <div class="stat-content-grp">
+            <div class="stat-value-grp">{{ colegios|length }}</div>
+            <div class="stat-label-grp">Colegios</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Card -->
+<div class="card-grp">
+    <div class="card-header-grp">
+        <i class="fas fa-filter"></i> Filtros y Búsqueda
+    </div>
+    <div class="card-body-grp">
+        <!-- Filters -->
+        <div class="filters-grid-grp">
+            <div class="filter-group-grp">
+                <label class="filter-label-grp">
+                    <i class="fas fa-search"></i> Buscar
+                </label>
+                <input type="text" id="searchInput" class="filter-input-grp" placeholder="Nombre del grupo...">
+            </div>
+
+            <div class="filter-group-grp">
+                <label class="filter-label-grp">
+                    <i class="fas fa-school"></i> Colegio
+                </label>
+                <select id="colegioFilter" class="filter-select-grp">
+                    <option value="">Todos los colegios</option>
+                    {% for colegio in colegios %}
+                    <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group-grp">
+                <label class="filter-label-grp">
+                    <i class="fas fa-clock"></i> Jornada
+                </label>
+                <select id="jornadaFilter" class="filter-select-grp">
+                    <option value="">Todas las jornadas</option>
+                    <option value="MAÑANA">Mañana</option>
+                    <option value="TARDE">Tarde</option>
+                    <option value="NOCHE">Noche</option>
+                    <option value="UNICA">Única</option>
+                </select>
+            </div>
+
+            <div class="filter-group-grp">
+                <label class="filter-label-grp">
+                    <i class="fas fa-toggle-on"></i> Estado
+                </label>
+                <select id="estadoFilter" class="filter-select-grp">
+                    <option value="">Todos</option>
+                    <option value="true">Activos</option>
+                    <option value="false">Inactivos</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="card-grp">
+    <div class="card-header-grp">
+        <div class="card-header-content-grp">
+            <span><i class="fas fa-table"></i> Lista de Grupos</span>
+            <span class="result-count-grp" id="resultCount">{{ grupos|length }} grupos</span>
+        </div>
+    </div>
+    <div class="card-body-grp no-padding-grp">
+        {% if grupos %}
+        <div class="table-wrapper-grp">
+            <table class="table-grp" id="gruposTable">
+                <thead>
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Colegio</th>
+                        <th>Programa</th>
+                        <th>Jornada</th>
+                        <th>Año Lectivo</th>
+                        <th>Aprendices</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grupo in grupos %}
+                    <tr data-colegio="{{ grupo.colegio_id }}" data-jornada="{{ grupo.jornada }}" data-activo="{{ grupo.activo }}">
+                        <td>
+                            <div class="group-info-grp">
+                                <div class="group-icon-grp">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <div class="group-name-grp">{{ grupo.nombre }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-cell-grp">
+                                <i class="fas fa-school text-muted-grp"></i> {{ grupo.colegio.nombre }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="text-cell-grp">
+                                <i class="fas fa-graduation-cap text-muted-grp"></i> {{ grupo.programa.nombre }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-grp badge-jornada-{{ grupo.jornada|lower }}-grp">
+                                {{ grupo.jornada }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="year-badge-grp">
+                                <i class="fas fa-calendar-alt"></i> {{ grupo.año_lectivo }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="count-badge-grp">
+                                <i class="fas fa-user-graduate"></i> {{ grupo.aprendices|length }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge-grp status-{{ 'active' if grupo.activo else 'inactive' }}-grp">
+                                <i class="fas fa-circle"></i> {{ 'Activo' if grupo.activo else 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions-grp">
+                                <a href="{{ url_for('admin.editar_grupo', grupo_id=grupo.id) }}"
+                                   class="btn-action-grp btn-edit-grp"
+                                   title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                {% if grupo.aprendices|length == 0 %}
+                                <form method="POST" action="{{ url_for('admin.eliminar_grupo', grupo_id=grupo.id) }}"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('¿Está seguro de eliminar el grupo {{ grupo.nombre }}?')">
+                                    <button type="submit" class="btn-action-grp btn-delete-grp" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button class="btn-action-grp btn-disabled-grp"
+                                        title="No se puede eliminar (tiene aprendices)"
+                                        disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state-grp">
+            <i class="fas fa-users empty-icon-grp"></i>
+            <h3>No hay grupos registrados</h3>
+            <p>Comience creando un nuevo grupo para organizar a los aprendices</p>
+            <a href="{{ url_for('admin.crear_grupo') }}" class="btn-new-grp">
+                <i class="fas fa-plus"></i> Crear Primer Grupo
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('colegioFilter').addEventListener('change', filterTable);
+document.getElementById('jornadaFilter').addEventListener('change', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const colegio = document.getElementById('colegioFilter').value;
+    const jornada = document.getElementById('jornadaFilter').value;
+    const estado = document.getElementById('estadoFilter').value;
+    const rows = document.querySelectorAll('#gruposTable tbody tr');
+
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowColegio = row.dataset.colegio;
+        const rowJornada = row.dataset.jornada;
+        const rowActivo = row.dataset.activo;
+
+        const matchSearch = text.includes(search);
+        const matchColegio = !colegio || rowColegio === colegio;
+        const matchJornada = !jornada || rowJornada === jornada;
+        const matchEstado = !estado || rowActivo === estado;
+
+        const visible = matchSearch && matchColegio && matchJornada && matchEstado;
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    document.getElementById('resultCount').textContent = visibleCount + ' grupo' + (visibleCount !== 1 ? 's' : '');
+}
+</script>
+
+<style>
+:root {
+    --grp-primary: #667eea;
+    --grp-primary-dark: #5568d3;
+    --grp-success: #39A900;
+    --grp-info: #1976D2;
+    --grp-warning: #FFA000;
+    --grp-danger: #D32F2F;
+    --grp-text: #1a202c;
+    --grp-text-secondary: #4a5568;
+    --grp-text-muted: #718096;
+    --grp-bg: #f7fafc;
+    --grp-border: #e2e8f0;
+    --grp-white: #ffffff;
+}
+
+/* Header Section */
+.header-section-grp {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content-grp {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb-grp {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link-grp {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link-grp:hover {
+    color: white;
+}
+
+.breadcrumb-sep-grp {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-grp {
+    color: white;
+    font-weight: 500;
+}
+
+.header-title-row-grp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.page-title-grp {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-title-grp i {
+    margin-right: 0.75rem;
+}
+
+.page-subtitle-grp {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.btn-new-grp {
+    background: white;
+    color: var(--grp-primary);
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-new-grp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    color: var(--grp-primary-dark);
+}
+
+@media (max-width: 768px) {
+    .header-title-row-grp {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btn-new-grp {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Stats Grid */
+.stats-grid-grp {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+.stat-card-grp {
+    background: var(--grp-white);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border-left: 4px solid var(--stat-color);
+    transition: transform 0.2s;
+}
+
+.stat-card-grp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total-grp { --stat-color: var(--grp-primary); }
+.stat-active-grp { --stat-color: var(--grp-success); }
+.stat-students-grp { --stat-color: var(--grp-info); }
+.stat-colegios-grp { --stat-color: var(--grp-warning); }
+
+.stat-icon-grp {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--stat-color) 0%, var(--stat-color) 100%);
+    opacity: 0.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: var(--stat-color);
+    position: relative;
+}
+
+.stat-icon-grp i {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+}
+
+.stat-content-grp {
+    flex: 1;
+}
+
+.stat-value-grp {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--grp-text);
+    line-height: 1;
+}
+
+.stat-label-grp {
+    font-size: 0.9rem;
+    color: var(--grp-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Card Styles */
+.card-grp {
+    background: var(--grp-white);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+}
+
+.card-header-grp {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-header-content-grp {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-count-grp {
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.card-body-grp {
+    padding: 1.5rem;
+}
+
+.no-padding-grp {
+    padding: 0;
+}
+
+/* Filters */
+.filters-grid-grp {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+}
+
+.filter-group-grp {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label-grp {
+    color: var(--grp-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.filter-label-grp i {
+    color: var(--grp-primary);
+    margin-right: 0.5rem;
+}
+
+.filter-input-grp, .filter-select-grp {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--grp-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.filter-input-grp:focus, .filter-select-grp:focus {
+    outline: none;
+    border-color: var(--grp-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Table */
+.table-wrapper-grp {
+    overflow-x: auto;
+}
+
+.table-grp {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-grp thead {
+    background: var(--grp-bg);
+}
+
+.table-grp th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--grp-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-grp td {
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--grp-border);
+}
+
+.table-grp tbody tr {
+    transition: background 0.2s;
+}
+
+.table-grp tbody tr:hover {
+    background: var(--grp-bg);
+}
+
+.group-info-grp {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.group-icon-grp {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--grp-primary) 0%, var(--grp-primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.group-name-grp {
+    font-weight: 600;
+    color: var(--grp-text);
+    font-size: 1rem;
+}
+
+.text-cell-grp {
+    color: var(--grp-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.text-muted-grp {
+    color: var(--grp-text-muted);
+}
+
+/* Badges */
+.badge-grp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-jornada-mañana-grp {
+    background: #FFF3E0;
+    color: #E65100;
+}
+
+.badge-jornada-tarde-grp {
+    background: #E3F2FD;
+    color: #0D47A1;
+}
+
+.badge-jornada-noche-grp {
+    background: #E8EAF6;
+    color: #311B92;
+}
+
+.badge-jornada-unica-grp {
+    background: #F3E5F5;
+    color: #4A148C;
+}
+
+.year-badge-grp, .count-badge-grp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--grp-text-secondary);
+    font-weight: 500;
+}
+
+.status-badge-grp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-active-grp {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.status-inactive-grp {
+    background: #F5F5F5;
+    color: #616161;
+}
+
+.status-badge-grp i {
+    font-size: 0.5rem;
+}
+
+/* Actions */
+.actions-grp {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-action-grp {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-edit-grp {
+    background: #E3F2FD;
+    color: #1976D2;
+}
+
+.btn-edit-grp:hover {
+    background: #1976D2;
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-delete-grp {
+    background: #FFEBEE;
+    color: #D32F2F;
+}
+
+.btn-delete-grp:hover {
+    background: #D32F2F;
+    color: white;
+    transform: scale(1.1);
+}
+
+.btn-disabled-grp {
+    background: #F5F5F5;
+    color: #BDBDBD;
+    cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-state-grp {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon-grp {
+    font-size: 4rem;
+    color: var(--grp-border);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state-grp h3 {
+    color: var(--grp-text);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-grp p {
+    color: var(--grp-text-muted);
+    margin-bottom: 2rem;
+}
+</style>
+
+{% endblock %}

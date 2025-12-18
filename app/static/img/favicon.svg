@@ -1,0 +1,32 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
+    <circle cx="100" cy="100" r="95" fill="#FFFFFF"/>
+
+    <!-- Gradient border -->
+    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#gradient1)" stroke-width="6"/>
+
+    <!-- Hexagonal background shape -->
+    <polygon points="100,30 155,60 155,120 100,150 45,120 45,60" fill="url(#gradient2)" opacity="0.15"/>
+
+    <!-- S-shaped path -->
+    <path d="M 70 65 Q 85 55 100 55 Q 115 55 120 70 Q 120 80 105 85 L 85 95 Q 70 100 70 115 Q 70 130 85 135 Q 95 138 105 135"
+          stroke="#667eea" stroke-width="10" fill="none" stroke-linecap="round"/>
+
+    <!-- Connection nodes -->
+    <circle cx="100" cy="55" r="6" fill="#667eea"/>
+    <circle cx="70" cy="115" r="6" fill="#764ba2"/>
+    <circle cx="105" cy="135" r="6" fill="#39A900"/>
+
+    <!-- Gradients -->
+    <defs>
+        <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#764ba2;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#39A900;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#39A900;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+</svg>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Programas - SIAM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/programas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="programas-modern-container">
+    <div class="programas-header">
+        <h1 class="programas-title">
+            <i class="fas fa-graduation-cap"></i> Programas de Formación
+        </h1>
+        <p class="programas-subtitle">
+            Conoce los programas de articulación con la media técnica que ofrecemos
+        </p>
+    </div>
+
+    {% if programas %}
+    <div class="programas-grid">
+        {% for programa in programas %}
+        <div class="programa-card-modern">
+            <div class="programa-card-header">
+                <div class="programa-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="programa-nombre">{{ programa.nombre }}</h3>
+            </div>
+
+            <div class="programa-card-body">
+                <div class="programa-info-item">
+                    <div class="programa-info-icon">
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <div class="programa-info-content">
+                        <div class="programa-info-label">Código</div>
+                        <div class="programa-info-value">{{ programa.codigo }}</div>
+                    </div>
+                </div>
+
+                <div class="programa-info-item">
+                    <div class="programa-info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="programa-info-content">
+                        <div class="programa-info-label">Duración</div>
+                        <div class="programa-info-value">{{ programa.duracion_horas }} horas</div>
+                    </div>
+                </div>
+
+                <div class="programa-descripcion">
+                    <h4>Descripción</h4>
+                    <p>{{ programa.descripcion }}</p>
+                </div>
+
+                <a href="{{ url_for('public.programa_detalle', programa_id=programa.id) }}"
+                   class="btn-ver-detalles">
+                    <span>Ver Detalles</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="programas-empty">
+        <div class="programas-empty-icon">
+            <i class="fas fa-book-open"></i>
+        </div>
+        <p class="programas-empty-text">No hay programas disponibles en este momento.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

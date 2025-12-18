@@ -1,0 +1,403 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Documentos SIMAT - Administración{% endblock %}
+
+{% block page_title %}Documentos SIMAT{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-simat">
+    <div class="header-content-simat">
+        <div class="header-text-simat">
+            <h1 class="header-title-simat">
+                <i class="fas fa-file-alt"></i> Gestión de Documentos SIMAT
+            </h1>
+            <p class="header-subtitle-simat">Sistema de Matrícula Estudiantil de Educación Básica y Media</p>
+        </div>
+        <div class="header-icon-simat">
+            <i class="fas fa-clipboard-check"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid-simat">
+    <div class="stat-card-simat stat-primary-simat">
+        <div class="stat-icon-simat">
+            <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="stat-content-simat">
+            <div class="stat-value-simat">{{ stats.total }}</div>
+            <div class="stat-label-simat">Total Documentos</div>
+        </div>
+    </div>
+
+    <div class="stat-card-simat stat-warning-simat">
+        <div class="stat-icon-simat">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content-simat">
+            <div class="stat-value-simat">{{ stats.pendientes }}</div>
+            <div class="stat-label-simat">Pendientes</div>
+        </div>
+    </div>
+
+    <div class="stat-card-simat stat-success-simat">
+        <div class="stat-icon-simat">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content-simat">
+            <div class="stat-value-simat">{{ stats.aprobados }}</div>
+            <div class="stat-label-simat">Aprobados</div>
+        </div>
+    </div>
+
+    <div class="stat-card-simat stat-danger-simat">
+        <div class="stat-icon-simat">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-content-simat">
+            <div class="stat-value-simat">{{ stats.rechazados }}</div>
+            <div class="stat-label-simat">Rechazados</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card-modern-simat filters-card-simat">
+    <div class="card-header-simat">
+        <h3 class="card-title-simat">
+            <i class="fas fa-filter"></i> Filtros de Búsqueda
+        </h3>
+    </div>
+    <div class="card-body-simat">
+        <form method="GET" action="{{ url_for('admin.simat') }}" class="filters-form-simat">
+            <div class="filter-grid-simat">
+                <div class="filter-group-simat">
+                    <label for="estado" class="filter-label-simat">
+                        <i class="fas fa-flag"></i> Estado
+                    </label>
+                    <select name="estado" id="estado" class="filter-select-simat">
+                        <option value="TODOS" {% if request.args.get('estado', 'TODOS') == 'TODOS' %}selected{% endif %}>Todos los Estados</option>
+                        <option value="PENDIENTE" {% if request.args.get('estado') == 'PENDIENTE' %}selected{% endif %}>Pendientes</option>
+                        <option value="APROBADO" {% if request.args.get('estado') == 'APROBADO' %}selected{% endif %}>Aprobados</option>
+                        <option value="RECHAZADO" {% if request.args.get('estado') == 'RECHAZADO' %}selected{% endif %}>Rechazados</option>
+                    </select>
+                </div>
+
+                <div class="filter-group-simat">
+                    <label for="colegio_id" class="filter-label-simat">
+                        <i class="fas fa-school"></i> Colegio
+                    </label>
+                    <select name="colegio_id" id="colegio_id" class="filter-select-simat">
+                        <option value="">Todos los Colegios</option>
+                        {% for colegio in colegios %}
+                        <option value="{{ colegio.id }}" {% if request.args.get('colegio_id') == colegio.id|string %}selected{% endif %}>
+                            {{ colegio.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-actions-simat">
+                    <button type="submit" class="btn-filter-simat">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <a href="{{ url_for('admin.simat') }}" class="btn-clear-simat">
+                        <i class="fas fa-redo"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Documents Table -->
+<div class="card-modern-simat">
+    <div class="card-header-simat">
+        <h3 class="card-title-simat">
+            <i class="fas fa-list"></i> Documentos SIMAT Registrados
+        </h3>
+        <div class="card-actions-simat">
+            <span class="badge-count-simat">{{ documentos|length }} documentos</span>
+        </div>
+    </div>
+    <div class="card-body-simat">
+        {% if documentos %}
+        <div class="table-wrapper-simat">
+            <table class="table-modern-simat">
+                <thead>
+                    <tr>
+                        <th>Colegio</th>
+                        <th>Tipo</th>
+                        <th>Grupo/Ficha</th>
+                        <th>Archivo</th>
+                        <th>Fecha</th>
+                        <th>Subido Por</th>
+                        <th>Estado</th>
+                        <th>Revisión</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documentos %}
+                    <tr class="table-row-simat">
+                        <td class="cell-bold-simat">{{ doc.colegio.nombre }}</td>
+                        <td>
+                            {% if doc.tipo == 'COLEGIO' %}
+                            <span class="badge-tipo-simat badge-colegio-simat">
+                                <i class="fas fa-building"></i> Colegio
+                            </span>
+                            {% else %}
+                            <span class="badge-tipo-simat badge-grupo-simat">
+                                <i class="fas fa-users"></i> Grupo
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.grupo %}
+                            <span class="text-grupo-simat">{{ doc.grupo.nombre }}</span>
+                            {% else %}
+                            <span class="text-muted-simat">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="file-info-simat">
+                                <i class="fas fa-file-pdf text-danger"></i>
+                                <span class="file-name-simat">{{ doc.nombre_archivo_original }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-info-simat">
+                                <i class="fas fa-calendar"></i>
+                                {{ doc.created_at.strftime('%d/%m/%Y') }}
+                                <br>
+                                <small class="time-simat">{{ doc.created_at.strftime('%H:%M') }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            {% if doc.usuario_subio %}
+                            <div class="user-info-simat">
+                                <i class="fas fa-user"></i>
+                                {{ doc.usuario_subio.nombre }}
+                            </div>
+                            {% else %}
+                            <span class="text-muted-simat">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.estado == 'PENDIENTE' %}
+                            <span class="badge-estado-simat badge-pendiente-simat">
+                                <i class="fas fa-clock"></i> Pendiente
+                            </span>
+                            {% elif doc.estado == 'APROBADO' %}
+                            <span class="badge-estado-simat badge-aprobado-simat">
+                                <i class="fas fa-check-circle"></i> Aprobado
+                            </span>
+                            {% elif doc.estado == 'RECHAZADO' %}
+                            <span class="badge-estado-simat badge-rechazado-simat">
+                                <i class="fas fa-times-circle"></i> Rechazado
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if doc.fecha_revision %}
+                            <div class="revision-info-simat">
+                                <small>{{ doc.fecha_revision.strftime('%d/%m/%Y') }}</small>
+                                {% if doc.usuario_reviso %}
+                                <br><small class="text-muted-simat">por {{ doc.usuario_reviso.nombre }}</small>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted-simat">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions-group-simat">
+                                <a href="{{ url_for('admin.ver_simat_admin', simat_id=doc.id) }}"
+                                   class="btn-action-simat btn-view-simat"
+                                   target="_blank"
+                                   title="Ver Documento">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('admin.descargar_simat_admin', simat_id=doc.id) }}"
+                                   class="btn-action-simat btn-download-simat"
+                                   title="Descargar">
+                                    <i class="fas fa-download"></i>
+                                </a>
+
+                                {% if doc.estado == 'PENDIENTE' %}
+                                <button type="button"
+                                        class="btn-action-simat btn-approve-simat"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalAprobar{{ doc.id }}"
+                                        title="Aprobar">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button type="button"
+                                        class="btn-action-simat btn-reject-simat"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalRechazar{{ doc.id }}"
+                                        title="Rechazar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                {% endif %}
+
+                                {% if doc.observaciones %}
+                                <button type="button"
+                                        class="btn-action-simat btn-comment-simat"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalObservaciones{{ doc.id }}"
+                                        title="Ver Observaciones">
+                                    <i class="fas fa-comment"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state-simat">
+            <div class="empty-icon-simat">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="empty-title-simat">No hay documentos SIMAT</h3>
+            <p class="empty-text-simat">No se encontraron documentos con los filtros seleccionados.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modales -->
+{% for doc in documentos %}
+{% if doc.estado == 'PENDIENTE' %}
+<!-- Modal Aprobar -->
+<div class="modal fade" id="modalAprobar{{ doc.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-modern-simat">
+            <div class="modal-header modal-success-simat">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i> Aprobar Documento SIMAT
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.aprobar_simat', simat_id=doc.id) }}">
+                <div class="modal-body">
+                    <div class="alert-simat alert-success-simat">
+                        <i class="fas fa-check-circle"></i>
+                        ¿Está seguro que desea aprobar este documento SIMAT?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-simat" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-success-simat">
+                        <i class="fas fa-check"></i> Aprobar Documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Rechazar -->
+<div class="modal fade" id="modalRechazar{{ doc.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-modern-simat">
+            <div class="modal-header modal-danger-simat">
+                <h5 class="modal-title">
+                    <i class="fas fa-times-circle"></i> Rechazar Documento SIMAT
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.rechazar_simat', simat_id=doc.id) }}">
+                <div class="modal-body">
+                    <div class="alert-simat alert-danger-simat">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Seleccione el motivo del rechazo
+                    </div>
+
+                    <div class="form-group-modal-simat">
+                        <label for="motivo_rechazo{{ doc.id }}" class="form-label-modal-simat">
+                            Motivo del Rechazo <span class="text-danger">*</span>
+                        </label>
+                        <select class="form-select-simat"
+                                id="motivo_rechazo{{ doc.id }}"
+                                name="observaciones"
+                                required>
+                            <option value="">-- Seleccione un motivo --</option>
+                            <option value="Documento ilegible o de mala calidad">Documento ilegible o de mala calidad</option>
+                            <option value="Información incompleta en el documento">Información incompleta en el documento</option>
+                            <option value="Documento no corresponde al tipo solicitado">Documento no corresponde al tipo solicitado</option>
+                            <option value="Formato de archivo incorrecto">Formato de archivo incorrecto</option>
+                            <option value="Datos inconsistentes con el sistema">Datos inconsistentes con el sistema</option>
+                            <option value="Documento desactualizado o vencido">Documento desactualizado o vencido</option>
+                            <option value="Falta firma o sello institucional">Falta firma o sello institucional</option>
+                            <option value="Documento duplicado">Documento duplicado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary-simat" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn-danger-simat">
+                        <i class="fas fa-times"></i> Rechazar Documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal Observaciones -->
+{% if doc.observaciones %}
+<div class="modal fade" id="modalObservaciones{{ doc.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-modern-simat">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-comment"></i> Observaciones del Documento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="info-box-simat">
+                    <p><strong>Colegio:</strong> {{ doc.colegio.nombre }}</p>
+                    <p><strong>Archivo:</strong> {{ doc.nombre_archivo_original }}</p>
+                    <p><strong>Estado:</strong>
+                        {% if doc.estado == 'APROBADO' %}
+                        <span class="badge-estado-simat badge-aprobado-simat">Aprobado</span>
+                        {% else %}
+                        <span class="badge-estado-simat badge-rechazado-simat">Rechazado</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="observaciones-box-simat">
+                    <h6><i class="fas fa-comment-dots"></i> Observaciones:</h6>
+                    <p>{{ doc.observaciones }}</p>
+                </div>
+
+                {% if doc.usuario_reviso %}
+                <div class="revision-box-simat">
+                    <small class="text-muted">
+                        <i class="fas fa-user"></i> Revisado por: {{ doc.usuario_reviso.nombre }}<br>
+                        <i class="fas fa-calendar"></i> Fecha: {{ doc.fecha_revision.strftime('%d/%m/%Y %H:%M') }}
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary-simat" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+
+{% endblock %}

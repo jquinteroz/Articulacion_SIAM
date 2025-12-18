@@ -1,0 +1,1110 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Detalle Matricula - Docente{% endblock %}
+
+{% block page_title %}Detalle de Matricula #{{ matricula.id }}{% endblock %}
+
+{% block content %}
+{% set docs_requeridos_ver = 5 if (matricula.aprendiz.usuario.tipo_documento == 'CC' and matricula.aprendiz.usuario.es_mayor_de_edad) else 8 %}
+<!-- Header Section -->
+<div class="header-section-ver">
+    <div class="header-left-ver">
+        <nav class="breadcrumb-ver">
+            <a href="{{ url_for('docente.dashboard') }}" class="breadcrumb-item-ver">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-ver">/</span>
+            <a href="{{ url_for('docente.matriculas') }}" class="breadcrumb-item-ver">
+                Matrículas
+            </a>
+            <span class="breadcrumb-sep-ver">/</span>
+            <span class="breadcrumb-active-ver">Matrícula #{{ matricula.id }}</span>
+        </nav>
+        <h1 class="page-title-ver">
+            <i class="fas fa-file-alt"></i> Matrícula #{{ matricula.id }}
+        </h1>
+        <div class="estado-badge-wrapper-ver">
+            <span class="estado-badge-ver estado-{{ matricula.estado|lower }}-ver">
+                {{ matricula.estado }}
+            </span>
+        </div>
+    </div>
+    <div class="header-actions-ver">
+        {% if documentos %}
+        <a href="{{ url_for('docente.descargar_documentos_aprendiz', aprendiz_id=matricula.aprendiz.id) }}"
+           class="btn-action-ver btn-download-ver">
+            <i class="fas fa-file-pdf"></i> Descargar PDF
+        </a>
+        {% endif %}
+        <a href="{{ url_for('docente.matriculas') }}" class="btn-action-ver btn-back-ver">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="content-layout-ver">
+    <!-- Sidebar - Información del Aprendiz -->
+    <div class="sidebar-ver">
+        <!-- Aprendiz Info Card -->
+        <div class="info-card-ver aprendiz-card-ver">
+            <div class="info-card-header-ver">
+                <div class="avatar-circle-ver">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3 class="info-card-title-ver">Información del Aprendiz</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Nombre Completo</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.nombre_completo }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Documento</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.documento }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Email</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.email }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Teléfono</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.telefono or '-' }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Colegio</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.colegio.nombre if matricula.aprendiz.colegio else '-' }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Grupo</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.grupo.nombre if matricula.aprendiz.grupo else '-' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programa Card -->
+        {% if matricula.aprendiz.programa %}
+        <div class="info-card-ver programa-card-ver">
+            <div class="info-card-header-ver">
+                <div class="icon-circle-ver">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="info-card-title-ver">Programa</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <h4 class="programa-nombre-ver">{{ matricula.aprendiz.programa.nombre }}</h4>
+                <p class="programa-desc-ver">{{ matricula.aprendiz.programa.descripcion or '' }}</p>
+                <div class="programa-duracion-ver">
+                    <i class="fas fa-clock"></i> {{ matricula.aprendiz.programa.duracion_horas }} horas
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Editar Datos Card -->
+        <div class="info-card-ver edit-card-ver">
+            <div class="info-card-header-ver">
+                <div class="icon-circle-ver">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h3 class="info-card-title-ver">Editar Datos</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <form method="POST" action="{{ url_for('docente.editar_datos_aprendiz', matricula_id=matricula.id) }}">
+                    <div class="form-group-edit-ver">
+                        <label class="form-label-edit-ver" for="tipo_documento">
+                            <i class="fas fa-id-card"></i> Tipo de Documento
+                        </label>
+                        <select class="form-select-edit-ver" id="tipo_documento" name="tipo_documento" required>
+                            <option value="TI" {% if matricula.aprendiz.usuario.tipo_documento == 'TI' %}selected{% endif %}>Tarjeta de Identidad</option>
+                            <option value="CC" {% if matricula.aprendiz.usuario.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                            <option value="CE" {% if matricula.aprendiz.usuario.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                            <option value="PEP" {% if matricula.aprendiz.usuario.tipo_documento == 'PEP' %}selected{% endif %}>PEP</option>
+                            <option value="PPT" {% if matricula.aprendiz.usuario.tipo_documento == 'PPT' %}selected{% endif %}>PPT</option>
+                        </select>
+                        <small class="form-hint-edit-ver">Puede cambiar el tipo de documento del aprendiz</small>
+                    </div>
+
+                    <div class="form-group-edit-ver">
+                        <label class="form-label-edit-ver" for="programa_id">
+                            <i class="fas fa-graduation-cap"></i> Programa
+                        </label>
+                        <select class="form-select-edit-ver" id="programa_id" name="programa_id" required>
+                            <option value="">Seleccione un programa...</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}"
+                                    {% if matricula.aprendiz.programa_id == programa.id %}selected{% endif %}>
+                                {{ programa.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group-edit-ver">
+                        <label class="form-label-edit-ver" for="grupo_id">
+                            <i class="fas fa-users"></i> Grupo/Ficha SENA
+                        </label>
+                        <select class="form-select-edit-ver" id="grupo_id" name="grupo_id" required>
+                            <option value="">Seleccione un grupo...</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}"
+                                    data-programa="{{ grupo.programa_id }}"
+                                    {% if matricula.aprendiz.grupo_id == grupo.id %}selected{% endif %}>
+                                {{ grupo.nombre }} - {{ grupo.jornada }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-edit-ver">Solo grupos de este colegio</small>
+                    </div>
+
+                    <button type="submit" class="btn-save-edit-ver" onclick="showSpinner2('Guardando cambios...')">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Fechas Card -->
+        <div class="info-card-ver fechas-card-ver">
+            <div class="info-card-header-ver">
+                <div class="icon-circle-ver">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <h3 class="info-card-title-ver">Fechas</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <div class="fecha-item-ver">
+                    <i class="fas fa-plus-circle"></i>
+                    <div>
+                        <label class="fecha-label-ver">Creación</label>
+                        <p class="fecha-value-ver">{{ matricula.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+                </div>
+                {% if matricula.fecha_envio %}
+                <div class="fecha-item-ver">
+                    <i class="fas fa-paper-plane"></i>
+                    <div>
+                        <label class="fecha-label-ver">Envío</label>
+                        <p class="fecha-value-ver">{{ matricula.fecha_envio.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% if matricula.fecha_validacion_docente %}
+                <div class="fecha-item-ver">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <label class="fecha-label-ver">Validación Docente</label>
+                        <p class="fecha-value-ver">{{ matricula.fecha_validacion_docente.strftime('%d/%m/%Y %H:%M') }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content - Documentos -->
+    <div class="main-content-ver">
+        <!-- Documentos Card -->
+        <div class="docs-card-ver">
+            <div class="docs-card-header-ver">
+                <h2 class="docs-card-title-ver">
+                    <i class="fas fa-folder-open"></i> Documentos del Aprendiz
+                </h2>
+                <div class="docs-header-actions-ver">
+                    {% set docs_pendientes = documentos|selectattr('estado', 'in', ['PENDIENTE', 'ENVIADO'])|list %}
+                    {% if docs_pendientes|length > 0 %}
+                    <form method="POST" action="{{ url_for('docente.aprobar_todos_documentos', matricula_id=matricula.id) }}"
+                          class="d-inline" onsubmit="if(confirm('¿Aprobar todos los documentos pendientes ({{ docs_pendientes|length }})?')) { showSpinner2('Aprobando documentos...'); return true; } return false;">
+                        <button type="submit" class="btn-approve-all-ver">
+                            <i class="fas fa-check-double"></i> Aprobar Todos
+                        </button>
+                    </form>
+                    {% endif %}
+                    <div class="docs-count-ver">{{ documentos|length }}/{{ docs_requeridos_ver }}</div>
+                </div>
+            </div>
+
+            <div class="docs-card-body-ver">
+                {% if documentos %}
+                <div class="docs-grid-ver">
+                    {% for documento in documentos %}
+                    <div class="doc-item-ver doc-estado-{{ documento.estado|lower }}-ver">
+                        <div class="doc-header-ver">
+                            <div class="doc-icon-ver">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="doc-info-ver">
+                                <h4 class="doc-title-ver">{{ documento.tipo_documento.replace('_', ' ').title() }}</h4>
+                                <p class="doc-filename-ver">{{ documento.nombre_archivo[:35] }}...</p>
+                                <span class="doc-date-ver">
+                                    <i class="fas fa-calendar"></i> {{ documento.fecha_subida.strftime('%d/%m/%Y') }}
+                                </span>
+                            </div>
+                            <span class="doc-badge-ver doc-badge-{{ documento.estado|lower }}-ver">
+                                {{ documento.estado }}
+                            </span>
+                        </div>
+
+                        {% if documento.observaciones %}
+                        <div class="doc-observaciones-ver">
+                            <i class="fas fa-info-circle"></i>
+                            <span>{{ documento.observaciones }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="doc-actions-ver">
+                            <a href="{{ url_for('docente.ver_documento', documento_id=documento.id) }}"
+                               class="btn-doc-ver btn-doc-view-ver" target="_blank">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                            {% if documento.estado in ['PENDIENTE', 'ENVIADO'] %}
+                            <form method="POST" action="{{ url_for('docente.aprobar_documento', documento_id=documento.id) }}"
+                                  class="d-inline" onsubmit="if(confirm('¿Aprobar este documento?')) { showSpinner2('Aprobando...'); return true; } return false;">
+                                <button type="submit" class="btn-doc-ver btn-doc-approve-ver">
+                                    <i class="fas fa-check"></i> Aprobar
+                                </button>
+                            </form>
+                            <button type="button" class="btn-doc-ver btn-doc-reject-ver"
+                                    onclick="rechazarDocSimple({{ documento.id }})">
+                                <i class="fas fa-times"></i> Rechazar
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Progreso -->
+                <div class="progress-section-ver">
+                    {% set progreso = (documentos|length / docs_requeridos_ver * 100)|int %}
+                    <div class="progress-header-ver">
+                        <span class="progress-label-ver">Progreso de Documentos</span>
+                        <span class="progress-value-ver">{{ progreso }}%</span>
+                    </div>
+                    <div class="progress-bar-wrapper-ver">
+                        <div class="progress-bar-ver" style="width: {{ progreso }}%"></div>
+                    </div>
+                    <div class="progress-text-ver">{{ documentos|length }} de {{ docs_requeridos_ver }} documentos subidos</div>
+                </div>
+                {% else %}
+                <div class="empty-docs-ver">
+                    <i class="fas fa-inbox"></i>
+                    <p>No hay documentos cargados</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Observaciones del Docente -->
+        {% if matricula.observaciones_docente %}
+        <div class="obs-card-ver">
+            <div class="obs-header-ver">
+                <i class="fas fa-comment-alt"></i>
+                <h3>Observaciones del Docente</h3>
+            </div>
+            <div class="obs-body-ver">
+                {{ matricula.observaciones_docente }}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function rechazarDocSimple(docId) {
+    const motivo = prompt('Ingrese el motivo del rechazo:');
+    if (motivo && motivo.trim() !== '') {
+        showSpinner2('Rechazando documento...');
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/docente/rechazar-documento/' + docId;
+
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'observaciones';
+        input.value = motivo.trim();
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+
+<style>
+:root {
+    --primary-color: #1976D2;
+    --success-color: #39A900;
+    --warning-color: #FFA000;
+    --danger-color: #D32F2F;
+    --info-color: #0288D1;
+    --text-dark: #1a202c;
+    --text-gray: #4a5568;
+    --text-light: #718096;
+    --bg-gray: #f7fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Header Section */
+.header-section-ver {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 50%, #0D47A1 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(25, 118, 210, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+.header-left-ver {
+    flex: 1;
+}
+
+.breadcrumb-ver {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.breadcrumb-item-ver {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item-ver:hover {
+    color: white;
+}
+
+.breadcrumb-sep-ver {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-ver {
+    color: white;
+    font-weight: 600;
+}
+
+.page-title-ver {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.estado-badge-wrapper-ver {
+    display: inline-block;
+}
+
+.estado-badge-ver {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-borrador-ver { background: #e2e8f0; color: #4a5568; }
+.estado-enviado-ver { background: #bee3f8; color: #2c5282; }
+.estado-pendiente-ver { background: #feebc8; color: #7c2d12; }
+.estado-completo-ver { background: #c6f6d5; color: #22543d; }
+.estado-prematricula-ver { background: #9ae6b4; color: #22543d; }
+
+.header-actions-ver {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.btn-action-ver {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btn-download-ver {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-download-ver:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.btn-back-ver {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-back-ver:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Content Layout */
+.content-layout-ver {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 2rem;
+}
+
+/* Sidebar */
+.sidebar-ver {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.info-card-ver {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.info-card-header-ver {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar-circle-ver, .icon-circle-ver {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.info-card-title-ver {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.info-card-body-ver {
+    padding: 1.5rem;
+}
+
+.info-item-ver {
+    margin-bottom: 1rem;
+}
+
+.info-item-ver:last-child {
+    margin-bottom: 0;
+}
+
+.info-label-ver {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.info-value-ver {
+    color: var(--text-dark);
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Programa Card */
+.programa-card-ver .info-card-header-ver {
+    background: linear-gradient(135deg, var(--success-color), #2d8a00);
+}
+
+.programa-nombre-ver {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 0.5rem 0;
+}
+
+.programa-desc-ver {
+    color: var(--text-gray);
+    font-size: 0.875rem;
+    margin: 0 0 1rem 0;
+}
+
+.programa-duracion-ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-gray);
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+/* Fechas Card */
+.fechas-card-ver .info-card-header-ver {
+    background: linear-gradient(135deg, var(--info-color), #0277BD);
+}
+
+.fecha-item-ver {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-gray);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.fecha-item-ver:last-child {
+    margin-bottom: 0;
+}
+
+.fecha-item-ver > i {
+    font-size: 1.25rem;
+    color: var(--info-color);
+    margin-top: 0.25rem;
+}
+
+.fecha-label-ver {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.125rem;
+    display: block;
+}
+
+.fecha-value-ver {
+    color: var(--text-dark);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Main Content */
+.main-content-ver {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.docs-card-ver {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.docs-card-header-ver {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, var(--warning-color), #F57C00);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.docs-card-title-ver {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.docs-header-actions-ver {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.btn-approve-all-ver {
+    padding: 0.625rem 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--success-color);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-approve-all-ver:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.docs-count-ver {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.docs-card-body-ver {
+    padding: 1.5rem;
+}
+
+.docs-grid-ver {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.doc-item-ver {
+    background: var(--bg-gray);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border-left: 4px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.doc-item-ver:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateX(4px);
+}
+
+.doc-estado-aprobado-ver {
+    border-left-color: var(--success-color);
+    background: linear-gradient(to right, rgba(57, 169, 0, 0.05), transparent);
+}
+
+.doc-estado-pendiente-ver, .doc-estado-enviado-ver {
+    border-left-color: var(--warning-color);
+    background: linear-gradient(to right, rgba(255, 160, 0, 0.05), transparent);
+}
+
+.doc-estado-rechazado-ver {
+    border-left-color: var(--danger-color);
+    background: linear-gradient(to right, rgba(211, 47, 47, 0.05), transparent);
+}
+
+.doc-header-ver {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.doc-icon-ver {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--danger-color), #C62828);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.doc-info-ver {
+    flex: 1;
+    min-width: 0;
+}
+
+.doc-title-ver {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0 0 0.25rem 0;
+}
+
+.doc-filename-ver {
+    font-size: 0.875rem;
+    color: var(--text-gray);
+    margin: 0 0 0.25rem 0;
+}
+
+.doc-date-ver {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.doc-badge-ver {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.doc-badge-aprobado-ver { background: #c6f6d5; color: #22543d; }
+.doc-badge-pendiente-ver, .doc-badge-enviado-ver { background: #feebc8; color: #7c2d12; }
+.doc-badge-rechazado-ver { background: #fed7d7; color: #742a2a; }
+
+.doc-observaciones-ver {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(2, 136, 209, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-gray);
+}
+
+.doc-observaciones-ver i {
+    color: var(--info-color);
+    margin-top: 0.125rem;
+}
+
+.doc-actions-ver {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-doc-ver {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-doc-view-ver {
+    background: var(--info-color);
+    color: white;
+}
+
+.btn-doc-view-ver:hover {
+    background: #0277BD;
+    transform: translateY(-2px);
+}
+
+.btn-doc-approve-ver {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-doc-approve-ver:hover {
+    background: #2d8a00;
+    transform: translateY(-2px);
+}
+
+.btn-doc-reject-ver {
+    background: var(--danger-color);
+    color: white;
+}
+
+.btn-doc-reject-ver:hover {
+    background: #C62828;
+    transform: translateY(-2px);
+}
+
+/* Progress Section */
+.progress-section-ver {
+    padding: 1.5rem;
+    background: var(--bg-gray);
+    border-radius: 12px;
+}
+
+.progress-header-ver {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.progress-label-ver {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.progress-value-ver {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--primary-color);
+}
+
+.progress-bar-wrapper-ver {
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar-ver {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success-color), #2d8a00);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+}
+
+.progress-text-ver {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    text-align: center;
+}
+
+/* Empty State */
+.empty-docs-ver {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-light);
+}
+
+.empty-docs-ver i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Observaciones Card */
+.obs-card-ver {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.obs-header-ver {
+    padding: 1rem 1.5rem;
+    background: var(--bg-gray);
+    border-left: 4px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.obs-header-ver h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.obs-header-ver i {
+    color: var(--primary-color);
+}
+
+.obs-body-ver {
+    padding: 1.5rem;
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content-layout-ver {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-ver {
+        order: 2;
+    }
+
+    .main-content-ver {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-section-ver {
+        padding: 1.5rem;
+    }
+
+    .page-title-ver {
+        font-size: 1.5rem;
+    }
+
+    .header-actions-ver {
+        width: 100%;
+    }
+
+    .btn-action-ver {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .doc-header-ver {
+        flex-wrap: wrap;
+    }
+
+    .doc-badge-ver {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    .doc-actions-ver {
+        flex-direction: column;
+    }
+
+    .btn-doc-ver {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Edit Card Styles */
+.edit-card-ver .info-card-header-ver {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.form-group-edit-ver {
+    margin-bottom: 1rem;
+}
+
+.form-label-edit-ver {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.form-label-edit-ver i {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+
+.form-select-edit-ver {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-select-edit-ver:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(57, 169, 0, 0.1);
+}
+
+.form-hint-edit-ver {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.btn-save-edit-ver {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, var(--success-color), #2d8a00);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-save-edit-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+}
+
+.btn-save-edit-ver i {
+    margin-right: 0.5rem;
+}
+</style>
+
+<script>
+// Filtrar grupos según programa seleccionado (solo mostrar grupos del programa)
+function filtrarGruposDocente() {
+    const programaSelect = document.getElementById('programa_id');
+    const grupoSelect = document.getElementById('grupo_id');
+
+    const programaSeleccionado = programaSelect.value;
+
+    // Obtener todas las opciones de grupos
+    const todasLasOpciones = Array.from(grupoSelect.options);
+
+    // Limpiar el select de grupos
+    grupoSelect.innerHTML = '<option value="">Seleccione un grupo...</option>';
+
+    // Si no hay programa seleccionado, mostrar mensaje
+    if (!programaSeleccionado) {
+        grupoSelect.innerHTML = '<option value="">Primero seleccione un programa...</option>';
+        grupoSelect.disabled = true;
+        return;
+    }
+
+    // Habilitar el select
+    grupoSelect.disabled = false;
+
+    // Filtrar y agregar solo los grupos que coincidan
+    let gruposEncontrados = 0;
+    todasLasOpciones.forEach(option => {
+        if (option.value === '') return; // Ignorar la opción vacía
+
+        const programaGrupo = option.getAttribute('data-programa');
+
+        // Si el grupo pertenece al programa seleccionado
+        if (programaGrupo === programaSeleccionado) {
+            grupoSelect.appendChild(option.cloneNode(true));
+            gruposEncontrados++;
+        }
+    });
+
+    // Si no se encontraron grupos
+    if (gruposEncontrados === 0) {
+        grupoSelect.innerHTML = '<option value="">No hay grupos disponibles para este programa</option>';
+        grupoSelect.disabled = true;
+    }
+}
+
+// Event listener para el select de programa
+document.addEventListener('DOMContentLoaded', function() {
+    const programaSelect = document.getElementById('programa_id');
+    const grupoSelect = document.getElementById('grupo_id');
+
+    programaSelect.addEventListener('change', filtrarGruposDocente);
+
+    // Aplicar filtro inicial si hay valores pre-seleccionados
+    const programaActual = programaSelect.value;
+    if (programaActual) {
+        filtrarGruposDocente();
+    }
+});
+</script>
+{% endblock %}

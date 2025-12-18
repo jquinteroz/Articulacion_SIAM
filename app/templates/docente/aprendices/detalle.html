@@ -1,0 +1,749 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Detalle Aprendiz - {{ aprendiz.usuario.nombre_completo }}{% endblock %}
+
+{% block page_title %}Detalle del Aprendiz{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-aprendiz-det">
+    <div class="header-content-aprendiz-det">
+        <div class="header-text-aprendiz-det">
+            <h1 class="header-title-aprendiz-det">
+                <i class="fas fa-user-graduate"></i> {{ aprendiz.usuario.nombre_completo }}
+            </h1>
+            <p class="header-subtitle-aprendiz-det">
+                <i class="fas fa-id-card"></i> {{ aprendiz.usuario.tipo_documento }} {{ aprendiz.usuario.documento }}
+            </p>
+        </div>
+        <div class="header-actions-aprendiz-det">
+            <a href="{{ url_for('docente.ver_aprendiz', aprendiz_id=aprendiz.id) }}" class="btn-edit-aprendiz-det">
+                <i class="fas fa-edit"></i> Editar Información
+            </a>
+            <a href="{{ url_for('docente.aprendices') }}" class="btn-back-aprendiz-det">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-row-aprendiz-det">
+    <div class="stat-item-aprendiz-det stat-primary-det">
+        <div class="stat-icon-aprendiz-det">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div class="stat-content-aprendiz-det">
+            <div class="stat-value-aprendiz-det">{{ matriculas|length }}</div>
+            <div class="stat-label-aprendiz-det">Matrículas</div>
+        </div>
+    </div>
+
+    <div class="stat-item-aprendiz-det stat-success-det">
+        <div class="stat-icon-aprendiz-det">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content-aprendiz-det">
+            <div class="stat-value-aprendiz-det">
+                {{ matriculas|selectattr('estado', 'equalto', 'COMPLETO')|list|length }}
+            </div>
+            <div class="stat-label-aprendiz-det">Completas</div>
+        </div>
+    </div>
+
+    <div class="stat-item-aprendiz-det stat-warning-det">
+        <div class="stat-icon-aprendiz-det">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content-aprendiz-det">
+            <div class="stat-value-aprendiz-det">
+                {{ matriculas|selectattr('estado', 'in', ['ENVIADO', 'PENDIENTE'])|list|length }}
+            </div>
+            <div class="stat-label-aprendiz-det">Pendientes</div>
+        </div>
+    </div>
+
+    <div class="stat-item-aprendiz-det {% if aprendiz.usuario.activo %}stat-active-det{% else %}stat-inactive-det{% endif %}">
+        <div class="stat-icon-aprendiz-det">
+            <i class="fas fa-{{ 'check' if aprendiz.usuario.activo else 'ban' }}"></i>
+        </div>
+        <div class="stat-content-aprendiz-det">
+            <div class="stat-value-aprendiz-det">{{ 'Activo' if aprendiz.usuario.activo else 'Inactivo' }}</div>
+            <div class="stat-label-aprendiz-det">Estado</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="content-grid-aprendiz-det">
+    <!-- Información Personal -->
+    <div class="info-card-aprendiz-det">
+        <div class="card-header-aprendiz-det">
+            <h3 class="card-title-aprendiz-det">
+                <i class="fas fa-user"></i> Información Personal
+            </h3>
+        </div>
+        <div class="card-body-aprendiz-det">
+            <div class="info-grid-aprendiz-det">
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-id-card"></i> Tipo de Documento
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.usuario.tipo_documento }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-hashtag"></i> Número de Documento
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.usuario.documento }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-envelope"></i> Correo Electrónico
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.usuario.email }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-phone"></i> Teléfono
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.usuario.telefono or '-' }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-birthday-cake"></i> Fecha de Nacimiento
+                    </div>
+                    <div class="info-value-aprendiz-det">
+                        {% if aprendiz.usuario.fecha_nacimiento %}
+                        {{ aprendiz.usuario.fecha_nacimiento.strftime('%d/%m/%Y') }}
+                        <span class="edad-badge-det">({{ aprendiz.usuario.edad }} años)</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-venus-mars"></i> Género
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.usuario.genero or '-' }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-map-marker-alt"></i> Ciudad
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.ciudad or '-' }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-school"></i> Colegio
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.colegio.nombre if aprendiz.colegio else '-' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Académica -->
+    <div class="info-card-aprendiz-det">
+        <div class="card-header-aprendiz-det">
+            <h3 class="card-title-aprendiz-det">
+                <i class="fas fa-graduation-cap"></i> Información Académica
+            </h3>
+        </div>
+        <div class="card-body-aprendiz-det">
+            <div class="info-grid-aprendiz-det">
+                <div class="info-item-aprendiz-det info-full-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-book-open"></i> Programa de Formación
+                    </div>
+                    <div class="info-value-aprendiz-det info-highlight-det">
+                        {{ aprendiz.programa.nombre if aprendiz.programa else 'Sin programa asignado' }}
+                    </div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-users"></i> Grupo/Ficha
+                    </div>
+                    <div class="info-value-aprendiz-det">{{ aprendiz.grupo.nombre if aprendiz.grupo else '-' }}</div>
+                </div>
+
+                <div class="info-item-aprendiz-det">
+                    <div class="info-label-aprendiz-det">
+                        <i class="fas fa-calendar-plus"></i> Fecha de Registro
+                    </div>
+                    <div class="info-value-aprendiz-det">
+                        {% if aprendiz.created_at %}
+                        {{ aprendiz.created_at.strftime('%d/%m/%Y') }}
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Historial de Matrículas -->
+<div class="matriculas-card-aprendiz-det">
+    <div class="card-header-aprendiz-det">
+        <h3 class="card-title-aprendiz-det">
+            <i class="fas fa-history"></i> Historial de Matrículas
+        </h3>
+        <div class="badge-count-det">{{ matriculas|length }} matrículas</div>
+    </div>
+    <div class="card-body-aprendiz-det">
+        {% if matriculas %}
+        <div class="matriculas-list-aprendiz-det">
+            {% for matricula in matriculas %}
+            <div class="matricula-item-aprendiz-det">
+                <div class="matricula-icon-det">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="matricula-info-det">
+                    <div class="matricula-programa-det">
+                        {{ matricula.aprendiz.programa.nombre if matricula.aprendiz and matricula.aprendiz.programa else 'Sin programa' }}
+                    </div>
+                    <div class="matricula-meta-det">
+                        <span class="meta-item-det">
+                            <i class="fas fa-calendar"></i>
+                            {% if matricula.fecha_envio %}
+                            {{ matricula.fecha_envio.strftime('%d/%m/%Y') }}
+                            {% else %}
+                            {{ matricula.created_at.strftime('%d/%m/%Y') }}
+                            {% endif %}
+                        </span>
+                        <span class="meta-item-det">
+                            <i class="fas fa-clock"></i>
+                            {% if matricula.fecha_envio %}
+                            {{ matricula.fecha_envio.strftime('%H:%M') }}
+                            {% else %}
+                            {{ matricula.created_at.strftime('%H:%M') }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="matricula-status-det">
+                    {% if matricula.estado == 'BORRADOR' %}
+                    <span class="badge-estado-det badge-borrador-det">
+                        <i class="fas fa-edit"></i> Borrador
+                    </span>
+                    {% elif matricula.estado == 'ENVIADO' %}
+                    <span class="badge-estado-det badge-enviado-det">
+                        <i class="fas fa-paper-plane"></i> Enviado
+                    </span>
+                    {% elif matricula.estado == 'PENDIENTE' %}
+                    <span class="badge-estado-det badge-pendiente-det">
+                        <i class="fas fa-clock"></i> Pendiente
+                    </span>
+                    {% elif matricula.estado == 'COMPLETO' %}
+                    <span class="badge-estado-det badge-completo-det">
+                        <i class="fas fa-check-circle"></i> Completo
+                    </span>
+                    {% elif matricula.estado == 'PREMATRICULA' %}
+                    <span class="badge-estado-det badge-prematricula-det">
+                        <i class="fas fa-user-check"></i> Pre-matrícula
+                    </span>
+                    {% elif matricula.estado == 'RECHAZADO' %}
+                    <span class="badge-estado-det badge-rechazado-det">
+                        <i class="fas fa-times-circle"></i> Rechazado
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="matricula-actions-det">
+                    <a href="{{ url_for('docente.ver_matricula', matricula_id=matricula.id) }}"
+                       class="btn-action-det btn-view-det"
+                       title="Ver detalle">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-det">
+            <div class="empty-icon-det">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="empty-title-det">Sin matrículas registradas</h3>
+            <p class="empty-text-det">El aprendiz aún no tiene matrículas en el sistema</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+:root {
+    --det-primary: #1976D2;
+    --det-success: #39A900;
+    --det-warning: #FFA000;
+    --det-danger: #D32F2F;
+    --det-info: #0288D1;
+    --det-active: #4CAF50;
+    --det-inactive: #9E9E9E;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --bg-light: #f7fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Header Section */
+.header-section-aprendiz-det {
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 50%, #0D47A1 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(25, 118, 210, 0.2);
+    animation: fadeInDown 0.6s ease;
+}
+
+.header-content-aprendiz-det {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.header-title-aprendiz-det {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-subtitle-aprendiz-det {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.header-actions-aprendiz-det {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn-edit-aprendiz-det,
+.btn-back-aprendiz-det {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-edit-aprendiz-det {
+    background: white;
+    color: var(--det-primary);
+    border: 2px solid white;
+}
+
+.btn-edit-aprendiz-det:hover {
+    background: var(--det-success);
+    border-color: var(--det-success);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+}
+
+.btn-back-aprendiz-det {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-back-aprendiz-det:hover {
+    background: white;
+    color: var(--det-primary);
+    transform: translateY(-2px);
+}
+
+/* Stats Row */
+.stats-row-aprendiz-det {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item-aprendiz-det {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-left: 4px solid var(--stat-color);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease;
+}
+
+.stat-item-aprendiz-det:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-primary-det { --stat-color: var(--det-primary); }
+.stat-success-det { --stat-color: var(--det-success); }
+.stat-warning-det { --stat-color: var(--det-warning); }
+.stat-active-det { --stat-color: var(--det-active); }
+.stat-inactive-det { --stat-color: var(--det-inactive); }
+
+.stat-icon-aprendiz-det {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: var(--stat-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-value-aprendiz-det {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.stat-label-aprendiz-det {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Content Grid */
+.content-grid-aprendiz-det {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Info Card */
+.info-card-aprendiz-det,
+.matriculas-card-aprendiz-det {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.card-header-aprendiz-det {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-aprendiz-det {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-count-det {
+    background: var(--det-primary);
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.card-body-aprendiz-det {
+    padding: 1.5rem;
+}
+
+/* Info Grid */
+.info-grid-aprendiz-det {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item-aprendiz-det {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-full-det {
+    grid-column: 1 / -1;
+}
+
+.info-label-aprendiz-det {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-value-aprendiz-det {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.info-highlight-det {
+    color: var(--det-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.edad-badge-det {
+    display: inline-block;
+    background: var(--det-info);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+/* Matrículas List */
+.matriculas-card-aprendiz-det {
+    grid-column: 1 / -1;
+}
+
+.matriculas-list-aprendiz-det {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.matricula-item-aprendiz-det {
+    background: var(--bg-light);
+    padding: 1.25rem;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--det-primary);
+}
+
+.matricula-item-aprendiz-det:hover {
+    background: #edf2f7;
+    transform: translateX(4px);
+}
+
+.matricula-icon-det {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--det-primary), var(--det-info));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.matricula-info-det {
+    flex: 1;
+}
+
+.matricula-programa-det {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.matricula-meta-det {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.meta-item-det {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.matricula-status-det {
+    flex-shrink: 0;
+}
+
+.badge-estado-det {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.badge-borrador-det {
+    background: rgba(158, 158, 158, 0.1);
+    color: #757575;
+}
+
+.badge-enviado-det {
+    background: rgba(2, 136, 209, 0.1);
+    color: var(--det-info);
+}
+
+.badge-pendiente-det {
+    background: rgba(255, 160, 0, 0.1);
+    color: var(--det-warning);
+}
+
+.badge-completo-det {
+    background: rgba(57, 169, 0, 0.1);
+    color: var(--det-success);
+}
+
+.badge-prematricula-det {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--det-active);
+}
+
+.badge-rechazado-det {
+    background: rgba(211, 47, 47, 0.1);
+    color: var(--det-danger);
+}
+
+.matricula-actions-det {
+    flex-shrink: 0;
+}
+
+.btn-action-det {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-view-det {
+    background: var(--det-primary);
+    color: white;
+}
+
+.btn-view-det:hover {
+    background: var(--det-info);
+    transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state-det {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon-det {
+    font-size: 5rem;
+    color: var(--text-muted);
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title-det {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-text-det {
+    color: var(--text-muted);
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .content-grid-aprendiz-det {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid-aprendiz-det {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content-aprendiz-det {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .header-title-aprendiz-det {
+        font-size: 1.5rem;
+    }
+
+    .stats-row-aprendiz-det {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .matricula-item-aprendiz-det {
+        flex-wrap: wrap;
+    }
+
+    .matricula-status-det {
+        order: 3;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+}
+</style>
+
+{% endblock %}

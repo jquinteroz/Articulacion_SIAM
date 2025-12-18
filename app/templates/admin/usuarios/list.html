@@ -1,0 +1,651 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Usuarios - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-usr">
+    <div class="header-content-usr">
+        <nav class="breadcrumb-usr">
+            <a href="{{ url_for('admin.dashboard') }}" class="breadcrumb-link-usr">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-usr">/</span>
+            <span class="breadcrumb-active-usr">Gestión de Usuarios</span>
+        </nav>
+        <div class="header-title-section-usr">
+            <h1 class="page-title-usr">
+                <i class="fas fa-users"></i> Gestión de Usuarios
+            </h1>
+            <a href="{{ url_for('admin.crear_usuario') }}" class="btn-add-usr">
+                <i class="fas fa-plus"></i> Nuevo Usuario
+            </a>
+        </div>
+        <p class="page-subtitle-usr">Administre los usuarios del sistema y sus roles</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid-usr">
+    <div class="stat-card-usr stat-total-usr">
+        <div class="stat-icon-usr">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-content-usr">
+            <div class="stat-value-usr">{{ usuarios|length }}</div>
+            <div class="stat-label-usr">Total Usuarios</div>
+        </div>
+    </div>
+
+    <div class="stat-card-usr stat-aprendiz-usr">
+        <div class="stat-icon-usr">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="stat-content-usr">
+            <div class="stat-value-usr">{{ usuarios|selectattr('rol', 'equalto', 'APRENDIZ')|list|length }}</div>
+            <div class="stat-label-usr">Aprendices</div>
+        </div>
+    </div>
+
+    <div class="stat-card-usr stat-docente-usr">
+        <div class="stat-icon-usr">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <div class="stat-content-usr">
+            <div class="stat-value-usr">{{ usuarios|selectattr('rol', 'equalto', 'DOCENTE')|list|length }}</div>
+            <div class="stat-label-usr">Docentes</div>
+        </div>
+    </div>
+
+    <div class="stat-card-usr stat-admin-usr">
+        <div class="stat-icon-usr">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <div class="stat-content-usr">
+            <div class="stat-value-usr">{{ usuarios|selectattr('rol', 'equalto', 'ADMINISTRADOR')|list|length }}</div>
+            <div class="stat-label-usr">Administradores</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="filters-section-usr">
+    <form method="GET" class="filters-form-usr">
+        <div class="filter-group-usr">
+            <label for="rol" class="filter-label-usr">
+                <i class="fas fa-filter"></i> Filtrar por rol:
+            </label>
+            <select name="rol" id="rol" class="filter-select-usr" onchange="this.form.submit()">
+                <option value="todos" {% if rol_filtro == 'todos' %}selected{% endif %}>Todos los roles</option>
+                <option value="APRENDIZ" {% if rol_filtro == 'APRENDIZ' %}selected{% endif %}>Aprendices</option>
+                <option value="DOCENTE" {% if rol_filtro == 'DOCENTE' %}selected{% endif %}>Docentes</option>
+                <option value="ADMINISTRADOR" {% if rol_filtro == 'ADMINISTRADOR' %}selected{% endif %}>Administradores</option>
+                <option value="RECTOR" {% if rol_filtro == 'RECTOR' %}selected{% endif %}>Rectores</option>
+            </select>
+        </div>
+    </form>
+</div>
+
+<!-- Table Section -->
+<div class="table-section-usr">
+    {% if usuarios %}
+    <div class="table-container-usr">
+        <table class="table-usr">
+            <thead class="table-head-usr">
+                <tr>
+                    <th><i class="fas fa-id-card"></i> Documento</th>
+                    <th><i class="fas fa-user"></i> Nombre Completo</th>
+                    <th><i class="fas fa-envelope"></i> Email</th>
+                    <th><i class="fas fa-user-tag"></i> Rol</th>
+                    <th><i class="fas fa-toggle-on"></i> Estado</th>
+                    <th class="text-center-usr"><i class="fas fa-cogs"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="table-body-usr">
+                {% for usuario in usuarios %}
+                <tr class="table-row-usr">
+                    <td class="td-documento-usr">
+                        <span class="documento-badge-usr">{{ usuario.tipo_documento }}</span>
+                        {{ usuario.documento }}
+                    </td>
+                    <td class="td-nombre-usr">
+                        <div class="user-info-usr">
+                            <div class="user-avatar-usr">
+                                {% if usuario.rol == 'APRENDIZ' %}
+                                    <i class="fas fa-user-graduate"></i>
+                                {% elif usuario.rol == 'DOCENTE' %}
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                {% elif usuario.rol == 'ADMINISTRADOR' %}
+                                    <i class="fas fa-user-shield"></i>
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <span class="user-name-usr">{{ usuario.nombre_completo }}</span>
+                        </div>
+                    </td>
+                    <td class="td-email-usr">{{ usuario.email }}</td>
+                    <td class="td-rol-usr">
+                        <span class="badge-rol-usr badge-{{ usuario.rol.lower() }}-usr">
+                            {{ usuario.rol }}
+                        </span>
+                    </td>
+                    <td class="td-estado-usr">
+                        {% if usuario.activo %}
+                            <span class="badge-estado-usr badge-activo-usr">
+                                <i class="fas fa-check-circle"></i> Activo
+                            </span>
+                        {% else %}
+                            <span class="badge-estado-usr badge-inactivo-usr">
+                                <i class="fas fa-times-circle"></i> Inactivo
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="td-acciones-usr">
+                        <div class="btn-group-usr">
+                            <a href="{{ url_for('admin.editar_usuario', user_id=usuario.id) }}"
+                               class="btn-action-usr btn-edit-usr"
+                               title="Editar usuario">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            {% if usuario.id != current_user.id %}
+                            <form method="POST"
+                                  action="{{ url_for('admin.eliminar_usuario', user_id=usuario.id) }}"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar este usuario?\n\nEsta acción no se puede deshacer.')">
+                                <button type="submit"
+                                        class="btn-action-usr btn-delete-usr"
+                                        title="Eliminar usuario">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn-action-usr btn-disabled-usr"
+                                    title="No puedes eliminar tu propio usuario"
+                                    disabled>
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state-usr">
+        <div class="empty-icon-usr">
+            <i class="fas fa-users-slash"></i>
+        </div>
+        <h3 class="empty-title-usr">No hay usuarios</h3>
+        <p class="empty-text-usr">No se encontraron usuarios con los filtros aplicados</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+:root {
+    --usr-primary: #667eea;
+    --usr-primary-dark: #5568d3;
+    --usr-secondary: #764ba2;
+    --usr-success: #48bb78;
+    --usr-info: #4299e1;
+    --usr-warning: #ed8936;
+    --usr-danger: #f56565;
+    --usr-text: #1a202c;
+    --usr-text-secondary: #4a5568;
+    --usr-text-muted: #718096;
+    --usr-bg: #f7fafc;
+    --usr-border: #e2e8f0;
+    --usr-white: #ffffff;
+}
+
+/* Header Section */
+.header-section-usr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2.5rem 2rem;
+    margin: -2rem -2rem 2rem -2rem;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.header-content-usr {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.breadcrumb-usr {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-link-usr {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link-usr:hover {
+    color: white;
+}
+
+.breadcrumb-sep-usr {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-usr {
+    color: white;
+    font-weight: 500;
+}
+
+.header-title-section-usr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.page-title-usr {
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.page-title-usr i {
+    margin-right: 0.75rem;
+}
+
+.btn-add-usr {
+    background: white;
+    color: var(--usr-primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-add-usr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-add-usr i {
+    margin-right: 0.5rem;
+}
+
+.page-subtitle-usr {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* Stats Grid */
+.stats-grid-usr {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-usr {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    transition: all 0.2s;
+    border-left: 4px solid var(--stat-color);
+}
+
+.stat-card-usr:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total-usr { --stat-color: var(--usr-primary); }
+.stat-aprendiz-usr { --stat-color: var(--usr-info); }
+.stat-docente-usr { --stat-color: var(--usr-success); }
+.stat-admin-usr { --stat-color: var(--usr-warning); }
+
+.stat-icon-usr {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--stat-color), var(--stat-color));
+    opacity: 0.15;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: var(--stat-color);
+    position: relative;
+}
+
+.stat-icon-usr i {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+}
+
+.stat-content-usr {
+    flex: 1;
+}
+
+.stat-value-usr {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--usr-text);
+    line-height: 1;
+}
+
+.stat-label-usr {
+    font-size: 0.9rem;
+    color: var(--usr-text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Filters Section */
+.filters-section-usr {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.filters-form-usr {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.filter-group-usr {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-label-usr {
+    color: var(--usr-text);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.filter-label-usr i {
+    color: var(--usr-primary);
+    margin-right: 0.5rem;
+}
+
+.filter-select-usr {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--usr-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    min-width: 200px;
+    transition: all 0.2s;
+}
+
+.filter-select-usr:focus {
+    outline: none;
+    border-color: var(--usr-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Table Section */
+.table-section-usr {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.table-container-usr {
+    overflow-x: auto;
+}
+
+.table-usr {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-head-usr {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.table-head-usr th {
+    color: white;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-head-usr th i {
+    margin-right: 0.5rem;
+    opacity: 0.9;
+}
+
+.text-center-usr {
+    text-align: center !important;
+}
+
+.table-body-usr {
+}
+
+.table-row-usr {
+    border-bottom: 1px solid var(--usr-border);
+    transition: background 0.2s;
+}
+
+.table-row-usr:hover {
+    background: var(--usr-bg);
+}
+
+.table-row-usr td {
+    padding: 1.25rem 1.25rem;
+    color: var(--usr-text-secondary);
+    font-size: 0.95rem;
+}
+
+/* User Info Cell */
+.user-info-usr {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar-usr {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.user-name-usr {
+    font-weight: 600;
+    color: var(--usr-text);
+}
+
+/* Documento Cell */
+.td-documento-usr {
+    font-family: 'Courier New', monospace;
+}
+
+.documento-badge-usr {
+    display: inline-block;
+    background: var(--usr-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--usr-primary);
+    margin-right: 0.5rem;
+}
+
+/* Badges */
+.badge-rol-usr {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-aprendiz-usr {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+}
+
+.badge-docente-usr {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.badge-administrador-usr {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+    color: white;
+}
+
+.badge-rector-usr {
+    background: linear-gradient(135deg, #9f7aea, #805ad5);
+    color: white;
+}
+
+.badge-estado-usr {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.badge-activo-usr {
+    background: #e6fffa;
+    color: #38a169;
+}
+
+.badge-inactivo-usr {
+    background: #fed7d7;
+    color: #c53030;
+}
+
+/* Actions */
+.td-acciones-usr {
+    text-align: center;
+}
+
+.btn-group-usr {
+    display: inline-flex;
+    gap: 0.5rem;
+}
+
+.btn-action-usr {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.btn-edit-usr {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+}
+
+.btn-edit-usr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+.btn-delete-usr {
+    background: linear-gradient(135deg, #f56565, #e53e3e);
+    color: white;
+}
+
+.btn-delete-usr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+}
+
+.btn-disabled-usr {
+    background: #e2e8f0;
+    color: #a0aec0;
+    cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-state-usr {
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.empty-icon-usr {
+    font-size: 4rem;
+    color: var(--usr-text-muted);
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-title-usr {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--usr-text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-text-usr {
+    color: var(--usr-text-muted);
+    font-size: 1.05rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-title-section-usr {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .stats-grid-usr {
+        grid-template-columns: 1fr;
+    }
+
+    .table-container-usr {
+        overflow-x: scroll;
+    }
+
+    .table-usr {
+        min-width: 800px;
+    }
+}
+</style>
+
+{% endblock %}

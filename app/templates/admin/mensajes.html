@@ -1,0 +1,1431 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Mensajes de Contacto - Admin{% endblock %}
+
+{% block content %}
+<!-- Modern Messages Header -->
+<div class="messages-header">
+    <div class="header-content-msg">
+        <div class="header-text-msg">
+            <h1 class="header-title-msg">Mensajes de Contacto</h1>
+            <p class="header-subtitle-msg">Gestiona los mensajes recibidos desde el formulario de contacto del sitio web</p>
+        </div>
+        <div class="header-icon-msg">
+            <i class="fas fa-envelope"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid-msg">
+    <div class="stat-card-msg stat-total-msg">
+        <div class="stat-icon-wrapper-msg">
+            <div class="stat-icon-msg">
+                <i class="fas fa-envelope"></i>
+            </div>
+        </div>
+        <div class="stat-content-msg">
+            <div class="stat-value-msg">{{ mensajes|length }}</div>
+            <div class="stat-label-msg">Total Mensajes</div>
+        </div>
+        <div class="stat-trend-msg">
+            <i class="fas fa-list"></i>
+        </div>
+    </div>
+
+    <div class="stat-card-msg stat-unread-msg">
+        <div class="stat-icon-wrapper-msg">
+            <div class="stat-icon-msg">
+                <i class="fas fa-envelope"></i>
+            </div>
+        </div>
+        <div class="stat-content-msg">
+            <div class="stat-value-msg">{{ mensajes|selectattr('leido', 'equalto', False)|list|length }}</div>
+            <div class="stat-label-msg">No Leídos</div>
+        </div>
+        <div class="stat-trend-msg">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+    </div>
+
+    <div class="stat-card-msg stat-read-msg">
+        <div class="stat-icon-wrapper-msg">
+            <div class="stat-icon-msg">
+                <i class="fas fa-envelope-open"></i>
+            </div>
+        </div>
+        <div class="stat-content-msg">
+            <div class="stat-value-msg">{{ mensajes|selectattr('leido', 'equalto', True)|list|length }}</div>
+            <div class="stat-label-msg">Leídos</div>
+        </div>
+        <div class="stat-trend-msg">
+            <i class="fas fa-check"></i>
+        </div>
+    </div>
+
+    <div class="stat-card-msg stat-replied-msg">
+        <div class="stat-icon-wrapper-msg">
+            <div class="stat-icon-msg">
+                <i class="fas fa-reply"></i>
+            </div>
+        </div>
+        <div class="stat-content-msg">
+            <div class="stat-value-msg">{{ mensajes|selectattr('respondido', 'equalto', True)|list|length }}</div>
+            <div class="stat-label-msg">Respondidos</div>
+        </div>
+        <div class="stat-trend-msg">
+            <i class="fas fa-check-double"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filters-panel-msg">
+    <div class="filters-header-msg">
+        <h3 class="filters-title-msg">
+            <i class="fas fa-filter"></i> Filtros de Búsqueda
+        </h3>
+    </div>
+    <form method="GET" class="filters-form-msg">
+        <div class="filters-grid-msg">
+            <div class="filter-group-msg">
+                <label for="estado" class="filter-label-msg">
+                    <i class="fas fa-flag"></i> Estado
+                </label>
+                <select name="estado" id="estado" class="filter-select-msg">
+                    <option value="">Todos los estados</option>
+                    <option value="no_leido" {{ 'selected' if request.args.get('estado') == 'no_leido' }}>📩 No Leídos</option>
+                    <option value="leido" {{ 'selected' if request.args.get('estado') == 'leido' }}>✉️ Leídos</option>
+                    <option value="respondido" {{ 'selected' if request.args.get('estado') == 'respondido' }}>↩️ Respondidos</option>
+                </select>
+            </div>
+
+            <div class="filter-group-msg">
+                <label for="buscar" class="filter-label-msg">
+                    <i class="fas fa-search"></i> Búsqueda
+                </label>
+                <input type="text" name="buscar" id="buscar" class="filter-input-msg"
+                       placeholder="Buscar por nombre, email o asunto..." value="{{ request.args.get('buscar', '') }}">
+            </div>
+        </div>
+
+        <div class="filters-actions-msg">
+            <button type="submit" class="btn-filter-msg btn-primary-msg">
+                <i class="fas fa-search"></i> Aplicar Filtros
+            </button>
+            <a href="{{ url_for('admin.mensajes') }}" class="btn-filter-msg btn-secondary-msg">
+                <i class="fas fa-times"></i> Limpiar Filtros
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Messages List -->
+<div class="messages-container-msg">
+    <div class="messages-list-header-msg">
+        <h3 class="messages-list-title-msg">
+            <i class="fas fa-inbox"></i> Bandeja de Mensajes
+        </h3>
+        <div class="messages-count-msg">
+            <span class="count-badge-msg">{{ mensajes|length }} mensaje{{ 's' if mensajes|length != 1 else '' }}</span>
+        </div>
+    </div>
+
+    {% if mensajes %}
+    <div class="messages-list-msg">
+        {% for mensaje in mensajes %}
+        <div class="message-card-msg {{ 'message-unread-msg' if not mensaje.leido else '' }}" id="mensaje-{{ mensaje.id }}">
+            <div class="message-status-indicator-msg {{ 'unread' if not mensaje.leido else 'read' }}"></div>
+
+            <div class="message-header-msg">
+                <div class="message-sender-msg">
+                    <div class="sender-avatar-msg">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sender-info-msg">
+                        <div class="sender-name-msg">{{ mensaje.nombre }}</div>
+                        <div class="sender-email-msg">
+                            <i class="fas fa-envelope"></i> {{ mensaje.email }}
+                        </div>
+                        {% if mensaje.telefono %}
+                        <div class="sender-phone-msg">
+                            <i class="fas fa-phone"></i> {{ mensaje.telefono }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="message-meta-msg">
+                    <div class="message-date-msg">
+                        <i class="fas fa-calendar"></i> {{ mensaje.created_at.strftime('%d/%m/%Y') }}
+                    </div>
+                    <div class="message-time-msg">
+                        <i class="fas fa-clock"></i> {{ mensaje.created_at.strftime('%H:%M') }}
+                    </div>
+                    <div class="message-status-badge-msg">
+                        {% if mensaje.respondido %}
+                        <span class="status-badge-msg status-replied-msg">
+                            <i class="fas fa-reply"></i> Respondido
+                        </span>
+                        {% elif mensaje.leido %}
+                        <span class="status-badge-msg status-read-msg">
+                            <i class="fas fa-envelope-open"></i> Leído
+                        </span>
+                        {% else %}
+                        <span class="status-badge-msg status-unread-msg">
+                            <i class="fas fa-envelope"></i> No Leído
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="message-subject-msg">
+                <i class="fas fa-tag"></i> {{ mensaje.asunto }}
+            </div>
+
+            <div class="message-preview-msg">
+                {{ mensaje.mensaje[:150] }}{{ '...' if mensaje.mensaje|length > 150 else '' }}
+            </div>
+
+            <div class="message-actions-msg">
+                <button type="button" class="btn-action-msg btn-view-msg"
+                        data-toggle="modal"
+                        data-target="#mensajeModal{{ mensaje.id }}"
+                        onclick="marcarComoLeido({{ mensaje.id }})">
+                    <i class="fas fa-eye"></i> Ver Mensaje Completo
+                </button>
+                <a href="mailto:{{ mensaje.email }}?subject=Re: {{ mensaje.asunto }}"
+                   class="btn-action-msg btn-reply-msg"
+                   onclick="marcarComoRespondido({{ mensaje.id }})">
+                    <i class="fas fa-reply"></i> Responder
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state-msg">
+        <div class="empty-icon-msg">
+            <i class="fas fa-inbox"></i>
+        </div>
+        <h3 class="empty-title-msg">No hay mensajes</h3>
+        <p class="empty-description-msg">No se han recibido mensajes de contacto todavía</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modals for Message Details -->
+{% for mensaje in mensajes %}
+<div class="modal fade" id="mensajeModal{{ mensaje.id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content modal-modern-msg">
+            <div class="modal-header-msg">
+                <div class="modal-header-content-msg">
+                    <div class="modal-icon-msg">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="modal-title-wrapper-msg">
+                        <h5 class="modal-title-msg">Mensaje de {{ mensaje.nombre }}</h5>
+                        <p class="modal-subtitle-msg">{{ mensaje.created_at.strftime('%d de %B de %Y a las %H:%M') }}</p>
+                    </div>
+                </div>
+                <button type="button" class="close-modal-msg" data-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-body-msg">
+                <!-- Contact Info Grid -->
+                <div class="contact-info-grid-msg">
+                    <div class="contact-info-item-msg">
+                        <div class="info-icon-msg info-name-msg">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="info-content-msg">
+                            <div class="info-label-msg">Nombre</div>
+                            <div class="info-value-msg">{{ mensaje.nombre }}</div>
+                        </div>
+                    </div>
+
+                    <div class="contact-info-item-msg">
+                        <div class="info-icon-msg info-email-msg">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content-msg">
+                            <div class="info-label-msg">Email</div>
+                            <div class="info-value-msg">
+                                <a href="mailto:{{ mensaje.email }}" class="email-link-msg">{{ mensaje.email }}</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if mensaje.telefono %}
+                    <div class="contact-info-item-msg">
+                        <div class="info-icon-msg info-phone-msg">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content-msg">
+                            <div class="info-label-msg">Teléfono</div>
+                            <div class="info-value-msg">{{ mensaje.telefono }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="contact-info-item-msg">
+                        <div class="info-icon-msg info-status-msg">
+                            <i class="fas fa-{{ 'check-circle' if mensaje.respondido else 'envelope-open' if mensaje.leido else 'envelope' }}"></i>
+                        </div>
+                        <div class="info-content-msg">
+                            <div class="info-label-msg">Estado</div>
+                            <div class="info-value-msg">
+                                <span class="status-badge-modal-msg status-{{ 'replied' if mensaje.respondido else 'read' if mensaje.leido else 'unread' }}-modal">
+                                    {{ 'Respondido' if mensaje.respondido else 'Leído' if mensaje.leido else 'No Leído' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subject Section -->
+                <div class="subject-section-msg">
+                    <div class="subject-label-msg">
+                        <i class="fas fa-tag"></i> Asunto
+                    </div>
+                    <div class="subject-value-msg">{{ mensaje.asunto }}</div>
+                </div>
+
+                <!-- Message Content -->
+                <div class="message-content-section-msg">
+                    <div class="message-label-msg">
+                        <i class="fas fa-comment-alt"></i> Mensaje
+                    </div>
+                    <div class="message-text-msg">
+                        {{ mensaje.mensaje }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer-msg">
+                <!-- Reply Form Section -->
+                <div class="reply-section-msg" id="replySection{{ mensaje.id }}" style="display: none;">
+                    <div class="reply-header-msg">
+                        <h4 class="reply-title-msg">
+                            <i class="fas fa-reply"></i> Responder Mensaje
+                        </h4>
+                    </div>
+                    <form id="replyForm{{ mensaje.id }}" onsubmit="enviarRespuesta(event, {{ mensaje.id }}, '{{ mensaje.email }}', '{{ mensaje.nombre }}', 'Re: {{ mensaje.asunto }}')">
+                        <div class="reply-form-group-msg">
+                            <label class="reply-label-msg">
+                                <i class="fas fa-envelope"></i> Para
+                            </label>
+                            <input type="text" class="reply-input-msg" value="{{ mensaje.email }}" readonly>
+                        </div>
+                        <div class="reply-form-group-msg">
+                            <label class="reply-label-msg">
+                                <i class="fas fa-tag"></i> Asunto
+                            </label>
+                            <input type="text" class="reply-input-msg" value="Re: {{ mensaje.asunto }}" readonly>
+                        </div>
+                        <div class="reply-form-group-msg">
+                            <label class="reply-label-msg">
+                                <i class="fas fa-comment-alt"></i> Mensaje
+                            </label>
+                            <textarea class="reply-textarea-msg" id="replyMessage{{ mensaje.id }}" rows="6" placeholder="Escribe tu respuesta aquí..." required></textarea>
+                        </div>
+                        <div class="reply-actions-msg">
+                            <button type="button" class="btn-reply-action-msg btn-cancel-reply-msg" onclick="toggleReplyForm({{ mensaje.id }})">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn-reply-action-msg btn-send-reply-msg">
+                                <i class="fas fa-paper-plane"></i> Enviar Respuesta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer Buttons -->
+                <div class="modal-footer-buttons-msg">
+                    <button type="button" class="btn-modal-msg btn-close-msg" data-dismiss="modal">
+                        <i class="fas fa-times"></i> Cerrar
+                    </button>
+                    <button type="button" class="btn-modal-msg btn-reply-modal-msg" onclick="toggleReplyForm({{ mensaje.id }})">
+                        <i class="fas fa-reply"></i> Responder Mensaje
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<style>
+/* Color Scheme */
+:root {
+    --msg-primary: #7c3aed;
+    --msg-primary-dark: #6d28d9;
+    --msg-primary-light: #a78bfa;
+    --msg-success: #10b981;
+    --msg-warning: #f59e0b;
+    --msg-danger: #ef4444;
+    --msg-info: #3b82f6;
+    --msg-unread: #fbbf24;
+}
+
+/* Messages Header */
+.messages-header {
+    background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+}
+
+.header-content-msg {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-text-msg {
+    flex: 1;
+}
+
+.header-title-msg {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-subtitle-msg {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+}
+
+.header-icon-msg {
+    font-size: 5rem;
+    color: rgba(255, 255, 255, 0.2);
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Stats Grid */
+.stats-grid-msg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-msg {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card-msg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--color), transparent);
+}
+
+.stat-total-msg { --color: #7c3aed; }
+.stat-unread-msg { --color: #f59e0b; }
+.stat-read-msg { --color: #10b981; }
+.stat-replied-msg { --color: #3b82f6; }
+
+.stat-card-msg:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon-wrapper-msg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon-msg {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    background: var(--color);
+}
+
+.stat-content-msg {
+    flex: 1;
+}
+
+.stat-value-msg {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.stat-label-msg {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.stat-trend-msg {
+    font-size: 1.5rem;
+    color: #d1d5db;
+}
+
+/* Filters Panel */
+.filters-panel-msg {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.filters-header-msg {
+    margin-bottom: 1.5rem;
+}
+
+.filters-title-msg {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.filters-form-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.filters-grid-msg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.filter-group-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label-msg {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.filter-label-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.25rem;
+}
+
+.filter-select-msg,
+.filter-input-msg {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.filter-select-msg:focus,
+.filter-input-msg:focus {
+    outline: none;
+    border-color: var(--msg-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.filters-actions-msg {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-filter-msg {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary-msg {
+    background: linear-gradient(135deg, var(--msg-primary), var(--msg-primary-dark));
+    color: white;
+}
+
+.btn-primary-msg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.btn-secondary-msg {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.btn-secondary-msg:hover {
+    background: #e5e7eb;
+}
+
+/* Messages Container */
+.messages-container-msg {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.messages-list-header-msg {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.messages-list-title-msg {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.count-badge-msg {
+    background: linear-gradient(135deg, var(--msg-primary), var(--msg-primary-dark));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Messages List */
+.messages-list-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Message Card */
+.message-card-msg {
+    background: #fafafa;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.message-card-msg:hover {
+    border-color: var(--msg-primary-light);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.1);
+    transform: translateX(5px);
+}
+
+.message-unread-msg {
+    background: #fffbeb;
+    border-color: var(--msg-unread);
+}
+
+.message-status-indicator-msg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: #10b981;
+}
+
+.message-status-indicator-msg.unread {
+    background: var(--msg-unread);
+    animation: pulse 2s infinite;
+}
+
+.message-header-msg {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.message-sender-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1;
+}
+
+.sender-avatar-msg {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--msg-primary), var(--msg-primary-dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.sender-info-msg {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sender-name-msg {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.sender-email-msg,
+.sender-phone-msg {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.sender-email-msg i,
+.sender-phone-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.25rem;
+}
+
+.message-meta-msg {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
+.message-date-msg,
+.message-time-msg {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.message-date-msg i,
+.message-time-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.25rem;
+}
+
+.message-status-badge-msg {
+    margin-top: 0.5rem;
+}
+
+.status-badge-msg {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.status-unread-msg {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-read-msg {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-replied-msg {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.message-subject-msg {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid var(--msg-primary);
+}
+
+.message-subject-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.5rem;
+}
+
+.message-preview-msg {
+    color: #4b5563;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.message-actions-msg {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-action-msg {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-view-msg {
+    background: linear-gradient(135deg, var(--msg-primary), var(--msg-primary-dark));
+    color: white;
+}
+
+.btn-view-msg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.btn-reply-msg {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-reply-msg:hover {
+    background: var(--msg-success);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Empty State */
+.empty-state-msg {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon-msg {
+    font-size: 5rem;
+    color: #d1d5db;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title-msg {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.empty-description-msg {
+    font-size: 1rem;
+    color: #9ca3af;
+}
+
+/* Modal Styles */
+.modal-modern-msg {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.modal-header-msg {
+    background: linear-gradient(135deg, var(--msg-primary), var(--msg-primary-dark));
+    color: white;
+    padding: 2rem;
+    border: none;
+    position: relative;
+}
+
+.modal-header-content-msg {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.modal-icon-msg {
+    font-size: 3rem;
+    opacity: 0.9;
+}
+
+.modal-title-wrapper-msg {
+    flex: 1;
+}
+
+.modal-title-msg {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.modal-subtitle-msg {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.close-modal-msg {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-modal-msg:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body-msg {
+    padding: 2rem;
+}
+
+/* Contact Info Grid in Modal */
+.contact-info-grid-msg {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.contact-info-item-msg {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 10px;
+    border: 2px solid #f3f4f6;
+}
+
+.info-icon-msg {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+}
+
+.info-name-msg { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+.info-email-msg { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.info-phone-msg { background: linear-gradient(135deg, #10b981, #059669); }
+.info-status-msg { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+.info-content-msg {
+    flex: 1;
+}
+
+.info-label-msg {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.info-value-msg {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.email-link-msg {
+    color: var(--msg-primary);
+    text-decoration: none;
+}
+
+.email-link-msg:hover {
+    text-decoration: underline;
+}
+
+.status-badge-modal-msg {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-unread-modal { background: #fef3c7; color: #92400e; }
+.status-read-modal { background: #d1fae5; color: #065f46; }
+.status-replied-modal { background: #dbeafe; color: #1e40af; }
+
+/* Subject Section */
+.subject-section-msg {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    background: #f9fafb;
+    border-radius: 10px;
+    border-left: 4px solid var(--msg-primary);
+}
+
+.subject-label-msg {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.subject-label-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.5rem;
+}
+
+.subject-value-msg {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Message Content */
+.message-content-section-msg {
+    padding: 1.25rem;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.message-label-msg {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.message-label-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.5rem;
+}
+
+.message-text-msg {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.7;
+    white-space: pre-wrap;
+}
+
+/* Modal Footer */
+.modal-footer-msg {
+    padding: 1.5rem 2rem;
+    background: #f9fafb;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-footer-buttons-msg {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Reply Section */
+.reply-section-msg {
+    width: 100%;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    margin-bottom: 1rem;
+}
+
+.reply-header-msg {
+    margin-bottom: 1.5rem;
+}
+
+.reply-title-msg {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+}
+
+.reply-title-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.5rem;
+}
+
+.reply-form-group-msg {
+    margin-bottom: 1rem;
+}
+
+.reply-label-msg {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.reply-label-msg i {
+    color: var(--msg-primary);
+    margin-right: 0.25rem;
+}
+
+.reply-input-msg,
+.reply-textarea-msg {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.reply-input-msg:focus,
+.reply-textarea-msg:focus {
+    outline: none;
+    border-color: var(--msg-primary);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.reply-textarea-msg {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.reply-actions-msg {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-reply-action-msg {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cancel-reply-msg {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-cancel-reply-msg:hover {
+    background: #d1d5db;
+}
+
+.btn-send-reply-msg {
+    background: linear-gradient(135deg, var(--msg-success), #059669);
+    color: white;
+}
+
+.btn-send-reply-msg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-modal-msg {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-close-msg {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-close-msg:hover {
+    background: #d1d5db;
+}
+
+.btn-reply-modal-msg {
+    background: linear-gradient(135deg, var(--msg-success), #059669);
+    color: white;
+}
+
+.btn-reply-modal-msg:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .stats-grid-msg {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header-title-msg {
+        font-size: 2rem;
+    }
+
+    .header-subtitle-msg {
+        font-size: 1rem;
+    }
+
+    .header-icon-msg {
+        font-size: 3rem;
+    }
+
+    .stats-grid-msg {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-grid-msg {
+        grid-template-columns: 1fr;
+    }
+
+    .message-header-msg {
+        flex-direction: column;
+    }
+
+    .message-meta-msg {
+        align-items: flex-start;
+    }
+
+    .contact-info-grid-msg {
+        grid-template-columns: 1fr;
+    }
+
+    .filters-actions-msg {
+        flex-direction: column;
+    }
+
+    .btn-filter-msg {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .message-actions-msg {
+        flex-direction: column;
+    }
+
+    .btn-action-msg {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-footer-msg {
+        flex-direction: column;
+    }
+
+    .modal-footer-buttons-msg {
+        flex-direction: column;
+    }
+
+    .btn-modal-msg {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .reply-actions-msg {
+        flex-direction: column;
+    }
+
+    .btn-reply-action-msg {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title-msg {
+        font-size: 1.5rem;
+    }
+
+    .stat-value-msg {
+        font-size: 1.5rem;
+    }
+
+    .sender-name-msg {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<script>
+function marcarComoLeido(mensajeId) {
+    fetch(`/admin/mensajes/marcar-leido/${mensajeId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update UI
+            const messageCard = document.getElementById(`mensaje-${mensajeId}`);
+            if (messageCard) {
+                messageCard.classList.remove('message-unread-msg');
+                const indicator = messageCard.querySelector('.message-status-indicator-msg');
+                if (indicator) {
+                    indicator.classList.remove('unread');
+                    indicator.classList.add('read');
+                }
+            }
+            // Reload to update counters
+            setTimeout(() => location.reload(), 1000);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function marcarComoRespondido(mensajeId) {
+    fetch(`/admin/mensajes/marcar-respondido/${mensajeId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Marcado como respondido');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function toggleReplyForm(mensajeId) {
+    const replySection = document.getElementById(`replySection${mensajeId}`);
+    if (replySection.style.display === 'none' || replySection.style.display === '') {
+        replySection.style.display = 'block';
+    } else {
+        replySection.style.display = 'none';
+        // Limpiar el textarea si se cancela
+        const textarea = document.getElementById(`replyMessage${mensajeId}`);
+        if (textarea) {
+            textarea.value = '';
+        }
+    }
+}
+
+function enviarRespuesta(event, mensajeId, destinatario, nombre, asunto) {
+    event.preventDefault();
+
+    const mensaje = document.getElementById(`replyMessage${mensajeId}`).value;
+
+    if (!mensaje.trim()) {
+        alert('Por favor escribe un mensaje antes de enviar.');
+        return;
+    }
+
+    showSpinner2('Enviando respuesta...');
+
+    // Enviar el correo al backend
+    fetch('/admin/mensajes/enviar-respuesta', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            mensaje_id: mensajeId,
+            destinatario: destinatario,
+            nombre: nombre,
+            asunto: asunto,
+            mensaje: mensaje
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideSpinner2();
+        if (data.success) {
+            // Marcar como respondido
+            marcarComoRespondido(mensajeId);
+
+            // Cerrar el formulario
+            toggleReplyForm(mensajeId);
+
+            // Cerrar el modal
+            $(`#mensajeModal${mensajeId}`).modal('hide');
+
+            // Mostrar mensaje de éxito
+            alert('¡Respuesta enviada exitosamente!');
+
+            // Recargar la página para actualizar el estado
+            setTimeout(() => location.reload(), 500);
+        } else {
+            alert('Error al enviar la respuesta: ' + (data.message || 'Error desconocido'));
+        }
+    })
+    .catch(error => {
+        hideSpinner2();
+        console.error('Error:', error);
+        alert('Error al enviar la respuesta. Por favor intenta nuevamente.');
+    });
+}
+</script>
+{% endblock %}

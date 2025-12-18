@@ -1,0 +1,180 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ 'Editar' if colegio else 'Nuevo' }} Colegio - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-home"></i> Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.colegios') }}">Colegios</a></li>
+            <li class="breadcrumb-item active">{{ 'Editar' if colegio else 'Nuevo' }}</li>
+        </ol>
+    </nav>
+
+    <!-- Encabezado -->
+    <div class="mb-4">
+        <h2><i class="fas fa-school"></i> {{ 'Editar' if colegio else 'Nuevo' }} Colegio</h2>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-edit"></i> Formulario de Colegio</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <!-- Informacion Basica -->
+                        <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle"></i> Informacion Basica</h6>
+
+                        <div class="form-group">
+                            <label for="nombre"><strong>Nombre del Colegio <span class="text-danger">*</span></strong></label>
+                            <input type="text" name="nombre" id="nombre" class="form-control"
+                                   value="{{ colegio.nombre if colegio else '' }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo_colegio"><strong>Tipo de Colegio <span class="text-danger">*</span></strong></label>
+                            <select name="tipo_colegio" id="tipo_colegio" class="form-control" required>
+                                <option value="PUBLICO" {{ 'selected' if colegio and colegio.tipo_colegio == 'PUBLICO' else '' }}>Publico</option>
+                                <option value="PRIVADO" {{ 'selected' if colegio and colegio.tipo_colegio == 'PRIVADO' else '' }}>Privado</option>
+                                <option value="MIXTO" {{ 'selected' if colegio and colegio.tipo_colegio == 'MIXTO' else '' }}>Mixto</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="direccion"><strong>Direccion</strong></label>
+                            <input type="text" name="direccion" id="direccion" class="form-control"
+                                   value="{{ colegio.direccion if colegio else '' }}">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="telefono"><strong>Telefono</strong></label>
+                                    <input type="tel" name="telefono" id="telefono" class="form-control"
+                                           value="{{ colegio.telefono if colegio else '' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email"><strong>Email</strong></label>
+                                    <input type="email" name="email" id="email" class="form-control"
+                                           value="{{ colegio.email if colegio else '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Responsables -->
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="fas fa-users"></i> Responsables</h6>
+
+                        <div class="form-group">
+                            <label for="rector_id"><strong>Rector</strong></label>
+                            <select name="rector_id" id="rector_id" class="form-control">
+                                <option value="">-- Seleccionar Rector --</option>
+                                {% for usuario in rectores %}
+                                <option value="{{ usuario.id }}" {{ 'selected' if colegio and colegio.rector_id == usuario.id else '' }}>
+                                    {{ usuario.nombre_completo }} ({{ usuario.documento }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Solo usuarios con rol RECTOR</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="docente_enlace_id"><strong>Docente Enlace</strong></label>
+                            <select name="docente_enlace_id" id="docente_enlace_id" class="form-control">
+                                <option value="">-- Seleccionar Docente Enlace --</option>
+                                {% for usuario in docentes %}
+                                <option value="{{ usuario.id }}" {{ 'selected' if colegio and colegio.docente_enlace_id == usuario.id else '' }}>
+                                    {{ usuario.nombre_completo }} ({{ usuario.documento }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Solo usuarios con rol DOCENTE</small>
+                        </div>
+
+                        <!-- Estado (solo para edicion) -->
+                        {% if colegio %}
+                        <h6 class="border-bottom pb-2 mb-3 mt-4"><i class="fas fa-toggle-on"></i> Estado</h6>
+
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" name="activo" class="custom-control-input" id="activo"
+                                       {{ 'checked' if colegio.activo else '' }}>
+                                <label class="custom-control-label" for="activo">Colegio Activo</label>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('admin.colegios') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Colegio
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    list-style: none;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}
+
+.breadcrumb-item {
+    display: inline-block;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    display: inline-block;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    color: #6c757d;
+    content: "/";
+}
+
+.breadcrumb-item.active {
+    color: #6c757d;
+}
+
+.breadcrumb-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Form styling */
+h6 {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.custom-switch {
+    padding-left: 2.5rem;
+}
+
+.custom-control-label {
+    font-weight: 500;
+}
+</style>
+{% endblock %}
