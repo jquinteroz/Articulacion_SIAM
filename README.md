@@ -385,21 +385,24 @@ rm -rf uploads/temp reports/*
 
 ## Documentación Adicional
 
+📁 **Toda la documentación detallada se encuentra en la carpeta [historial/](historial/)**
+
 ### Guías de Deploy
-- **[DEPLOY_PYTHONANYWHERE.md](DEPLOY_PYTHONANYWHERE.md)** - Despliegue en PythonAnywhere (recomendado)
-- **[DEPLOY_PRODUCCION.md](DEPLOY_PRODUCCION.md)** - Despliegue en servidor tradicional (Nginx + Gunicorn)
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Guía general de despliegue
+- **[historial/DEPLOY_PYTHONANYWHERE.md](historial/DEPLOY_PYTHONANYWHERE.md)** - Despliegue en PythonAnywhere (recomendado)
+- **[historial/DEPLOY_PRODUCCION.md](historial/DEPLOY_PRODUCCION.md)** - Despliegue en servidor tradicional (Nginx + Gunicorn)
+- **[historial/DEPLOYMENT.md](historial/DEPLOYMENT.md)** - Guía general de despliegue
 
-### Documentación del Proyecto
-- **[AUTHORS.md](AUTHORS.md)** - Autoría y contribuciones del proyecto
+### Documentación del Desarrollo
+- **[historial/AUTHORS.md](historial/AUTHORS.md)** - Autoría y contribuciones del proyecto
+- **[historial/CAMBIOS_FRONTEND_V2.md](historial/CAMBIOS_FRONTEND_V2.md)** - Refactorización del frontend v2.0
+- **[historial/API_DOCUMENTATION.md](historial/API_DOCUMENTATION.md)** - Documentación de la API
 
-### Documentación Histórica
-- **[historial/](historial/)** - Carpeta con documentación histórica del desarrollo
-  - Cambios de base de datos
-  - Refactorizaciones del frontend
-  - Guías de instalación antiguas
-  - Solución a problemas comunes
-  - Resúmenes de actualizaciones
+### Guías y Soluciones
+- **[historial/INSTALLATION.md](historial/INSTALLATION.md)** - Guía de instalación detallada
+- **[historial/SOLUCION_PIP_INSTALL.md](historial/SOLUCION_PIP_INSTALL.md)** - Solución a errores de pip install
+- **[historial/GUIA_GITHUB.md](historial/GUIA_GITHUB.md)** - Guía para subir a GitHub
+
+Ver **[historial/README.md](historial/README.md)** para el índice completo de documentación.
 
 ## Soporte
 
