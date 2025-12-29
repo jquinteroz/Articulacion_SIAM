@@ -383,11 +383,30 @@ rmdir /s /q reports
 rm -rf uploads/temp reports/*
 ```
 
+## Documentación Adicional
+
+### Guías de Deploy
+- **[DEPLOY_PYTHONANYWHERE.md](DEPLOY_PYTHONANYWHERE.md)** - Despliegue en PythonAnywhere (recomendado)
+- **[DEPLOY_PRODUCCION.md](DEPLOY_PRODUCCION.md)** - Despliegue en servidor tradicional (Nginx + Gunicorn)
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Guía general de despliegue
+
+### Documentación del Proyecto
+- **[AUTHORS.md](AUTHORS.md)** - Autoría y contribuciones del proyecto
+
+### Documentación Histórica
+- **[historial/](historial/)** - Carpeta con documentación histórica del desarrollo
+  - Cambios de base de datos
+  - Refactorizaciones del frontend
+  - Guías de instalación antiguas
+  - Solución a problemas comunes
+  - Resúmenes de actualizaciones
+
 ## Soporte
 
 Para soporte técnico o consultas:
 - Email: soporte@sena.edu.co
-- Documentación: Este archivo README
+- GitHub Issues: [Reportar un problema](https://github.com/jquinteroz/Articulacion_SIAM/issues)
+- Documentación: Este archivo README y carpeta `historial/`
 
 ## Desarrollador
 

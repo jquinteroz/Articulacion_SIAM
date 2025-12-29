@@ -68,7 +68,11 @@
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(git push)",
+      "Bash(git stash:*)",
+      "Bash(git mv:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
