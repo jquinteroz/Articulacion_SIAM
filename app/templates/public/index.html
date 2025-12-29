@@ -1,49 +1,327 @@
 {% extends "base.html" %}
 
-{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica{% endblock %}
+{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica SENA{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 {% endblock %}
 
 {% block content %}
-<section class="hero-minimal">
-    <div class="container-minimal">
-        <div class="siam-logo-hero">
-            <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" style="width: 100%; height: auto; max-width: 200px;">
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <span class="hero-badge">
+                <i class="fas fa-graduation-cap"></i> SENA - Formación de Calidad
+            </span>
+            <h1 class="hero-title">
+                Sistema <span class="hero-title-highlight">SIAM</span>
+            </h1>
+            <h2 class="hero-subtitle">
+                Centro de Gestión de Mercados, Logística y Tecnologías de la Información
+            </h2>
+            <p class="hero-description">
+                Plataforma integral para la gestión de articulación con la media técnica.
+                Simplifica el proceso de matrícula, seguimiento académico y generación de documentos
+                para estudiantes, docentes y administrativos.
+            </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('public.login') }}" class="btn-hero btn-primary">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </a>
+                <a href="{{ url_for('public.registro') }}" class="btn-hero btn-outline">
+                    <i class="fas fa-user-plus"></i>
+                    Registrarse
+                </a>
+            </div>
         </div>
-        <h1 class="siam-title-hero">SIAM</h1>
-        <p class="siam-subtitle-hero">CENTRO DE GESTIÓN DE MERCADOS LOGISTICA Y TECNOLOGIAS DE LA INFORMACIÓN</p>
-        <div class="sena-logo-container" style="margin: 1.5rem 0;">
-            <img src="{{ url_for('static', filename='img/sena.png') }}" alt="Logo SENA" style="max-width: 150px; height: auto;">
-        </div>
-        <p class="siam-description">Sistema Integrado de Articulación y Media Técnica</p>
-        <div class="actions-hero">
-            <a href="{{ url_for('public.login') }}" class="btn-hero btn-primary-hero">
-                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-            </a>
-            <a href="{{ url_for('public.registro') }}" class="btn-hero btn-secondary-hero">
-                <i class="fas fa-user-plus"></i> Registrarse
-            </a>
+
+        <div class="hero-visual">
+            <div class="hero-logo-container">
+                <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" class="hero-logo">
+
+                <!-- Estadísticas flotantes -->
+                <div class="hero-stat-card hero-stat-card-1">
+                    <span class="stat-number">{{ stats.programas if stats else '15+' }}</span>
+                    <span class="stat-label">Programas Activos</span>
+                </div>
+                <div class="hero-stat-card hero-stat-card-2">
+                    <span class="stat-number">{{ stats.estudiantes if stats else '500+' }}</span>
+                    <span class="stat-label">Estudiantes</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">¿Por qué SIAM?</span>
+            <h2 class="section-title">
+                Gestión Integral de Articulación
+            </h2>
+            <p class="section-description">
+                Una plataforma completa diseñada para simplificar todos los procesos
+                de articulación entre instituciones educativas y el SENA.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3 class="feature-title">Gestión de Documentos</h3>
+                <p class="feature-description">
+                    Carga, almacena y descarga documentos de forma segura.
+                    Generación automática de formatos requeridos por el SENA.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Multi-Rol</h3>
+                <p class="feature-description">
+                    Interfaces personalizadas para administradores, docentes,
+                    rectores y aprendices con permisos específicos.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Reportes y Estadísticas</h3>
+                <p class="feature-description">
+                    Visualiza el progreso académico con dashboards intuitivos
+                    y exporta reportes en múltiples formatos.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-excel"></i>
+                </div>
+                <h3 class="feature-title">Exportación SOFIA Plus</h3>
+                <p class="feature-description">
+                    Genera automáticamente archivos Excel compatibles con SOFIA Plus
+                    con toda la información de los aprendices.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Seguridad</h3>
+                <p class="feature-description">
+                    Encriptación de datos sensibles, autenticación robusta
+                    y control de acceso por roles.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3 class="feature-title">Responsive</h3>
+                <p class="feature-description">
+                    Accede desde cualquier dispositivo: computador, tablet o móvil.
+                    Diseño adaptativo y optimizado.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Programas Section -->
 <section class="programas-section">
-    <div class="container-minimal">
-        <h2 class="section-title-minimal">Programas Disponibles</h2>
-        <div class="programas-grid-minimal">
-            <div class="programa-card-minimal">
-                <i class="fas fa-laptop-code"></i>
-                <h3>Programación</h3>
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Formación Técnica</span>
+            <h2 class="section-title">
+                Programas Disponibles
+            </h2>
+            <p class="section-description">
+                Explora los programas de formación técnica disponibles en articulación
+                con el SENA. Formación de calidad para tu futuro profesional.
+            </p>
+        </div>
+
+        <div class="programas-grid">
+            <!-- Programa 1: Sistemas -->
+            <div class="programa-card">
+                <div class="programa-header">
+                    <div class="programa-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <h3 class="programa-title">Sistemas e Informática</h3>
+                </div>
+                <div class="programa-body">
+                    <p class="programa-description">
+                        Forma parte de la era digital desarrollando sistemas de información
+                        y aplicaciones tecnológicas innovadoras.
+                    </p>
+                    <ul class="programa-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Programación de software
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Bases de datos
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Desarrollo web y móvil
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Redes de computadores
+                        </li>
+                    </ul>
+                </div>
+                <div class="programa-footer">
+                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
+                        <span>Ver más información</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <div class="programa-card-minimal">
-                <i class="fas fa-network-wired"></i>
-                <h3>Sistemas</h3>
+
+            <!-- Programa 2: Contabilidad -->
+            <div class="programa-card">
+                <div class="programa-header">
+                    <div class="programa-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="programa-title">Contabilidad y Finanzas</h3>
+                </div>
+                <div class="programa-body">
+                    <p class="programa-description">
+                        Conviértete en experto en gestión contable y financiera.
+                        Aprende a manejar las finanzas de empresas y organizaciones.
+                    </p>
+                    <ul class="programa-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Contabilidad general
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Análisis financiero
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Impuestos y tributación
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Auditoría y control
+                        </li>
+                    </ul>
+                </div>
+                <div class="programa-footer">
+                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
+                        <span>Ver más información</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
             </div>
-            <div class="programa-card-minimal">
-                <i class="fas fa-tools"></i>
-                <h3>Mantenimiento</h3>
+
+            <!-- Programa 3: Mecánica -->
+            <div class="programa-card">
+                <div class="programa-header">
+                    <div class="programa-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3 class="programa-title">Mecánica Industrial</h3>
+                </div>
+                <div class="programa-body">
+                    <p class="programa-description">
+                        Domina la operación, mantenimiento y reparación de maquinaria
+                        industrial. Desarrolla habilidades técnicas prácticas.
+                    </p>
+                    <ul class="programa-features">
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Mantenimiento de máquinas
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Soldadura y mecanizado
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Hidráulica y neumática
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle"></i>
+                            Control de calidad
+                        </li>
+                    </ul>
+                </div>
+                <div class="programa-footer">
+                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
+                        <span>Ver más información</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.colegios if stats else '10+' }}</span>
+                <span class="stat-title">Instituciones Articuladas</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.programas if stats else '15+' }}</span>
+                <span class="stat-title">Programas Técnicos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.estudiantes if stats else '500+' }}</span>
+                <span class="stat-title">Aprendices Activos</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">{{ stats.docentes if stats else '50+' }}</span>
+                <span class="stat-title">Instructores</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-container">
+            <div class="cta-content">
+                <h2 class="cta-title">¿Listo para comenzar tu formación?</h2>
+                <p class="cta-description">
+                    Únete a cientos de estudiantes que ya están construyendo su futuro
+                    con la formación técnica del SENA.
+                </p>
+                <div class="cta-actions">
+                    <a href="{{ url_for('public.registro') }}" class="btn-hero btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Registrarse Ahora
+                    </a>
+                    <a href="{{ url_for('public.contacto') }}" class="btn-hero btn-outline">
+                        <i class="fas fa-envelope"></i>
+                        Contactar
+                    </a>
+                </div>
             </div>
         </div>
     </div>
