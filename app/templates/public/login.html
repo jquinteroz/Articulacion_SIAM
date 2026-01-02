@@ -126,69 +126,6 @@
                     <a href="{{ url_for('public.registro') }}" class="register-link">Regístrate aquí</a>
                 </p>
             </div>
-
-            <!-- Test Credentials -->
-            <div class="test-credentials-modern">
-                <button class="credentials-toggle" onclick="toggleCredentials()">
-                    <i class="fas fa-key"></i> Ver Credenciales de Prueba
-                    <i class="fas fa-chevron-down credentials-chevron"></i>
-                </button>
-
-                <div class="credentials-content" id="credentialsContent">
-                    <div class="credentials-grid">
-                        <div class="credential-card credential-admin">
-                            <div class="credential-header">
-                                <i class="fas fa-user-shield"></i>
-                                <span>Administrador</span>
-                            </div>
-                            <div class="credential-body">
-                                <div class="credential-row">
-                                    <span class="credential-label">Usuario:</span>
-                                    <code class="credential-value">1000000000</code>
-                                </div>
-                                <div class="credential-row">
-                                    <span class="credential-label">Contraseña:</span>
-                                    <code class="credential-value">Admin123!</code>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="credential-card credential-docente">
-                            <div class="credential-header">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <span>Docente Enlace</span>
-                            </div>
-                            <div class="credential-body">
-                                <div class="credential-row">
-                                    <span class="credential-label">Usuario:</span>
-                                    <code class="credential-value">1000000001</code>
-                                </div>
-                                <div class="credential-row">
-                                    <span class="credential-label">Contraseña:</span>
-                                    <code class="credential-value">Docente123!</code>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="credential-card credential-aprendiz">
-                            <div class="credential-header">
-                                <i class="fas fa-user-graduate"></i>
-                                <span>Aprendiz</span>
-                            </div>
-                            <div class="credential-body">
-                                <div class="credential-row">
-                                    <span class="credential-label">Usuario:</span>
-                                    <code class="credential-value">1000000002</code>
-                                </div>
-                                <div class="credential-row">
-                                    <span class="credential-label">Contraseña:</span>
-                                    <code class="credential-value">Aprendiz123!</code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -217,14 +154,6 @@ function togglePasswordInput(inputId, iconElement) {
         iconElement.classList.remove('fa-eye-slash');
         iconElement.classList.add('fa-eye');
     }
-}
-
-function toggleCredentials() {
-    const content = document.getElementById('credentialsContent');
-    const toggle = document.querySelector('.credentials-toggle');
-
-    content.classList.toggle('active');
-    toggle.classList.toggle('active');
 }
 
 // Add smooth scroll behavior

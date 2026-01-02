@@ -1,36 +1,51 @@
 /**
  * SIAM - Variables Globales
- * Paleta de colores profesional e institucional
+ * Paleta de colores verde corporativo SENA
  * Sistema de Articulación SENA
  */
 
 :root {
-    /* ===== COLORES INSTITUCIONALES SENA ===== */
-    --sena-naranja: #FF5A00;
-    --sena-verde: #39A900;
+    /* ===== COLORES CORPORATIVOS SENA (VERDES) ===== */
+    --sena-verde-principal: #39A900;
     --sena-verde-oscuro: #2D8700;
-    --sena-verde-claro: #4BC800;
+    --sena-verde-medio: #4BC800;
+    --sena-verde-claro: #66CC00;
+    --sena-verde-muy-claro: #E8F5E0;
 
-    /* ===== COLORES PRIMARIOS ===== */
+    /* ===== COLORES PRIMARIOS (TODOS VERDES) ===== */
     --primary: #39A900;
     --primary-dark: #2D8700;
     --primary-light: #4BC800;
     --primary-lighter: #E8F5E0;
+    --primary-hover: #329600;
 
-    --secondary: #FF5A00;
-    --secondary-dark: #CC4800;
-    --secondary-light: #FF7633;
-    --secondary-lighter: #FFF3ED;
+    /* ===== COLORES SECUNDARIOS (VERDES COMPLEMENTARIOS) ===== */
+    --secondary: #2D8700;
+    --secondary-dark: #1F5C00;
+    --secondary-light: #39A900;
+    --secondary-lighter: #D4EDCC;
+
+    /* ===== ACENTO (VERDE LIMA) ===== */
+    --accent: #66CC00;
+    --accent-dark: #55AA00;
+    --accent-light: #88DD33;
 
     /* ===== COLORES DE ESTADO ===== */
-    --success: #10B981;
-    --success-light: #D1FAE5;
+    --success: #39A900;
+    --success-light: #E8F5E0;
+    --success-dark: #2D8700;
+
     --warning: #F59E0B;
     --warning-light: #FEF3C7;
-    --danger: #EF4444;
+    --warning-dark: #D97706;
+
+    --danger: #DC2626;
     --danger-light: #FEE2E2;
-    --info: #3B82F6;
-    --info-light: #DBEAFE;
+    --danger-dark: #B91C1C;
+
+    --info: #2D8700;
+    --info-light: #D4EDCC;
+    --info-dark: #1F5C00;
 
     /* ===== COLORES NEUTRALES (PROFESIONALES) ===== */
     --gray-50: #F9FAFB;
@@ -49,23 +64,34 @@
     --text-secondary: #4B5563;
     --text-muted: #6B7280;
     --text-disabled: #9CA3AF;
+    --text-white: #FFFFFF;
 
     /* ===== FONDOS ===== */
     --bg-primary: #FFFFFF;
     --bg-secondary: #F9FAFB;
     --bg-tertiary: #F3F4F6;
     --bg-dark: #1F2937;
+    --bg-verde-suave: #F0F9EB;
 
     /* ===== BORDES ===== */
     --border-light: #E5E7EB;
     --border-medium: #D1D5DB;
     --border-dark: #9CA3AF;
+    --border-verde: #39A900;
 
     /* ===== SOMBRAS ===== */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-verde: 0 4px 15px rgba(57, 169, 0, 0.2);
+    --shadow-verde-hover: 0 6px 25px rgba(57, 169, 0, 0.3);
+
+    /* ===== GRADIENTES VERDES ===== */
+    --gradient-verde-principal: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    --gradient-verde-claro: linear-gradient(135deg, #4BC800 0%, #39A900 100%);
+    --gradient-verde-oscuro: linear-gradient(135deg, #2D8700 0%, #1F5C00 100%);
+    --gradient-verde-suave: linear-gradient(135deg, #E8F5E0 0%, #D4EDCC 100%);
 
     /* ===== ESPACIADOS ===== */
     --spacing-xs: 0.25rem;
@@ -112,18 +138,6 @@
     --z-tooltip: 1070;
 }
 
-/* ===== MODO OSCURO (PREPARADO PARA FUTURO) ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: #111827;
-        --bg-secondary: #1F2937;
-        --bg-tertiary: #374151;
-        --text-primary: #F9FAFB;
-        --text-secondary: #E5E7EB;
-        --text-muted: #9CA3AF;
-    }
-}
-
 /* ===== RESET Y BASE ===== */
 * {
     margin: 0;
@@ -162,6 +176,8 @@ body {
 .bg-warning { background-color: var(--warning); }
 .bg-danger { background-color: var(--danger); }
 .bg-info { background-color: var(--info); }
+
+.bg-gradient-verde { background: var(--gradient-verde-principal); }
 
 /* ===== ACCESIBILIDAD ===== */
 .sr-only {

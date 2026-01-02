@@ -470,7 +470,7 @@ body {
 
 /* Sección de Bienvenida */
 .welcome-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
@@ -586,7 +586,7 @@ body {
 
 .btn-download:hover {
     background: white;
-    color: #667eea;
+    color: #39A900;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
@@ -613,7 +613,7 @@ body {
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-.metric-primary { border-left-color: #667eea; }
+.metric-primary { border-left-color: #39A900; }
 .metric-success { border-left-color: #39A900; }
 .metric-info { border-left-color: #1976D2; }
 
@@ -630,7 +630,7 @@ body {
 
 .metric-primary .metric-icon {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    color: #667eea;
+    color: #39A900;
 }
 
 .metric-success .metric-icon {
@@ -756,7 +756,7 @@ body {
 }
 
 .timeline-step.active .step-icon {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #39A900, #2D8700);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
@@ -877,7 +877,7 @@ body {
 
 .action-icon-primary {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    color: #667eea;
+    color: #39A900;
 }
 
 .action-icon-success {
@@ -918,7 +918,7 @@ body {
 }
 
 .action-card:hover .action-arrow {
-    color: #667eea;
+    color: #39A900;
 }
 
 /* Notificaciones */

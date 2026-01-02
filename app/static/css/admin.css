@@ -12,7 +12,7 @@ body {
 /* Sidebar */
 .admin-sidebar {
     width: 260px;
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(180deg, #39A900 0%, #2D8700 100%);
     color: white;
     padding: 0;
     position: fixed;
@@ -192,7 +192,7 @@ body {
     cursor: pointer;
 }
 :root {
-    --simat-primary: #667eea;
+    --simat-primary: #39A900;
     --simat-success: #39A900;
     --simat-warning: #FFA000;
     --simat-danger: #D32F2F;
@@ -209,7 +209,7 @@ body {
 
 /* Header Section */
 .header-section-simat {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
     padding: 2.5rem;
     border-radius: 16px;
     margin-bottom: 2rem;

@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, make_response
 from flask_login import login_user, logout_user, current_user
 from app.models import db, Usuario, Novedad, Programa, MensajeContacto
 from app.services.auth_service import AuthService
@@ -7,14 +7,28 @@ from . import public_bp
 @public_bp.route('/')
 def index():
     """Landing page"""
+    from app.models import Aprendiz, Colegio
+
     novedades = Novedad.query.filter_by(activo=True).order_by(Novedad.fecha_publicacion.desc()).limit(6).all()
     programas = Programa.query.filter_by(activo=True).limit(6).all()
     destacadas = Novedad.query.filter_by(activo=True, destacado=True).order_by(Novedad.fecha_publicacion.desc()).limit(3).all()
 
+    # Calcular estadísticas desde la base de datos
+    total_programas = Programa.query.filter_by(activo=True).count()
+    total_estudiantes = Aprendiz.query.count()
+    total_colegios = Colegio.query.filter_by(activo=True).count()
+
+    estadisticas = {
+        'programas': total_programas,
+        'estudiantes': total_estudiantes,
+        'colegios': total_colegios
+    }
+
     return render_template('public/index.html',
                          novedades=novedades,
                          programas=programas,
-                         destacadas=destacadas)
+                         destacadas=destacadas,
+                         estadisticas=estadisticas)
 
 @public_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -122,9 +136,18 @@ def registro():
 @public_bp.route('/logout')
 def logout():
     """Cerrar sesión"""
+    from flask import session
     logout_user()
+    session.clear()  # Limpiar toda la sesión
     flash('Sesión cerrada exitosamente', 'info')
-    return redirect(url_for('public.index'))
+
+    # Crear respuesta con headers de no-caché
+    response = make_response(redirect(url_for('public.index')))
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+
+    return response
 
 @public_bp.route('/dashboard-redirect')
 def dashboard_redirect():

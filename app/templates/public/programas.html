@@ -21,6 +21,10 @@
     <div class="programas-grid">
         {% for programa in programas %}
         <div class="programa-card-modern">
+            <div class="programa-watermark">
+                <img src="{{ url_for('static', filename='img/sena.png') }}" alt="SENA" class="programa-watermark-logo">
+                <span class="programa-watermark-text">Centro de Gestión de Mercados, Logística y TI</span>
+            </div>
             <div class="programa-card-header">
                 <div class="programa-icon">
                     <i class="fas fa-code"></i>

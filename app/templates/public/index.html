@@ -41,15 +41,42 @@
         <div class="hero-visual">
             <div class="hero-logo-container">
                 <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" class="hero-logo">
+            </div>
+        </div>
+    </div>
+</section>
 
-                <!-- Estadísticas flotantes -->
-                <div class="hero-stat-card hero-stat-card-1">
-                    <span class="stat-number">{{ stats.programas if stats else '15+' }}</span>
-                    <span class="stat-label">Programas Activos</span>
+<!-- Estadísticas Section -->
+<section class="stats-cards-section">
+    <div class="container">
+        <div class="stats-cards-grid">
+            <div class="stat-card-modern">
+                <div class="stat-card-icon">
+                    <i class="fas fa-book"></i>
                 </div>
-                <div class="hero-stat-card hero-stat-card-2">
-                    <span class="stat-number">{{ stats.estudiantes if stats else '500+' }}</span>
-                    <span class="stat-label">Estudiantes</span>
+                <div class="stat-card-content">
+                    <h3 class="stat-card-number">{{ estadisticas.programas }}</h3>
+                    <p class="stat-card-label">Programas Técnicos</p>
+                </div>
+            </div>
+
+            <div class="stat-card-modern">
+                <div class="stat-card-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3 class="stat-card-number">{{ estadisticas.estudiantes }}</h3>
+                    <p class="stat-card-label">Estudiantes Activos</p>
+                </div>
+            </div>
+
+            <div class="stat-card-modern">
+                <div class="stat-card-icon">
+                    <i class="fas fa-school"></i>
+                </div>
+                <div class="stat-card-content">
+                    <h3 class="stat-card-number">{{ estadisticas.colegios }}</h3>
+                    <p class="stat-card-label">Instituciones Aliadas</p>
                 </div>
             </div>
         </div>
@@ -155,125 +182,44 @@
         </div>
 
         <div class="programas-grid">
-            <!-- Programa 1: Sistemas -->
-            <div class="programa-card">
-                <div class="programa-header">
-                    <div class="programa-icon">
-                        <i class="fas fa-laptop-code"></i>
+            {% if programas %}
+                {% for programa in programas %}
+                <div class="programa-card">
+                    <div class="programa-watermark">
+                        <img src="{{ url_for('static', filename='img/sena.png') }}" alt="SENA" class="programa-watermark-logo">
+                        <span class="programa-watermark-text">Centro de Gestión de Mercados, Logística y TI</span>
                     </div>
-                    <h3 class="programa-title">Sistemas e Informática</h3>
-                </div>
-                <div class="programa-body">
-                    <p class="programa-description">
-                        Forma parte de la era digital desarrollando sistemas de información
-                        y aplicaciones tecnológicas innovadoras.
-                    </p>
-                    <ul class="programa-features">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Programación de software
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Bases de datos
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Desarrollo web y móvil
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Redes de computadores
-                        </li>
-                    </ul>
-                </div>
-                <div class="programa-footer">
-                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
-                        <span>Ver más información</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Programa 2: Contabilidad -->
-            <div class="programa-card">
-                <div class="programa-header">
-                    <div class="programa-icon">
-                        <i class="fas fa-calculator"></i>
+                    <div class="programa-header">
+                        <div class="programa-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="programa-title">{{ programa.nombre }}</h3>
                     </div>
-                    <h3 class="programa-title">Contabilidad y Finanzas</h3>
-                </div>
-                <div class="programa-body">
-                    <p class="programa-description">
-                        Conviértete en experto en gestión contable y financiera.
-                        Aprende a manejar las finanzas de empresas y organizaciones.
-                    </p>
-                    <ul class="programa-features">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Contabilidad general
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Análisis financiero
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Impuestos y tributación
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Auditoría y control
-                        </li>
-                    </ul>
-                </div>
-                <div class="programa-footer">
-                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
-                        <span>Ver más información</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Programa 3: Mecánica -->
-            <div class="programa-card">
-                <div class="programa-header">
-                    <div class="programa-icon">
-                        <i class="fas fa-cog"></i>
+                    <div class="programa-body">
+                        <p class="programa-description">
+                            {{ programa.descripcion or 'Programa de formación técnica en articulación con el SENA.' }}
+                        </p>
+                        {% if programa.duracion_horas %}
+                        <div class="programa-info">
+                            <i class="fas fa-clock"></i>
+                            <span>{{ programa.duracion_horas }} horas de formación</span>
+                        </div>
+                        {% endif %}
                     </div>
-                    <h3 class="programa-title">Mecánica Industrial</h3>
+                    <div class="programa-footer">
+                        <a href="{{ url_for('public.programas') }}" class="btn-programa">
+                            <span>Ver más información</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="programa-body">
-                    <p class="programa-description">
-                        Domina la operación, mantenimiento y reparación de maquinaria
-                        industrial. Desarrolla habilidades técnicas prácticas.
-                    </p>
-                    <ul class="programa-features">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Mantenimiento de máquinas
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Soldadura y mecanizado
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Hidráulica y neumática
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            Control de calidad
-                        </li>
-                    </ul>
+                {% endfor %}
+            {% else %}
+                <div class="no-programas">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Próximamente publicaremos los programas disponibles.</p>
                 </div>
-                <div class="programa-footer">
-                    <a href="{{ url_for('public.programas') }}" class="btn-programa">
-                        <span>Ver más información</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -320,6 +266,92 @@
                     <a href="{{ url_for('public.contacto') }}" class="btn-hero btn-outline">
                         <i class="fas fa-envelope"></i>
                         Contactar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Ubicación Section -->
+<section class="ubicacion-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-badge">Ubicación</span>
+            <h2 class="section-title">
+                ¿Dónde Estamos Ubicados?
+            </h2>
+            <p class="section-description">
+                Visítanos en cualquiera de nuestras dos sedes del Centro de Gestión de Mercados,
+                Logística y Tecnologías de la Información en Bogotá.
+            </p>
+        </div>
+
+        <div class="ubicacion-grid">
+            <!-- Sede Chapinero -->
+            <div class="ubicacion-card">
+                <div class="ubicacion-card-header">
+                    <div class="ubicacion-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="ubicacion-title">Sede Chapinero</h3>
+                </div>
+                <div class="ubicacion-card-body">
+                    <p class="ubicacion-address">
+                        <i class="fas fa-location-dot"></i>
+                        Calle 52 No. 13-65, Bogotá
+                    </p>
+                    <p class="ubicacion-barrio">Barrio: Chapinero</p>
+                    <div class="ubicacion-map">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.6315882965944!2d-74.06588492404744!3d4.651516241820352!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a2e6e2e6e2f%3A0x8e3f9a2e6e2e6e2f!2sSENA%20CGMLTI%20Chapinero!5e0!3m2!1ses!2sco!4v1234567890123!5m2!1ses!2sco"
+                            width="100%"
+                            height="300"
+                            style="border:0; border-radius: 12px;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="ubicacion-card-footer">
+                    <a href="https://www.google.com/maps/dir//Calle+52+No.+13-65,+Bogotá" target="_blank" class="btn-ubicacion">
+                        <i class="fas fa-directions"></i>
+                        Cómo llegar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sede Fontibón -->
+            <div class="ubicacion-card">
+                <div class="ubicacion-card-header">
+                    <div class="ubicacion-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="ubicacion-title">Sede Fontibón</h3>
+                </div>
+                <div class="ubicacion-card-body">
+                    <p class="ubicacion-address">
+                        <i class="fas fa-location-dot"></i>
+                        Calle 22C No. 98A-55, Bogotá
+                    </p>
+                    <p class="ubicacion-barrio">Barrio: Fontibón</p>
+                    <div class="ubicacion-map">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.9367615428674!2d-74.15015742404819!3d4.6850642416976!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9b2e6e2e6e2f%3A0x8e3f9b2e6e2e6e2f!2sSENA%20CGMLTI%20Fontibón!5e0!3m2!1ses!2sco!4v1234567890123!5m2!1ses!2sco"
+                            width="100%"
+                            height="300"
+                            style="border:0; border-radius: 12px;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="ubicacion-card-footer">
+                    <a href="https://www.google.com/maps/dir//Calle+22C+No.+98A-55,+Bogotá" target="_blank" class="btn-ubicacion">
+                        <i class="fas fa-directions"></i>
+                        Cómo llegar
                     </a>
                 </div>
             </div>

@@ -8,7 +8,7 @@
 
 /* Left Side - Info */
 .contacto-left-side {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #39A900 100%);
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
     padding: 3rem;
     display: flex;
     flex-direction: column;
@@ -45,7 +45,7 @@
 .contacto-brand-title {
     font-size: 2.5rem;
     font-weight: 800;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #39A900 100%);
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -201,7 +201,7 @@
 
 .form-label-contacto i {
     margin-right: 0.5rem;
-    color: #667eea;
+    color: #39A900;
 }
 
 .form-input-contacto,
@@ -219,7 +219,7 @@
 .form-input-contacto:focus,
 .form-textarea-contacto:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #39A900;
     background: white;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -232,7 +232,7 @@
 .btn-enviar-contacto {
     width: 100%;
     padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
     color: white;
     border: none;
     border-radius: 10px;

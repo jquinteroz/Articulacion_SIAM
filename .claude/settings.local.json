@@ -72,7 +72,10 @@
       "Bash(git push)",
       "Bash(git stash:*)",
       "Bash(git mv:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(python remove_white_background.py:*)",
+      "Bash(python actualizar_passwords.py:*)",
+      "Bash(python actualizar_passwords_db.py:*)"
     ],
     "deny": [],
     "ask": []

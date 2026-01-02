@@ -30,7 +30,13 @@
                 SIAM
             </a>
 
-            <ul class="navbar-menu">
+            <button class="navbar-toggle" id="navbarToggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="navbar-menu" id="navbarMenu">
                 {% if current_user.is_authenticated %}
                     {% if current_user.is_admin() %}
                         <li><a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
@@ -133,6 +139,60 @@
         const spinner = document.getElementById('spinner2');
         if (spinner) spinner.classList.remove('active');
     }
+
+    // Prevenir navegación hacia atrás después de logout
+    {% if current_user.is_authenticated %}
+    (function() {
+        // Marcar que el usuario está autenticado
+        sessionStorage.setItem('user_authenticated', 'true');
+    })();
+    {% else %}
+    (function() {
+        // Verificar si venimos de un logout (página de logout)
+        if (sessionStorage.getItem('user_authenticated') === 'true') {
+            // Usuario cerró sesión, limpiar storage
+            sessionStorage.removeItem('user_authenticated');
+
+            // Reemplazar el historial para prevenir navegación hacia atrás
+            if (window.history && window.history.pushState) {
+                window.history.pushState(null, '', window.location.href);
+                window.addEventListener('popstate', function() {
+                    window.history.pushState(null, '', window.location.href);
+                });
+            }
+        }
+    })();
+    {% endif %}
+
+    // Toggle menú hamburguesa
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbarToggle = document.getElementById('navbarToggle');
+        const navbarMenu = document.getElementById('navbarMenu');
+
+        if (navbarToggle && navbarMenu) {
+            navbarToggle.addEventListener('click', function() {
+                navbarToggle.classList.toggle('active');
+                navbarMenu.classList.toggle('active');
+            });
+
+            // Cerrar menú al hacer click en un enlace
+            const menuLinks = navbarMenu.querySelectorAll('a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navbarToggle.classList.remove('active');
+                    navbarMenu.classList.remove('active');
+                });
+            });
+
+            // Cerrar menú al hacer click fuera
+            document.addEventListener('click', function(event) {
+                if (!navbarToggle.contains(event.target) && !navbarMenu.contains(event.target)) {
+                    navbarToggle.classList.remove('active');
+                    navbarMenu.classList.remove('active');
+                }
+            });
+        }
+    });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

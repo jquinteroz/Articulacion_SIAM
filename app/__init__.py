@@ -46,6 +46,20 @@ def create_app(config_name='default'):
         from app.models import Usuario
         return Usuario.query.get(int(user_id))
 
+    # Prevenir caché de páginas protegidas después de logout
+    @app.after_request
+    def add_no_cache_headers(response):
+        """Agrega headers para prevenir caché del navegador en páginas protegidas"""
+        from flask_login import current_user
+
+        # Solo aplicar a páginas protegidas (cuando el usuario está autenticado)
+        if current_user.is_authenticated:
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '-1'
+
+        return response
+
     # Registrar blueprints
     from app.blueprints.public import public_bp
     from app.blueprints.aprendiz import aprendiz_bp
