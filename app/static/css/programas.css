@@ -1,0 +1,655 @@
+/* Programas Page Modern Design */
+.programas-modern-container {
+    min-height: calc(100vh - 150px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 3rem 0;
+}
+
+.programas-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.programas-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+}
+
+.programas-subtitle {
+    font-size: 1.2rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.programas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.programa-card-modern {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.8s ease-out;
+    position: relative;
+}
+
+.programa-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+}
+
+.programa-watermark {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.programa-watermark-logo {
+    width: 50px;
+    height: auto;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    opacity: 0.9;
+}
+
+.programa-watermark-text {
+    font-size: 0.5rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 100px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    opacity: 0.9;
+}
+
+.programa-card-header {
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.programa-card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+.programa-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+.programa-nombre {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.programa-card-body {
+    padding: 2rem;
+}
+
+.programa-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.programa-info-item:hover {
+    background: #ede9fe;
+}
+
+.programa-info-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.programa-info-content {
+    flex: 1;
+}
+
+.programa-info-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.programa-info-value {
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.programa-descripcion {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.programa-descripcion h4 {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.programa-descripcion p {
+    color: #475569;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.btn-ver-detalles {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    text-decoration: none;
+}
+
+.btn-ver-detalles:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.programas-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.programas-empty-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
+}
+
+.programas-empty-text {
+    font-size: 1.2rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== PROGRAMA DETALLE PAGE - MODERN DESIGN ===== */
+.programa-detalle-container {
+    min-height: calc(100vh - 150px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 0;
+}
+
+.programa-detalle-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Hero Header Moderno */
+.programa-detalle-hero {
+    position: relative;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    padding: 4rem 2rem 3rem;
+    overflow: hidden;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.programa-hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.1;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.2) 0%, transparent 50%);
+}
+
+.programa-hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.btn-volver-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+}
+
+.btn-volver-modern:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-5px);
+}
+
+.programa-hero-title-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.programa-hero-logo {
+    flex-shrink: 0;
+}
+
+.programa-hero-logo-img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    filter: brightness(0) invert(1) drop-shadow(0 4px 15px rgba(0, 0, 0, 0.2));
+    animation: float 6s ease-in-out infinite;
+}
+
+.programa-hero-text {
+    flex: 1;
+}
+
+.programa-detalle-titulo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: white;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.programa-centro-nombre {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Badges */
+.programa-detalle-badges {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.badge-detalle {
+    padding: 0.65rem 1.25rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.badge-activo {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+.badge-inactivo {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.badge-info {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* Body - Quick Info Cards */
+.programa-detalle-body {
+    padding: 3rem 2rem;
+}
+
+.quick-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.quick-info-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.quick-info-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(57, 169, 0, 0.15);
+    border-color: rgba(57, 169, 0, 0.2);
+}
+
+.quick-info-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(57, 169, 0, 0.3);
+}
+
+.quick-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.quick-info-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quick-info-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+/* Descripción Card */
+.descripcion-card-modern {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease-out;
+    animation-delay: 0.2s;
+    animation-fill-mode: backwards;
+}
+
+.descripcion-card-header {
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: white;
+}
+
+.descripcion-card-header i {
+    font-size: 1.5rem;
+}
+
+.descripcion-card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.descripcion-card-body {
+    padding: 2rem;
+}
+
+.programa-descripcion-text {
+    color: #475569;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+/* CTA Moderno */
+.programa-cta-modern {
+    padding: 0 2rem 3rem;
+    animation: fadeInUp 0.8s ease-out;
+    animation-delay: 0.3s;
+    animation-fill-mode: backwards;
+}
+
+.cta-modern-content {
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    border-radius: 25px;
+    padding: 4rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(57, 169, 0, 0.3);
+}
+
+.cta-modern-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+.cta-modern-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cta-modern-title {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: white;
+    margin: 0 0 1rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-modern-description {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0 0 2.5rem 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-cta-modern {
+    padding: 1.25rem 3rem;
+    background: white;
+    color: #39A900;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.btn-cta-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    background: #f8fafc;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .programa-hero-title-section {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .programa-detalle-titulo {
+        font-size: 2rem;
+    }
+
+    .quick-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-modern-content {
+        padding: 3rem 2rem;
+    }
+
+    .cta-modern-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .programas-grid {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+
+    .programas-title {
+        font-size: 2rem;
+    }
+
+    .programas-subtitle {
+        font-size: 1rem;
+    }
+
+    .programa-card-modern {
+        border-radius: 16px;
+    }
+
+    .programa-detalle-wrapper {
+        padding: 0 1rem;
+    }
+
+    .programa-detalle-header {
+        padding: 1.5rem;
+    }
+
+    .programa-detalle-titulo {
+        font-size: 1.5rem;
+    }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel Aprendiz - Sistema de Matriculas SENA{% endblock %}</title>
+
+    <!-- Prevenir caché de página protegida -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aprendiz.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
+    <div class="aprendiz-layout">
+        <!-- Sidebar -->
+        <aside class="aprendiz-sidebar" id="aprendizSidebar">
+            <div class="aprendiz-sidebar-header" style="background: rgba(0,0,0,0.15); padding: 1.5rem; border-bottom: 2px solid rgba(255,255,255,0.2);">
+                <div class="sena-logo-sidebar" style="text-align: center; margin-bottom: 1rem;">
+                    <div style="display: inline-block; background: white; padding: 0.75rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                        <img src="{{ url_for('static', filename='img/sena.png') }}" alt="Logo SENA" style="width: 45px; height: 45px; display: block;">
+                    </div>
+                </div>
+                <h3 style="margin: 0 0 0.25rem 0; font-size: 1.25rem; font-weight: 600; color: white; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                    <i class="fas fa-user-graduate"></i>
+                    Panel Aprendiz
+                </h3>
+                <div class="user-info" style="font-size: 0.85rem; color: rgba(255,255,255,0.9); display: flex; align-items: center; gap: 0.4rem; justify-content: center;">
+                    <i class="fas fa-user" style="font-size: 0.75rem;"></i>
+                    {{ current_user.nombre_completo }}
+                </div>
+            </div>
+
+            <ul class="aprendiz-menu">
+                <!-- Dashboard -->
+                <li><a href="{{ url_for('aprendiz.dashboard') }}" class="{% if request.endpoint == 'aprendiz.dashboard' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a></li>
+
+                <!-- Matrícula -->
+                <li class="aprendiz-menu-section">
+                    <div class="aprendiz-menu-section-title">Matrícula</div>
+                </li>
+                <li><a href="{{ url_for('aprendiz.perfil') }}" class="{% if request.endpoint == 'aprendiz.perfil' %}active{% endif %}">
+                    <i class="fas fa-user"></i> Mi Perfil
+                </a></li>
+                <li><a href="{{ url_for('aprendiz.documentos') }}" class="{% if 'documento' in request.endpoint %}active{% endif %}">
+                    <i class="fas fa-folder-open"></i> Mis Documentos
+                </a></li>
+
+                <!-- Cuenta -->
+                <li class="aprendiz-menu-section">
+                    <div class="aprendiz-menu-section-title">Cuenta</div>
+                </li>
+                <li><a href="{{ url_for('public.logout') }}" onclick="event.preventDefault(); showSpinner2('Cerrando sesión...'); setTimeout(() => window.location.href='{{ url_for('public.logout') }}', 300);">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="aprendiz-content">
+            <div class="aprendiz-topbar">
+                <h1>{% block page_title %}Dashboard{% endblock %}</h1>
+                <div>
+                    <span class="badge badge-success">Aprendiz</span>
+                </div>
+            </div>
+
+            <div class="aprendiz-main">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Content -->
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Spinner2 - Alternative spinner with SENA logo -->
+    <div class="spinner2-overlay" id="spinner2">
+        <div class="spinner2-container">
+            <div class="spinner2-logo">
+                <img src="{{ url_for('static', filename='img/sena.png') }}" alt="Cargando..." class="spinner2-image">
+            </div>
+            <div class="spinner2-text" id="spinner2Text">Procesando...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // Funciones para spinner2
+    function showSpinner2(message = 'Procesando...') {
+        const spinner = document.getElementById('spinner2');
+        const spinnerText = document.getElementById('spinner2Text');
+        if (spinnerText) spinnerText.textContent = message;
+        if (spinner) spinner.classList.add('active');
+    }
+
+    function hideSpinner2() {
+        const spinner = document.getElementById('spinner2');
+        if (spinner) spinner.classList.remove('active');
+    }
+    
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('aprendizSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const menuLinks = sidebar.querySelectorAll('a');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+        
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', toggleSidebar);
+        }
+        
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+        
+        // Close sidebar when clicking on menu links
+        menuLinks.forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+    });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

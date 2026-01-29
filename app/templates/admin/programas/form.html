@@ -1,0 +1,209 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ 'Editar' if programa else 'Nuevo' }} Programa - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 mb-6 md:mb-8">
+    <!-- Breadcrumb -->
+    <nav class="text-white/80 text-xs md:text-sm mb-3 md:mb-4 flex items-center">
+        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+            <i class="fas fa-home mr-1"></i> Dashboard
+        </a>
+        <span class="mx-2">/</span>
+        <a href="{{ url_for('admin.programas') }}" class="hover:text-white transition-colors">
+            Programas
+        </a>
+        <span class="mx-2">/</span>
+        <span class="text-white font-semibold">{{ 'Editar' if programa else 'Nuevo' }}</span>
+    </nav>
+    
+    <!-- Título -->
+    <h1 class="text-2xl md:text-4xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-{% if programa %}edit{% else %}graduation-cap{% endif %} mr-2 md:mr-3"></i>
+        {{ 'Editar Programa' if programa else 'Nuevo Programa' }}
+    </h1>
+    <p class="text-sm md:text-lg text-white">
+        {% if programa %}
+        Modifique la información del programa técnico
+        {% else %}
+        Complete el formulario para agregar un nuevo programa
+        {% endif %}
+    </p>
+</div>
+
+<!-- Formulario Principal - Aprovechando todo el ancho -->
+<form method="POST" class="space-y-6">
+    
+    <!-- Sección: Información del Programa -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-sena-green to-sena-green-dark px-4 md:px-6 py-3 md:py-4 flex items-center">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                <i class="fas fa-info-circle text-white text-base md:text-lg"></i>
+            </div>
+            <h3 class="text-base md:text-xl font-bold text-white">Información del Programa</h3>
+        </div>
+        <div class="p-4 md:p-6 space-y-4 md:space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6">
+                <div>
+                    <label for="codigo" class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-hashtag text-sena-green mr-1"></i> Código del Programa
+                    </label>
+                    <input type="text"
+                           name="codigo"
+                           id="codigo"
+                           class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none bg-gray-50"
+                           value="{{ programa.codigo if programa else '' }}"
+                           placeholder="TEC-ADM-001">
+                    <small class="text-xs md:text-sm text-gray-500 mt-1 flex items-center">
+                        <i class="fas fa-info-circle mr-1"></i> Código único (opcional)
+                    </small>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="nombre" class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-graduation-cap text-sena-green mr-1"></i> Nombre del Programa
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text"
+                           name="nombre"
+                           id="nombre"
+                           class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none bg-gray-50"
+                           value="{{ programa.nombre if programa else '' }}"
+                           placeholder="Técnico en Administración"
+                           required>
+                </div>
+                <div>
+                    <label for="duracion_horas" class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                        <i class="fas fa-clock text-sena-green mr-1"></i> Duración (Horas)
+                    </label>
+                    <input type="number"
+                           name="duracion_horas"
+                           id="duracion_horas"
+                           class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none bg-gray-50"
+                           value="{{ programa.duracion_horas if programa else '' }}"
+                           placeholder="2640"
+                           min="0"
+                           step="1">
+                    <small class="text-xs md:text-sm text-gray-500 mt-1 flex items-center">
+                        <i class="fas fa-info-circle mr-1"></i> Horas totales
+                    </small>
+                </div>
+            </div>
+
+            <div>
+                <label for="descripcion" class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-align-left text-sena-green mr-1"></i> Descripción
+                </label>
+                <textarea name="descripcion"
+                          id="descripcion"
+                          rows="3"
+                          class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none bg-gray-50"
+                          placeholder="Descripción del programa académico...">{{ programa.descripcion if programa else '' }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección: Estado y Estadísticas (solo edición) -->
+    {% if programa %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        <!-- Estado -->
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-sena-green-dark to-sena-green px-4 md:px-6 py-3 md:py-4 flex items-center">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                    <i class="fas fa-toggle-on text-white text-base md:text-lg"></i>
+                </div>
+                <h3 class="text-base md:text-xl font-bold text-white">Estado</h3>
+            </div>
+            <div class="p-4 md:p-6">
+                <label for="activo" class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-power-off text-sena-green mr-1"></i> Estado del Programa
+                </label>
+                <div class="flex items-center space-x-3 bg-gray-50 p-3 md:p-4 rounded-lg md:rounded-xl border-2 border-gray-200">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox"
+                               name="activo"
+                               id="activo"
+                               class="sr-only peer"
+                               {{ 'checked' if programa.activo else '' }}>
+                        <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-sena-green/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-sena-green"></div>
+                    </label>
+                    <span class="text-xs md:text-sm font-medium text-gray-700">
+                        {{ 'Activo' if programa.activo else 'Inactivo' }}
+                    </span>
+                </div>
+                <small class="text-xs md:text-sm text-gray-500 mt-2 flex items-center">
+                    <i class="fas fa-info-circle mr-1"></i> Programas inactivos no se muestran
+                </small>
+            </div>
+        </div>
+
+        <!-- Stat: Grupos -->
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-4 md:px-6 py-3 md:py-4 flex items-center">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                    <i class="fas fa-users text-white text-base md:text-lg"></i>
+                </div>
+                <h3 class="text-base md:text-xl font-bold text-white">Grupos</h3>
+            </div>
+            <div class="p-4 md:p-6 text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl md:rounded-2xl mb-2 md:mb-3">
+                    <i class="fas fa-users text-white text-xl md:text-2xl"></i>
+                </div>
+                <p class="text-2xl md:text-3xl font-bold text-gray-900">{{ programa.grupos|length }}</p>
+                <p class="text-xs md:text-sm text-gray-600 mt-1">Grupos Asociados</p>
+                {% if programa.grupos %}
+                <div class="mt-4 border-t-2 border-gray-100 pt-3">
+                    <div class="space-y-2 max-h-24 overflow-y-auto text-left">
+                        {% for grupo in programa.grupos[:2] %}
+                        <div class="bg-gray-50 p-2 rounded-lg text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-gray-800 truncate">{{ grupo.nombre }}</span>
+                                <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap ml-2">
+                                    {{ grupo.aprendices|length }} 👨‍🎓
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% if programa.grupos|length > 2 %}
+                        <p class="text-xs text-gray-500 text-center">+{{ programa.grupos|length - 2 }} más</p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Stat: Aprendices -->
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 px-4 md:px-6 py-3 md:py-4 flex items-center">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                    <i class="fas fa-user-graduate text-white text-base md:text-lg"></i>
+                </div>
+                <h3 class="text-base md:text-xl font-bold text-white">Aprendices</h3>
+            </div>
+            <div class="p-4 md:p-6 text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl md:rounded-2xl mb-2 md:mb-3">
+                    <i class="fas fa-user-graduate text-white text-xl md:text-2xl"></i>
+                </div>
+                <p class="text-2xl md:text-3xl font-bold text-gray-900">{{ programa.aprendices|length }}</p>
+                <p class="text-xs md:text-sm text-gray-600 mt-1">Aprendices Matriculados</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de Acción -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3 md:gap-4 p-4 md:p-6 bg-gray-50 rounded-xl md:rounded-2xl border-2 border-gray-200">
+        <a href="{{ url_for('admin.programas') }}" class="inline-flex items-center justify-center px-6 py-3 bg-white border-2 border-gray-300 rounded-lg md:rounded-xl font-semibold text-sm md:text-base text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm">
+            <i class="fas fa-times mr-2"></i>
+            Cancelar
+        </a>
+        <button type="submit" class="inline-flex items-center justify-center px-8 py-3 bg-gradient-to-r from-sena-green to-sena-green-dark hover:from-sena-green-dark hover:to-sena-green-darker text-white font-bold text-sm md:text-base rounded-lg md:rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+            <i class="fas fa-save mr-2"></i>
+            Guardar Programa
+        </button>
+    </div>
+</form>
+
+{% endblock %}

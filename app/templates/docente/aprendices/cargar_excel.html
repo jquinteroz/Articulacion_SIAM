@@ -1,0 +1,504 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Cargar Aprendices desde Excel - Docente Enlace{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --excel-primary: #1976D2;
+    --excel-success: #39A900;
+    --excel-info: #0288D1;
+    --excel-warning: #FFA000;
+}
+
+.page-header-excel {
+    background: linear-gradient(135deg, var(--excel-primary) 0%, var(--excel-info) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+}
+
+.page-title-excel {
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle-excel {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.card-modern-excel {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card-header-excel {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-header-excel i {
+    font-size: 1.5rem;
+}
+
+.card-header-info { background: linear-gradient(135deg, #0288D1 0%, #03A9F4 100%); color: white; }
+.card-header-success { background: linear-gradient(135deg, #39A900 0%, #4CAF50 100%); color: white; }
+.card-header-primary { background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%); color: white; }
+
+.card-title-excel {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-body-excel {
+    padding: 1.5rem;
+}
+
+.table-excel {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.table-excel thead {
+    background: #f7fafc;
+}
+
+.table-excel th {
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #4a5568;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.table-excel td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1a202c;
+}
+
+.table-excel code {
+    background: #edf2f7;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #1976D2;
+}
+
+.badge-required {
+    background: #D32F2F;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-optional {
+    background: #718096;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.alert-excel {
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.alert-excel i {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.alert-warning-excel {
+    background: #FFF3E0;
+    border-left: 4px solid var(--excel-warning);
+    color: #663C00;
+}
+
+.alert-info-excel {
+    background: #E1F5FE;
+    border-left: 4px solid var(--excel-info);
+    color: #014361;
+}
+
+.alert-excel ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.5rem;
+}
+
+.alert-excel li {
+    margin-bottom: 0.25rem;
+}
+
+.file-upload-area {
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background: #f7fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-area:hover {
+    border-color: var(--excel-primary);
+    background: white;
+}
+
+.file-upload-area.dragover {
+    border-color: var(--excel-success);
+    background: #E8F5E9;
+}
+
+.file-upload-icon {
+    font-size: 3rem;
+    color: var(--excel-primary);
+    margin-bottom: 1rem;
+}
+
+.file-upload-text {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-hint {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+.file-selected {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #E8F5E9;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.file-selected i {
+    font-size: 2rem;
+    color: var(--excel-success);
+}
+
+.file-info h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0 0 0.25rem 0;
+}
+
+.file-info p {
+    font-size: 0.875rem;
+    color: #718096;
+    margin: 0;
+}
+
+.btn-excel {
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    justify-content: center;
+}
+
+.btn-excel-primary {
+    background: linear-gradient(135deg, var(--excel-primary) 0%, var(--excel-info) 100%);
+    color: white;
+}
+
+.btn-excel-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(25, 118, 210, 0.3);
+    color: white;
+}
+
+.btn-excel-success {
+    background: linear-gradient(135deg, var(--excel-success) 0%, #4CAF50 100%);
+    color: white;
+}
+
+.btn-excel-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(57, 169, 0, 0.3);
+    color: white;
+}
+
+.btn-excel-secondary {
+    background: #718096;
+    color: white;
+}
+
+.btn-excel-secondary:hover {
+    background: #4a5568;
+    color: white;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-group-excel {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.grid-excel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .grid-excel {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="page-header-excel">
+    <h1 class="page-title-excel">
+        <i class="fas fa-file-upload"></i> Carga Masiva de Aprendices
+    </h1>
+    <p class="page-subtitle-excel">Importe múltiples aprendices desde un archivo Excel</p>
+</div>
+
+<div class="grid-excel">
+    <!-- Instrucciones -->
+    <div>
+        <div class="card-modern-excel">
+            <div class="card-header-excel card-header-info">
+                <i class="fas fa-info-circle"></i>
+                <h2 class="card-title-excel">Instrucciones</h2>
+            </div>
+            <div class="card-body-excel">
+                <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Formato del Archivo Excel:</h3>
+                <p style="color: #718096; margin-bottom: 1rem;">El archivo debe contener las siguientes columnas:</p>
+
+                <div style="overflow-x: auto;">
+                    <table class="table-excel">
+                        <thead>
+                            <tr>
+                                <th>Columna</th>
+                                <th>Requerida</th>
+                                <th>Ejemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>documento</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>1000000003</td>
+                            </tr>
+                            <tr>
+                                <td><code>tipo_documento</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>TI, CC, CE</td>
+                            </tr>
+                            <tr>
+                                <td><code>nombres</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>Juan Carlos</td>
+                            </tr>
+                            <tr>
+                                <td><code>apellidos</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>Pérez López</td>
+                            </tr>
+                            <tr>
+                                <td><code>email</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>estudiante@mail.com</td>
+                            </tr>
+                            <tr>
+                                <td><code>telefono</code></td>
+                                <td><span class="badge-required">Sí</span></td>
+                                <td>3001234567</td>
+                            </tr>
+                            <tr>
+                                <td><code>direccion</code></td>
+                                <td><span class="badge-optional">No</span></td>
+                                <td>Calle 10 #5-20</td>
+                            </tr>
+                            <tr>
+                                <td><code>ciudad</code></td>
+                                <td><span class="badge-optional">No</span></td>
+                                <td>Bogotá</td>
+                            </tr>
+                            <tr>
+                                <td><code>departamento</code></td>
+                                <td><span class="badge-optional">No</span></td>
+                                <td>Cundinamarca</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert-excel alert-warning-excel">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Nota Importante:</strong>
+                        <ul>
+                            <li>La contraseña inicial será el número de documento</li>
+                            <li>Los aprendices serán vinculados automáticamente a: <strong>{{ colegio.nombre }}</strong></li>
+                            <li>Los documentos duplicados serán omitidos</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plantilla de Ejemplo -->
+        <div class="card-modern-excel">
+            <div class="card-header-excel card-header-success">
+                <i class="fas fa-download"></i>
+                <h2 class="card-title-excel">Plantilla de Ejemplo</h2>
+            </div>
+            <div class="card-body-excel">
+                <p style="color: #718096; margin-bottom: 1rem;">Descargue la plantilla de Excel para facilitar la carga de datos:</p>
+                <a href="{{ url_for('docente.descargar_plantilla_excel') }}" class="btn-excel btn-excel-success btn-full">
+                    <i class="fas fa-file-excel"></i> Descargar Plantilla Excel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulario de Carga -->
+    <div>
+        <div class="card-modern-excel">
+            <div class="card-header-excel card-header-primary">
+                <i class="fas fa-upload"></i>
+                <h2 class="card-title-excel">Cargar Archivo Excel</h2>
+            </div>
+            <div class="card-body-excel">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <div class="file-upload-area" id="dropArea">
+                        <div class="file-upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="file-upload-text">
+                            Arrastra tu archivo aquí o haz clic para seleccionar
+                        </div>
+                        <div class="file-upload-hint">
+                            Formatos permitidos: .xlsx, .xls | Tamaño máximo: 5MB
+                        </div>
+                        <input type="file" name="archivo" id="archivo" class="file-input-hidden"
+                               accept=".xlsx,.xls" required>
+                    </div>
+
+                    <div class="file-selected" id="fileSelected" style="display: none;">
+                        <i class="fas fa-file-excel"></i>
+                        <div class="file-info">
+                            <h4 id="fileName"></h4>
+                            <p id="fileSize"></p>
+                        </div>
+                    </div>
+
+                    <div class="alert-excel alert-info-excel">
+                        <i class="fas fa-info-circle"></i>
+                        <div>El proceso puede tardar varios segundos dependiendo del número de registros</div>
+                    </div>
+
+                    <div class="btn-group-excel">
+                        <button type="submit" class="btn-excel btn-excel-primary btn-full">
+                            <i class="fas fa-cloud-upload-alt"></i> Cargar Aprendices
+                        </button>
+                        <a href="{{ url_for('docente.aprendices') }}" class="btn-excel btn-excel-secondary btn-full">
+                            <i class="fas fa-arrow-left"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const dropArea = document.getElementById('dropArea');
+const fileInput = document.getElementById('archivo');
+const fileSelected = document.getElementById('fileSelected');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+
+// Click to select file
+dropArea.addEventListener('click', () => fileInput.click());
+
+// Drag and drop handlers
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName', () => dropArea.classList.remove('dragover'), false);
+});
+
+dropArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    fileInput.files = files;
+    handleFiles(files);
+}
+
+fileInput.addEventListener('change', function() {
+    handleFiles(this.files);
+});
+
+function handleFiles(files) {
+    if (files.length > 0) {
+        const file = files[0];
+        fileName.textContent = file.name;
+        fileSize.textContent = `${(file.size / 1024).toFixed(2)} KB`;
+        fileSelected.style.display = 'flex';
+    }
+}
+</script>
+{% endblock %}

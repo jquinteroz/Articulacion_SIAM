@@ -1,0 +1,1335 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Detalle Matrícula - Admin{% endblock %}
+
+{% block page_title %}Detalle de Matrícula #{{ matricula.id }}{% endblock %}
+
+{% block content %}
+{% set docs_requeridos_ver = 5 if (matricula.aprendiz.usuario.tipo_documento == 'CC' and matricula.aprendiz.usuario.es_mayor_de_edad) else 8 %}
+<!-- Header Section -->
+<div class="header-section-ver">
+    <div class="header-left-ver">
+        <nav class="breadcrumb-ver">
+            <a href="{{ url_for('admin.dashboard') }}" class="breadcrumb-item-ver">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-ver">/</span>
+            <a href="{{ url_for('admin.matriculas') }}" class="breadcrumb-item-ver">
+                Matrículas
+            </a>
+            <span class="breadcrumb-sep-ver">/</span>
+            <span class="breadcrumb-active-ver">Matrícula #{{ matricula.id }}</span>
+        </nav>
+        <h1 class="page-title-ver">
+            <i class="fas fa-file-alt"></i> Matrícula #{{ matricula.id }}
+        </h1>
+        <div class="estado-badge-wrapper-ver">
+            <span class="estado-badge-ver estado-{{ matricula.estado|lower }}-ver">
+                {{ matricula.estado }}
+            </span>
+        </div>
+    </div>
+    <div class="header-actions-ver">
+        {% if documentos %}
+        <a href="{{ url_for('admin.descargar_documentos_aprendiz', aprendiz_id=matricula.aprendiz.id) }}"
+           class="btn-action-ver btn-download-ver">
+            <i class="fas fa-file-pdf"></i> Descargar PDF
+        </a>
+        {% endif %}
+        <a href="{{ url_for('admin.matriculas') }}" class="btn-action-ver btn-back-ver">
+            <i class="fas fa-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="content-layout-ver">
+    <!-- Sidebar - Información del Aprendiz -->
+    <div class="sidebar-ver">
+        <!-- Aprendiz Info Card -->
+        <div class="info-card-ver aprendiz-card-ver">
+            <div class="info-card-header-ver">
+                <div class="avatar-circle-ver">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3 class="info-card-title-ver">Información del Aprendiz</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Nombre Completo</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.nombre_completo }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Documento</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.documento }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Email</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.email }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Teléfono</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.usuario.telefono or '-' }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Colegio</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.colegio.nombre if matricula.aprendiz.colegio else '-' }}</p>
+                </div>
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Grupo</label>
+                    <p class="info-value-ver">{{ matricula.aprendiz.grupo.nombre if matricula.aprendiz.grupo else '-' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programa Card -->
+        {% if matricula.aprendiz.programa %}
+        <div class="info-card-ver programa-card-ver">
+            <div class="info-card-header-ver">
+                <div class="icon-circle-ver">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3 class="info-card-title-ver">Programa</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <h4 class="programa-nombre-ver">{{ matricula.aprendiz.programa.nombre }}</h4>
+                <p class="programa-desc-ver">{{ matricula.aprendiz.programa.descripcion or '' }}</p>
+                <div class="programa-duracion-ver">
+                    <i class="fas fa-clock"></i> {{ matricula.aprendiz.programa.duracion_horas }} horas
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Fechas Card -->
+        <div class="info-card-ver fechas-card-ver">
+            <div class="info-card-header-ver">
+                <div class="icon-circle-ver">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <h3 class="info-card-title-ver">Fechas</h3>
+            </div>
+            <div class="info-card-body-ver">
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Creación</label>
+                    <p class="info-value-ver">{{ matricula.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                </div>
+                {% if matricula.fecha_envio %}
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Envío</label>
+                    <p class="info-value-ver">{{ matricula.fecha_envio.strftime('%d/%m/%Y %H:%M') }}</p>
+                </div>
+                {% endif %}
+                {% if matricula.fecha_validacion_docente %}
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Validación Docente</label>
+                    <p class="info-value-ver">{{ matricula.fecha_validacion_docente.strftime('%d/%m/%Y %H:%M') }}</p>
+                </div>
+                {% endif %}
+                {% if matricula.fecha_validacion_admin %}
+                <div class="info-item-ver">
+                    <label class="info-label-ver">Validación Admin</label>
+                    <p class="info-value-ver">{{ matricula.fecha_validacion_admin.strftime('%d/%m/%Y %H:%M') }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content - Documentos -->
+    <div class="main-content-ver">
+        <!-- Documentos Card -->
+        <div class="docs-card-ver">
+            <div class="docs-card-header-ver">
+                <div class="docs-header-content-ver">
+                    <h2 class="docs-title-ver">
+                        <i class="fas fa-folder-open"></i> Documentos Cargados
+                    </h2>
+                    <div class="docs-count-ver">{{ documentos|length }}/{{ docs_requeridos_ver }}</div>
+                </div>
+            </div>
+
+            <div class="docs-card-body-ver">
+                {% if documentos %}
+                <div class="docs-grid-ver">
+                    {% for documento in documentos %}
+                    <div class="doc-item-ver doc-{{ documento.estado|lower }}-ver">
+                        <div class="doc-header-ver">
+                            <div class="doc-icon-ver">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="doc-info-ver">
+                                <h4 class="doc-title-ver">{{ documento.tipo_documento.replace('_', ' ').title() }}</h4>
+                                <p class="doc-filename-ver">{{ documento.nombre_archivo }}</p>
+                                <span class="doc-date-ver">
+                                    <i class="fas fa-calendar"></i> {{ documento.fecha_subida.strftime('%d/%m/%Y') }}
+                                </span>
+                            </div>
+                            <span class="doc-badge-ver badge-{{ documento.estado|lower }}-ver">
+                                {{ documento.estado }}
+                            </span>
+                        </div>
+
+                        {% if documento.observaciones %}
+                        <div class="doc-observaciones-ver">
+                            <i class="fas fa-comment-alt"></i>
+                            <strong>Observaciones:</strong> {{ documento.observaciones }}
+                        </div>
+                        {% endif %}
+
+                        <div class="doc-actions-ver">
+                            <a href="{{ url_for('admin.ver_documento', documento_id=documento.id) }}"
+                               class="btn-doc-ver btn-view-ver" target="_blank">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                            {% if documento.estado == 'PENDIENTE' %}
+                            <form method="POST" action="{{ url_for('admin.aprobar_documento', documento_id=documento.id) }}" style="display: inline;" onsubmit="if(confirm('¿Aprobar {{ documento.tipo_documento.replace('_', ' ').title() }}?')) { showSpinner('Aprobando documento...'); return true; } return false;">
+                                <button type="submit" class="btn-doc-ver btn-approve-ver">
+                                    <i class="fas fa-check"></i> Aprobar
+                                </button>
+                            </form>
+                            <button type="button" class="btn-doc-ver btn-reject-ver"
+                                    onclick="rechazarDoc({{ documento.id }}, '{{ documento.tipo_documento }}')">
+                                <i class="fas fa-times"></i> Rechazar
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Progreso -->
+                <div class="progress-section-ver">
+                    {% set progreso = (documentos|length / docs_requeridos_ver * 100)|int %}
+                    <div class="progress-header-ver">
+                        <span class="progress-label-ver">Progreso de Documentos</span>
+                        <span class="progress-value-ver">{{ progreso }}%</span>
+                    </div>
+                    <div class="progress-bar-wrapper-ver">
+                        <div class="progress-bar-ver" style="width: {{ progreso }}%"></div>
+                    </div>
+                    <div class="progress-text-ver">{{ documentos|length }} de {{ docs_requeridos_ver }} documentos subidos</div>
+                </div>
+                {% else %}
+                <div class="empty-docs-ver">
+                    <i class="fas fa-inbox"></i>
+                    <p>No hay documentos cargados</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Aprobación Final (si estado es PREMATRICULA) -->
+        {% if matricula.estado == 'PREMATRICULA' %}
+        <div class="action-card-ver matricula-final-ver">
+            <div class="action-card-header-ver">
+                <i class="fas fa-graduation-cap"></i>
+                <h3>Aprobación Final de Matrícula</h3>
+            </div>
+            <div class="action-card-body-ver">
+                <div class="alert-info-ver">
+                    <i class="fas fa-info-circle"></i>
+                    <p><strong>Atención:</strong> Los documentos de este aprendiz han sido revisados y aprobados por el docente enlace. Puede proceder a matricular al estudiante de forma definitiva.</p>
+                </div>
+                <form method="POST" action="{{ url_for('admin.matricular_aprendiz', matricula_id=matricula.id) }}"
+                      onsubmit="if(confirm('¿Está seguro de que desea MATRICULAR a este aprendiz? Se notificará al aprendiz y al docente.')) { showSpinner('Matriculando aprendiz...'); return true; } return false;">
+                    <button type="submit" class="btn-matricular-ver">
+                        <i class="fas fa-graduation-cap"></i> MATRICULAR APRENDIZ
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Acciones Administrativas -->
+        {% if matricula.estado in ['ENVIADO', 'PENDIENTE', 'COMPLETO', 'PREMATRICULA'] %}
+        <div class="action-card-ver admin-actions-ver">
+            <div class="action-card-header-ver">
+                <i class="fas fa-cogs"></i>
+                <h3>Acciones Administrativas</h3>
+            </div>
+            <div class="action-card-body-ver">
+                <form method="POST" action="{{ url_for('admin.cambiar_estado_matricula', matricula_id=matricula.id) }}" class="admin-form-ver">
+                    <div class="form-row-ver">
+                        <div class="form-group-ver">
+                            <label for="nuevo_estado">Cambiar Estado</label>
+                            <select name="nuevo_estado" id="nuevo_estado" class="form-select-ver" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="BORRADOR">Borrador</option>
+                                <option value="ENVIADO">Enviado</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="COMPLETO">Completo</option>
+                                <option value="PREMATRICULA">Pre-Matrícula</option>
+                                <option value="MATRICULADO">Matriculado</option>
+                                <option value="RECHAZADO">Rechazado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group-ver">
+                        <label for="observaciones">Observaciones (opcional)</label>
+                        <textarea name="observaciones" id="observaciones" class="form-textarea-ver" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit-ver" onclick="showSpinner('Actualizando estado...')">
+                        <i class="fas fa-save"></i> Actualizar Estado
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para Rechazar -->
+<div class="modal-ver" id="rechazarModal">
+    <div class="modal-overlay-ver" onclick="$('#rechazarModal').fadeOut(200)"></div>
+    <div class="modal-content-ver">
+        <div class="modal-header-ver modal-header-danger-ver">
+            <h3><i class="fas fa-times-circle"></i> Rechazar Documento</h3>
+            <button type="button" class="modal-close-ver" onclick="$('#rechazarModal').fadeOut(200)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="POST" id="rechazarForm">
+            <div class="modal-body-ver">
+                <p>¿Rechazar <strong id="rechazarTipoDoc"></strong>?</p>
+                <div class="form-group-ver">
+                    <label>Motivo <span class="text-danger">*</span></label>
+                    <select name="motivo" class="form-select-ver" required onchange="toggleOtroMotivo(this)">
+                        <option value="">-- Seleccione un motivo --</option>
+                        <option value="Documento ilegible o borroso">Documento ilegible o borroso</option>
+                        <option value="Documento incompleto">Documento incompleto</option>
+                        <option value="Documento vencido">Documento vencido</option>
+                        <option value="Documento no corresponde">Documento no corresponde</option>
+                        <option value="Datos inconsistentes">Datos inconsistentes</option>
+                        <option value="Formato incorrecto">Formato incorrecto (debe ser PDF)</option>
+                        <option value="otro">Otro motivo...</option>
+                    </select>
+                </div>
+                <div class="form-group-ver" id="otroMotivoDiv" style="display:none;">
+                    <label>Especifique el motivo</label>
+                    <textarea name="observaciones" id="otroMotivoText" class="form-textarea-ver" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer-ver">
+                <button type="button" class="btn-cancel-ver" onclick="$('#rechazarModal').fadeOut(200)">Cancelar</button>
+                <button type="submit" class="btn-confirm-ver btn-danger-ver">
+                    <i class="fas fa-times"></i> Rechazar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function rechazarDoc(docId, tipoDoc) {
+    $('#rechazarTipoDoc').text(tipoDoc.replace(/_/g, ' '));
+    $('#rechazarForm').attr('action', '/admin/documentos/' + docId + '/rechazar');
+    $('#rechazarModal').fadeIn(200);
+}
+
+function toggleOtroMotivo(select) {
+    const otroDiv = document.getElementById('otroMotivoDiv');
+    const otroText = document.getElementById('otroMotivoText');
+    if (select.value === 'otro') {
+        otroDiv.style.display = 'block';
+        otroText.required = true;
+    } else {
+        otroDiv.style.display = 'none';
+        otroText.required = false;
+        otroText.value = '';
+    }
+}
+
+$('#rechazarForm').on('submit', function(e) {
+    const motivo = $('select[name="motivo"]').val();
+    if (motivo !== 'otro') {
+        // Si no es "otro", usar el motivo del select como observaciones
+        const hiddenInput = $('<input>').attr({
+            type: 'hidden',
+            name: 'observaciones',
+            value: motivo
+        });
+        $(this).append(hiddenInput);
+    }
+    // Mostrar spinner
+    showSpinner('Rechazando documento...');
+    $('#rechazarModal').fadeOut(200);
+});
+</script>
+
+<style>
+/* Importar estilos de ver_matricula */
+.header-section-ver {
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    box-shadow: 0 4px 20px rgba(57, 169, 0, 0.3);
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .header-section-ver {
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        flex-direction: row;
+    }
+}
+
+.header-left-ver {
+    flex: 1;
+}
+
+.breadcrumb-ver {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .breadcrumb-ver {
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+.breadcrumb-item-ver {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.breadcrumb-item-ver:hover {
+    color: #fff;
+}
+
+.breadcrumb-sep-ver {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.breadcrumb-active-ver {
+    color: #fff;
+    font-weight: 500;
+}
+
+.page-title-ver {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 0.75rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .page-title-ver {
+        font-size: 2rem;
+        margin: 0 0 1rem 0;
+    }
+}
+
+.estado-badge-wrapper-ver {
+    display: inline-block;
+}
+
+.estado-badge-ver {
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+
+.estado-borrador-ver { background: #cbd5e0; color: #2d3748; }
+.estado-enviado-ver { background: #4299e1; color: #fff; }
+.estado-pendiente-ver { background: #f6ad55; color: #744210; }
+.estado-completo-ver { background: #48bb78; color: #fff; }
+.estado-prematricula-ver { background: #9f7aea; color: #fff; }
+.estado-matriculado-ver { background: #38b2ac; color: #fff; }
+.estado-rechazado-ver { background: #f56565; color: #fff; }
+
+.header-actions-ver {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .header-actions-ver {
+        gap: 0.75rem;
+        width: auto;
+    }
+}
+
+.btn-action-ver {
+    padding: 0.625rem 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    .btn-action-ver {
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        flex: initial;
+    }
+}
+
+.btn-action-ver:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: #fff;
+    text-decoration: none;
+}
+
+.content-layout-ver {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+@media (min-width: 1024px) {
+    .content-layout-ver {
+        grid-template-columns: 350px 1fr;
+        gap: 2rem;
+    }
+}
+
+.sidebar-ver {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .sidebar-ver {
+        gap: 1.5rem;
+    }
+}
+
+.info-card-ver {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .info-card-ver {
+        border-radius: 16px;
+    }
+}
+
+.info-card-ver:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.info-card-header-ver {
+    padding: 1rem;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .info-card-header-ver {
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+}
+
+.avatar-circle-ver, .icon-circle-ver {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .avatar-circle-ver, .icon-circle-ver {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+
+.info-card-title-ver {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .info-card-title-ver {
+        font-size: 1.1rem;
+    }
+}
+
+.info-card-body-ver {
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .info-card-body-ver {
+        padding: 1.5rem;
+    }
+}
+
+.info-item-ver {
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .info-item-ver {
+        margin-bottom: 1.25rem;
+    }
+}
+
+.info-item-ver:last-child {
+    margin-bottom: 0;
+}
+
+.info-label-ver {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #718096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.info-value-ver {
+    font-size: 1rem;
+    color: #2d3748;
+    font-weight: 500;
+    margin: 0;
+}
+
+.programa-nombre-ver {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.5rem 0;
+}
+
+.programa-desc-ver {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0 0 1rem 0;
+}
+
+.programa-duracion-ver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.main-content-ver {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .main-content-ver {
+        gap: 2rem;
+    }
+}
+
+.docs-card-ver {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .docs-card-ver {
+        border-radius: 16px;
+    }
+}
+
+.docs-card-header-ver {
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    padding: 1rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .docs-card-header-ver {
+        padding: 1.5rem 2rem;
+    }
+}
+
+.docs-header-content-ver {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.docs-title-ver {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+    .docs-title-ver {
+        font-size: 1.5rem;
+    }
+}
+
+.docs-count-ver {
+    padding: 0.375rem 1rem;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+@media (min-width: 768px) {
+    .docs-count-ver {
+        padding: 0.5rem 1.5rem;
+        font-size: 1.1rem;
+    }
+}
+
+.docs-card-body-ver {
+    padding: 1rem;
+}
+
+@media (min-width: 768px) {
+    .docs-card-body-ver {
+        padding: 2rem;
+    }
+}
+
+.docs-grid-ver {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .docs-grid-ver {
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+}
+
+.doc-item-ver {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1rem;
+    border-left: 4px solid #cbd5e0;
+    transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+    .doc-item-ver {
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+}
+
+.doc-item-ver:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateX(4px);
+}
+
+.doc-pendiente-ver { border-left-color: #fbbf24; background: #fffbeb; }
+.doc-aprobado-ver { border-left-color: #10b981; background: #f0fdf4; }
+.doc-rechazado-ver { border-left-color: #ef4444; background: #fef2f2; }
+
+.doc-header-ver {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: start;
+    margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .doc-header-ver {
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+}
+
+.doc-icon-ver {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.25rem;
+}
+
+@media (min-width: 768px) {
+    .doc-icon-ver {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        font-size: 1.5rem;
+    }
+}
+
+.doc-info-ver {
+    flex: 1;
+    min-width: 0;
+}
+
+.doc-title-ver {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0 0 0.25rem 0;
+}
+
+@media (min-width: 768px) {
+    .doc-title-ver {
+        font-size: 1.1rem;
+    }
+}
+
+.doc-filename-ver {
+    font-size: 0.8rem;
+    color: #718096;
+    margin: 0 0 0.5rem 0;
+    word-break: break-all;
+}
+
+@media (min-width: 768px) {
+    .doc-filename-ver {
+        font-size: 0.85rem;
+    }
+}
+
+.doc-date-ver {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+@media (min-width: 768px) {
+    .doc-date-ver {
+        font-size: 0.8rem;
+    }
+}
+
+.doc-badge-ver {
+    padding: 0.375rem 0.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .doc-badge-ver {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+.badge-pendiente-ver { background: #fef3c7; color: #92400e; }
+.badge-aprobado-ver { background: #d1fae5; color: #065f46; }
+.badge-rechazado-ver { background: #fee2e2; color: #991b1b; }
+
+.doc-observaciones-ver {
+    padding: 1rem;
+    background: #fff;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #4a5568;
+    border-left: 3px solid #4299e1;
+}
+
+.doc-actions-ver {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .doc-actions-ver {
+        gap: 0.75rem;
+    }
+}
+
+.btn-doc-ver {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    justify-content: center;
+    min-width: fit-content;
+}
+
+@media (min-width: 768px) {
+    .btn-doc-ver {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        flex: initial;
+    }
+}
+
+.btn-view-ver {
+    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    color: #fff;
+}
+
+.btn-view-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+    color: #fff;
+}
+
+.btn-approve-ver {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: #fff;
+}
+
+.btn-approve-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.btn-reject-ver {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: #fff;
+}
+
+.btn-reject-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+}
+
+.progress-section-ver {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    border-radius: 12px;
+}
+
+.progress-header-ver {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.progress-label-ver {
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.progress-value-ver {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #39A900;
+}
+
+.progress-bar-wrapper-ver {
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 50px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-bar-ver {
+    height: 100%;
+    background: linear-gradient(90deg, #39A900 0%, #2d8000 100%);
+    border-radius: 50px;
+    transition: width 0.6s ease;
+}
+
+.progress-text-ver {
+    font-size: 0.9rem;
+    color: #718096;
+    text-align: center;
+}
+
+.empty-docs-ver {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #a0aec0;
+}
+
+.empty-docs-ver i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.action-card-ver {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.action-card-header-ver {
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.action-card-header-ver i {
+    font-size: 1.5rem;
+}
+
+.action-card-header-ver h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.action-card-body-ver {
+    padding: 2rem;
+}
+
+.matricula-final-ver .action-card-header-ver {
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+}
+
+.alert-info-ver {
+    padding: 1rem 1.5rem;
+    background: #ebf8ff;
+    border-left: 4px solid #4299e1;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.alert-info-ver i {
+    color: #4299e1;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.alert-info-ver p {
+    margin: 0;
+    color: #2c5282;
+}
+
+.btn-matricular-ver {
+    width: 100%;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.btn-matricular-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(57, 169, 0, 0.4);
+}
+
+.admin-form-ver {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row-ver {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.form-group-ver {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group-ver label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.form-select-ver, .form-textarea-ver {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-select-ver:focus, .form-textarea-ver:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-submit-ver {
+    padding: 0.875rem 2rem;
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-submit-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.4);
+}
+
+/* Modales */
+.modal-ver {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+}
+
+.modal-overlay-ver {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content-ver {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+}
+
+@media (min-width: 768px) {
+    .modal-content-ver {
+        border-radius: 16px;
+    }
+}
+
+.modal-header-ver {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+@media (min-width: 768px) {
+    .modal-header-ver {
+        padding: 1.5rem 2rem;
+    }
+}
+
+.modal-header-success-ver {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: #fff;
+}
+
+.modal-header-danger-ver {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: #fff;
+}
+
+.modal-header-ver h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .modal-header-ver h3 {
+        font-size: 1.25rem;
+    }
+}
+
+.modal-close-ver {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.modal-close-ver:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body-ver {
+    padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .modal-body-ver {
+        padding: 2rem;
+    }
+}
+
+.modal-footer-ver {
+    padding: 1rem 1.5rem;
+    background: #f7fafc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+    .modal-footer-ver {
+        padding: 1.5rem 2rem;
+        gap: 1rem;
+    }
+}
+
+.btn-cancel-ver {
+    padding: 0.75rem 1.5rem;
+    background: #e2e8f0;
+    color: #2d3748;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-ver:hover {
+    background: #cbd5e0;
+}
+
+.btn-confirm-ver {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-success-ver {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.btn-success-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.btn-danger-ver {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.btn-danger-ver:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+}
+
+.text-danger {
+    color: #e53e3e;
+}
+</style>
+{% endblock %}

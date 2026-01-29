@@ -1,0 +1,392 @@
+{% extends "aprendiz/base_aprendiz.html" %}
+
+{% block title %}Mi Perfil - Aprendiz{% endblock %}
+
+{% block page_title %}Mi Perfil{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aprendiz.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Modern Profile Header -->
+<div class="profile-header-apr">
+    <div class="header-content-prof">
+        <div class="header-text-prof">
+            <h1 class="header-title-prof">Mi Perfil</h1>
+            <p class="header-subtitle-prof">Gestiona tu información personal y académica</p>
+        </div>
+        <div class="header-icon-prof">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </div>
+</div>
+
+<form method="POST" class="profile-form-apr">
+    <!-- Datos Personales -->
+    <div class="profile-card-apr">
+        <div class="card-header-prof card-primary-prof">
+            <div class="header-icon-wrapper-prof">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="header-title-wrapper-prof">
+                <h3 class="card-title-prof">Datos Personales</h3>
+                <p class="card-subtitle-prof">Información básica del estudiante</p>
+            </div>
+        </div>
+        <div class="card-body-prof">
+            <div class="form-grid-prof">
+                <div class="form-group-prof">
+                    <label for="nombres" class="form-label-prof">
+                        <i class="fas fa-id-card"></i> Nombres
+                        <span class="required-prof">*</span>
+                    </label>
+                    <input type="text" name="nombres" id="nombres" class="form-input-prof"
+                           value="{{ current_user.nombres }}" required
+                           placeholder="Ingrese sus nombres">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="apellidos" class="form-label-prof">
+                        <i class="fas fa-id-card"></i> Apellidos
+                        <span class="required-prof">*</span>
+                    </label>
+                    <input type="text" name="apellidos" id="apellidos" class="form-input-prof"
+                           value="{{ current_user.apellidos }}" required
+                           placeholder="Ingrese sus apellidos">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="documento" class="form-label-prof">
+                        <i class="fas fa-address-card"></i> Documento
+                    </label>
+                    <input type="text" class="form-input-prof input-readonly-prof"
+                           value="{{ current_user.tipo_documento }} - {{ current_user.documento }}" readonly>
+                    <small class="form-hint-prof">
+                        <i class="fas fa-lock"></i> No se puede modificar
+                    </small>
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="fecha_nacimiento" class="form-label-prof">
+                        <i class="fas fa-calendar-alt"></i> Fecha de Nacimiento
+                    </label>
+                    <input type="date" class="form-input-prof input-readonly-prof"
+                           value="{{ current_user.fecha_nacimiento.strftime('%Y-%m-%d') if current_user.fecha_nacimiento else '' }}" readonly>
+                    <small class="form-hint-prof">
+                        <i class="fas fa-lock"></i> Solo puede ser modificado por el administrador o docente
+                    </small>
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="email" class="form-label-prof">
+                        <i class="fas fa-envelope"></i> Email
+                        <span class="required-prof">*</span>
+                    </label>
+                    <input type="email" name="email" id="email" class="form-input-prof"
+                           value="{{ current_user.email }}" required
+                           placeholder="correo@ejemplo.com">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="telefono" class="form-label-prof">
+                        <i class="fas fa-phone"></i> Teléfono
+                    </label>
+                    <input type="tel" name="telefono" id="telefono" class="form-input-prof"
+                           value="{{ current_user.telefono or '' }}"
+                           placeholder="Número de teléfono">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos del Acudiente -->
+    <div class="profile-card-apr">
+        <div class="card-header-prof card-info-prof">
+            <div class="header-icon-wrapper-prof">
+                <i class="fas fa-user-friends"></i>
+            </div>
+            <div class="header-title-wrapper-prof">
+                <h3 class="card-title-prof">Datos del Acudiente</h3>
+                <p class="card-subtitle-prof">Información del responsable</p>
+            </div>
+        </div>
+        <div class="card-body-prof">
+            <div class="form-grid-prof">
+                <div class="form-group-prof">
+                    <label for="acudiente_tipo_doc" class="form-label-prof">
+                        <i class="fas fa-id-badge"></i> Tipo Documento
+                    </label>
+                    <select name="acudiente_tipo_doc" id="acudiente_tipo_doc" class="form-select-prof">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="CC" {{ 'selected' if aprendiz.acudiente_tipo_doc == 'CC' }}>Cédula de Ciudadanía</option>
+                        <option value="TI" {{ 'selected' if aprendiz.acudiente_tipo_doc == 'TI' }}>Tarjeta de Identidad</option>
+                        <option value="CE" {{ 'selected' if aprendiz.acudiente_tipo_doc == 'CE' }}>Cédula de Extranjería</option>
+                        <option value="PEP" {{ 'selected' if aprendiz.acudiente_tipo_doc == 'PEP' }}>PEP</option>
+                        <option value="PPT" {{ 'selected' if aprendiz.acudiente_tipo_doc == 'PPT' }}>PPT</option>
+                    </select>
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_documento" class="form-label-prof">
+                        <i class="fas fa-hashtag"></i> Número de Documento
+                    </label>
+                    <input type="text" name="acudiente_documento" id="acudiente_documento" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_documento or '' }}"
+                           placeholder="Número de documento">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_lugar_expedicion" class="form-label-prof">
+                        <i class="fas fa-map-marked-alt"></i> Lugar de Expedición
+                    </label>
+                    <input type="text" name="acudiente_lugar_expedicion" id="acudiente_lugar_expedicion" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_lugar_expedicion or '' }}"
+                           placeholder="Ciudad donde se expidió el documento">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_nombres" class="form-label-prof">
+                        <i class="fas fa-user"></i> Nombres
+                    </label>
+                    <input type="text" name="acudiente_nombres" id="acudiente_nombres" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_nombres or '' }}"
+                           placeholder="Nombres del acudiente">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_apellidos" class="form-label-prof">
+                        <i class="fas fa-user"></i> Apellidos
+                    </label>
+                    <input type="text" name="acudiente_apellidos" id="acudiente_apellidos" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_apellidos or '' }}"
+                           placeholder="Apellidos del acudiente">
+                </div>
+
+                <div class="form-group-prof form-full-width-prof">
+                    <label for="acudiente_direccion" class="form-label-prof">
+                        <i class="fas fa-map-marker-alt"></i> Dirección de Residencia
+                    </label>
+                    <input type="text" name="acudiente_direccion" id="acudiente_direccion" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_direccion or '' }}"
+                           placeholder="Calle, número, barrio">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_telefono" class="form-label-prof">
+                        <i class="fas fa-phone"></i> Teléfono
+                    </label>
+                    <input type="tel" name="acudiente_telefono" id="acudiente_telefono" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_telefono or '' }}"
+                           placeholder="Teléfono de contacto">
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="acudiente_email" class="form-label-prof">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <input type="email" name="acudiente_email" id="acudiente_email" class="form-input-prof"
+                           value="{{ aprendiz.acudiente_email or '' }}"
+                           placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Datos Académicos -->
+    <div class="profile-card-apr">
+        <div class="card-header-prof card-warning-prof">
+            <div class="header-icon-wrapper-prof">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="header-title-wrapper-prof">
+                <h3 class="card-title-prof">Datos Académicos</h3>
+                <p class="card-subtitle-prof">Información educativa</p>
+            </div>
+        </div>
+        <div class="card-body-prof">
+            <div class="form-grid-single-prof">
+                <div class="form-group-prof">
+                    <label for="colegio_id" class="form-label-prof">
+                        <i class="fas fa-school"></i> Colegio
+                    </label>
+                    {% if aprendiz.grupo_id %}
+                        <input type="text" class="form-input-prof input-readonly-prof"
+                               value="{{ aprendiz.colegio.nombre if aprendiz.colegio else 'Sin asignar' }}" readonly>
+                        <input type="hidden" name="colegio_id" value="{{ aprendiz.colegio_id }}">
+                        <small class="form-hint-prof" style="color: #2196F3;">
+                            <i class="fas fa-lock"></i> El colegio no puede modificarse porque ya tienes un grupo asignado. Solo el docente o administrador puede modificarlo.
+                        </small>
+                    {% else %}
+                        <select name="colegio_id" id="colegio_id" class="form-select-prof">
+                            <option value="">-- Seleccionar Colegio --</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}" {{ 'selected' if aprendiz.colegio_id == colegio.id }}>
+                                {{ colegio.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="programa_id" class="form-label-prof">
+                        <i class="fas fa-book"></i> Programa
+                    </label>
+                    {% if aprendiz.grupo_id %}
+                        <input type="text" class="form-input-prof input-readonly-prof"
+                               value="{{ aprendiz.programa.nombre if aprendiz.programa else 'Sin asignar' }}" readonly>
+                        <input type="hidden" name="programa_id" value="{{ aprendiz.programa_id }}">
+                        <small class="form-hint-prof" style="color: #2196F3;">
+                            <i class="fas fa-lock"></i> El programa no puede modificarse porque ya tienes un grupo asignado. Solo el docente o administrador puede modificarlo.
+                        </small>
+                    {% else %}
+                        <select name="programa_id" id="programa_id" class="form-select-prof">
+                            <option value="">-- Seleccionar Programa --</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}" {{ 'selected' if aprendiz.programa_id == programa.id }}>
+                                {{ programa.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+
+                <div class="form-group-prof">
+                    <label for="grupo_id" class="form-label-prof">
+                        <i class="fas fa-users"></i> Grupo/Ficha SENA
+                    </label>
+                    {% if aprendiz.grupo_id %}
+                        <input type="text" class="form-input-prof" value="{{ aprendiz.grupo.nombre }} - {{ aprendiz.grupo.jornada }}" disabled>
+                        <input type="hidden" name="grupo_id" value="{{ aprendiz.grupo_id }}">
+                        <small class="form-hint-prof" style="color: #2196F3;">
+                            <i class="fas fa-info-circle"></i> El grupo ya fue asignado. Solo el docente o administrador puede modificarlo.
+                        </small>
+                    {% else %}
+                        <select name="grupo_id" id="grupo_id" class="form-select-prof">
+                            <option value="">Primero seleccione colegio y programa...</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}"
+                                    data-colegio="{{ grupo.colegio_id }}"
+                                    data-programa="{{ grupo.programa_id }}">
+                                {{ grupo.nombre }} - {{ grupo.jornada }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-hint-prof">Solo se mostrarán grupos de su colegio y programa seleccionado</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions-prof">
+        <a href="{{ url_for('aprendiz.dashboard') }}" class="btn-action-prof btn-secondary-prof">
+            <i class="fas fa-arrow-left"></i> Volver al Dashboard
+        </a>
+        <button type="submit" class="btn-action-prof btn-primary-prof" onclick="showSpinner2('Guardando cambios...')">
+            <i class="fas fa-save"></i> Guardar Cambios
+        </button>
+    </div>
+</form>
+
+<script>
+// ============================================
+// FILTRADO DINÁMICO DE GRUPOS
+// ============================================
+
+// Filtrar grupos según colegio y programa seleccionados
+function filtrarGrupos() {
+    const colegioSelect = document.getElementById('colegio_id');
+    const programaSelect = document.getElementById('programa_id');
+    const grupoSelect = document.getElementById('grupo_id');
+
+    // Si no existe el select de grupo (ya está asignado), no hacer nada
+    if (!grupoSelect) {
+        return;
+    }
+
+    const colegioSeleccionado = colegioSelect.value;
+    const programaSeleccionado = programaSelect.value;
+
+    // Obtener todas las opciones de grupos
+    const todasLasOpciones = Array.from(grupoSelect.options);
+
+    // Limpiar el select de grupos
+    grupoSelect.innerHTML = '<option value="">Seleccione un grupo...</option>';
+
+    // Si no hay colegio Y programa seleccionados, mostrar mensaje
+    if (!colegioSeleccionado || !programaSeleccionado) {
+        grupoSelect.innerHTML = '<option value="">Primero seleccione colegio y programa...</option>';
+        grupoSelect.disabled = true;
+        return;
+    }
+
+    // Habilitar el select
+    grupoSelect.disabled = false;
+
+    // Filtrar y agregar solo los grupos que coincidan
+    let gruposEncontrados = 0;
+    todasLasOpciones.forEach(option => {
+        if (option.value === '') return; // Ignorar la opción vacía
+
+        const colegioGrupo = option.getAttribute('data-colegio');
+        const programaGrupo = option.getAttribute('data-programa');
+
+        // Si el grupo pertenece al colegio Y programa seleccionados
+        // Convertir a string para comparación segura
+        if (String(colegioGrupo) === String(colegioSeleccionado) && String(programaGrupo) === String(programaSeleccionado)) {
+            grupoSelect.appendChild(option.cloneNode(true));
+            gruposEncontrados++;
+        }
+    });
+
+    // Si no se encontraron grupos
+    if (gruposEncontrados === 0) {
+        grupoSelect.innerHTML = '<option value="">No hay grupos disponibles para este colegio y programa</option>';
+        grupoSelect.disabled = true;
+    }
+}
+
+// Event listeners para los selects de colegio y programa (solo si existen)
+const colegioSelect = document.getElementById('colegio_id');
+const programaSelect = document.getElementById('programa_id');
+
+if (colegioSelect && programaSelect) {
+    colegioSelect.addEventListener('change', filtrarGrupos);
+    programaSelect.addEventListener('change', filtrarGrupos);
+}
+
+// Ejecutar al cargar la página para manejar valores pre-seleccionados
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si el select de grupo existe (solo existe si el aprendiz no tiene grupo asignado)
+    const grupoSelect = document.getElementById('grupo_id');
+    if (!grupoSelect) {
+        // Si no existe, significa que el grupo ya está asignado, no hacer nada
+        return;
+    }
+
+    // Verificar que los selects de colegio y programa existan
+    const colegioSelect = document.getElementById('colegio_id');
+    const programaSelect = document.getElementById('programa_id');
+
+    if (!colegioSelect || !programaSelect) {
+        // Si no existen (están bloqueados), no hacer nada
+        return;
+    }
+
+    // Aplicar filtro inicial si hay valores pre-seleccionados
+    const colegioActual = colegioSelect.value;
+    const programaActual = programaSelect.value;
+
+    if (colegioActual && programaActual) {
+        filtrarGrupos();
+    } else if (!colegioActual || !programaActual) {
+        // Si no hay colegio o programa, deshabilitar grupos
+        grupoSelect.disabled = true;
+        grupoSelect.innerHTML = '<option value="">Primero seleccione colegio y programa...</option>';
+    }
+});
+</script>
+{% endblock %}

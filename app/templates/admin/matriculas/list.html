@@ -1,0 +1,948 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Matrículas - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 mb-6 md:mb-8">
+    <!-- Breadcrumb -->
+    <nav class="text-white/80 text-xs md:text-sm mb-3 md:mb-4 flex items-center">
+        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+            <i class="fas fa-home mr-1"></i> Dashboard
+        </a>
+        <span class="mx-2">/</span>
+        <span class="text-white font-semibold">Matrículas</span>
+    </nav>
+    
+    <!-- Título -->
+    <h1 class="text-2xl md:text-4xl font-bold text-white mb-2 flex items-center">
+        <i class="fas fa-clipboard-list mr-2 md:mr-3"></i>
+        Gestión de Matrículas
+    </h1>
+    <p class="text-sm md:text-lg text-white">
+        Administre y supervise todas las matrículas del sistema
+    </p>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6 mb-6 md:mb-8">
+    <!-- Total Matrículas -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-list text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.total }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Total Matrículas</div>
+    </div>
+
+    <!-- Borradores -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-gray-400 transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-edit text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.borradores }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Borradores</div>
+    </div>
+
+    <!-- Enviadas -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-blue-500 transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-paper-plane text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.enviadas }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Enviadas</div>
+    </div>
+
+    <!-- Pendientes -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-orange-500 transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-clock text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.pendientes }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Pendientes</div>
+    </div>
+
+    <!-- Completas -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-check-circle text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.completas }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Completas</div>
+    </div>
+
+    <!-- Prematrículas -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-purple-500 transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-graduation-cap text-white text-base md:text-xl"></i>
+            </div>
+        </div>
+        <div class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ stats.prematriculas }}</div>
+        <div class="text-xs md:text-sm text-gray-600 font-semibold">Prematrículas</div>
+    </div>
+</div>
+
+<!-- Filtros y Búsqueda -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden mb-6 md:mb-8 border-2 border-gray-100">
+    <div class="bg-gradient-to-r from-sena-green to-sena-green-dark px-4 md:px-6 py-3 md:py-4 flex items-center">
+        <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+            <i class="fas fa-filter text-white text-sm md:text-base"></i>
+        </div>
+        <h3 class="text-base md:text-xl font-bold text-white">Filtros y Búsqueda</h3>
+    </div>
+    <div class="p-4 md:p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+            <!-- Buscar -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-search text-sena-green mr-1"></i> Buscar
+                </label>
+                <input type="text" 
+                       id="searchInput" 
+                       class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all" 
+                       placeholder="Nombre o documento...">
+            </div>
+
+            <!-- Estado -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-flag text-sena-green mr-1"></i> Estado
+                </label>
+                <select id="estadoFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos los estados</option>
+                    <option value="BORRADOR">Borrador</option>
+                    <option value="ENVIADO">Enviado</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="COMPLETO">Completo</option>
+                    <option value="PREMATRICULA">Prematrícula</option>
+                    <option value="RECHAZADO">Rechazado</option>
+                </select>
+            </div>
+
+            <!-- Programa -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-graduation-cap text-sena-green mr-1"></i> Programa
+                </label>
+                <select id="programaFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos los programas</option>
+                    {% for programa in programas %}
+                    <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Colegio -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-school text-sena-green mr-1"></i> Colegio
+                </label>
+                <select id="colegioFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos los colegios</option>
+                    {% for colegio in colegios %}
+                    <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Grupo -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-users text-sena-green mr-1"></i> Grupo
+                </label>
+                <select id="grupoFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos los grupos</option>
+                    {% for grupo in grupos %}
+                    <option value="{{ grupo.id }}">{{ grupo.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Descargar ZIP -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-download text-sena-green mr-1"></i> Descargar ZIP
+                </label>
+                <div class="flex flex-col gap-2">
+                    <button id="descargarZipBtn" 
+                            class="px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg md:rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2" 
+                            title="Descargar ZIP del grupo seleccionado" 
+                            disabled>
+                        <i class="fas fa-file-archive"></i> Grupo
+                    </button>
+                    <a href="{{ url_for('admin.descargar_todos_grupos') }}" 
+                       class="px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm bg-purple-500 hover:bg-purple-600 text-white font-semibold rounded-lg md:rounded-xl transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Todos
+                    </a>
+                </div>
+            </div>
+
+            <!-- Matricular -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-check-double text-sena-green mr-1"></i> Matricular
+                </label>
+                <form method="POST" 
+                      action="{{ url_for('admin.matricular_todos_prematricula') }}"
+                      onsubmit="return confirm('¿Matricular TODOS los aprendices en PRE-MATRÍCULA?');">
+                    <button type="submit" 
+                            class="w-full px-3 md:px-4 py-2 md:py-2.5 text-xs md:text-sm bg-gradient-to-r from-sena-green to-sena-green-dark hover:from-sena-green-dark hover:to-sena-green-darker text-white font-semibold rounded-lg md:rounded-xl transition-all duration-200 shadow-sm hover:shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            {% if stats.prematriculas == 0 %}disabled{% endif %}>
+                        <i class="fas fa-graduation-cap"></i> Todos ({{ stats.prematriculas }})
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Matrículas -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden border-2 border-gray-100">
+    <div class="bg-gradient-to-r from-sena-green to-sena-green-dark px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                <i class="fas fa-table text-white text-sm md:text-base"></i>
+            </div>
+            <h3 class="text-base md:text-xl font-bold text-white">Lista de Matrículas</h3>
+        </div>
+        <span class="text-white text-xs md:text-base font-semibold bg-white/20 px-3 md:px-4 py-1 md:py-2 rounded-lg" id="resultCount">{{ matriculas|length }} resultados</span>
+    </div>
+    
+    {% if matriculas %}
+    <!-- Vista Desktop: Tabla -->
+    <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full" id="matriculasTable">
+            <thead class="bg-gray-50 border-b-2 border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aprendiz</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Programa</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Colegio</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Grupo</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Docs</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Fecha Envío</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for matricula in matriculas %}
+                <tr class="hover:bg-gray-50 transition-colors" 
+                    data-estado="{{ matricula.estado }}"
+                    data-programa="{{ matricula.aprendiz.programa_id or '' }}"
+                    data-colegio="{{ matricula.aprendiz.colegio_id or '' }}"
+                    data-grupo="{{ matricula.aprendiz.grupo_id or '' }}">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <div class="font-semibold text-gray-800">{{ matricula.aprendiz.usuario.nombre_completo }}</div>
+                                <div class="text-sm text-gray-500">{{ matricula.aprendiz.usuario.documento }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2 text-gray-700">
+                            <i class="fas fa-graduation-cap text-gray-400"></i>
+                            <span class="text-sm">{{ (matricula.aprendiz.programa.nombre[:30] + '...') if matricula.aprendiz.programa else '-' }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-700">{{ (matricula.aprendiz.colegio.nombre[:25] + '...') if matricula.aprendiz.colegio else '-' }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm text-gray-700">{{ matricula.aprendiz.grupo.nombre if matricula.aprendiz.grupo else '-' }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if matricula.estado == 'BORRADOR' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
+                            BORRADOR
+                        </span>
+                        {% elif matricula.estado == 'ENVIADO' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                            ENVIADO
+                        </span>
+                        {% elif matricula.estado == 'PENDIENTE' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                            PENDIENTE
+                        </span>
+                        {% elif matricula.estado == 'COMPLETO' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                            COMPLETO
+                        </span>
+                        {% elif matricula.estado == 'PREMATRICULA' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                            PREMATRÍCULA
+                        </span>
+                        {% elif matricula.estado == 'RECHAZADO' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+                            RECHAZADO
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
+                            {{ matricula.estado }}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        {% set docs_req = 5 if (matricula.aprendiz.usuario.tipo_documento == 'CC' and matricula.aprendiz.usuario.es_mayor_de_edad) else 8 %}
+                        {% if matricula.documentos|length >= docs_req %}
+                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-lg text-sm font-bold border border-green-200">
+                            <i class="fas fa-check-circle"></i>
+                            {{ matricula.documentos|length }}/{{ docs_req }}
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-bold border border-yellow-200">
+                            <i class="fas fa-exclamation-circle"></i>
+                            {{ matricula.documentos|length }}/{{ docs_req }}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <i class="fas fa-calendar text-gray-400"></i>
+                            {{ matricula.fecha_envio.strftime('%d/%m/%Y') if matricula.fecha_envio else '-' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <a href="{{ url_for('admin.ver_matricula', matricula_id=matricula.id) }}"
+                               class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                               title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            {% if matricula.estado == 'PREMATRICULA' %}
+                            <form method="POST" 
+                                  action="{{ url_for('admin.matricular_aprendiz', matricula_id=matricula.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('¿Matricular a {{ matricula.aprendiz.usuario.nombre_completo }}?');">
+                                <button type="submit" 
+                                        class="inline-flex items-center justify-center w-9 h-9 bg-sena-green hover:bg-sena-green-dark text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md" 
+                                        title="Matricular">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Vista Mobile: Cards -->
+    <div class="lg:hidden divide-y divide-gray-200" id="matriculasCards">
+        {% for matricula in matriculas %}
+        <div class="p-4 hover:bg-gray-50 transition-colors matricula-card"
+             data-estado="{{ matricula.estado }}"
+             data-programa="{{ matricula.aprendiz.programa_id or '' }}"
+             data-colegio="{{ matricula.aprendiz.colegio_id or '' }}"
+             data-grupo="{{ matricula.aprendiz.grupo_id or '' }}">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-gray-800 text-sm truncate">{{ matricula.aprendiz.usuario.nombre_completo }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">{{ matricula.aprendiz.usuario.documento }}</div>
+                    </div>
+                </div>
+                {% if matricula.estado == 'BORRADOR' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200 flex-shrink-0">
+                    BORRADOR
+                </span>
+                {% elif matricula.estado == 'ENVIADO' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200 flex-shrink-0">
+                    ENVIADO
+                </span>
+                {% elif matricula.estado == 'PENDIENTE' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200 flex-shrink-0">
+                    PENDIENTE
+                </span>
+                {% elif matricula.estado == 'COMPLETO' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200 flex-shrink-0">
+                    COMPLETO
+                </span>
+                {% elif matricula.estado == 'PREMATRICULA' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 flex-shrink-0">
+                    PREMATRÍCULA
+                </span>
+                {% elif matricula.estado == 'RECHAZADO' %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200 flex-shrink-0">
+                    RECHAZADO
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Info Grid -->
+            <div class="grid grid-cols-1 gap-2 mb-3 text-xs">
+                <div class="flex items-center gap-2 text-gray-700">
+                    <i class="fas fa-graduation-cap text-gray-400 w-4"></i>
+                    <span class="truncate">{{ matricula.aprendiz.programa.nombre if matricula.aprendiz.programa else '-' }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-700">
+                    <i class="fas fa-school text-gray-400 w-4"></i>
+                    <span class="truncate">{{ matricula.aprendiz.colegio.nombre if matricula.aprendiz.colegio else '-' }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-700">
+                    <i class="fas fa-users text-gray-400 w-4"></i>
+                    <span>{{ matricula.aprendiz.grupo.nombre if matricula.aprendiz.grupo else '-' }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-calendar text-gray-400 w-4"></i>
+                    <span class="text-gray-700">{{ matricula.fecha_envio.strftime('%d/%m/%Y') if matricula.fecha_envio else '-' }}</span>
+                    {% set docs_req = 5 if (matricula.aprendiz.usuario.tipo_documento == 'CC' and matricula.aprendiz.usuario.es_mayor_de_edad) else 8 %}
+                    {% if matricula.documentos|length >= docs_req %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded-lg text-xs font-bold border border-green-200 ml-auto">
+                        <i class="fas fa-check-circle"></i>
+                        {{ matricula.documentos|length }}/{{ docs_req }}
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-lg text-xs font-bold border border-yellow-200 ml-auto">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ matricula.documentos|length }}/{{ docs_req }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-2 pt-3 border-t border-gray-200">
+                <a href="{{ url_for('admin.ver_matricula', matricula_id=matricula.id) }}"
+                   class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-all duration-200">
+                    <i class="fas fa-eye"></i>
+                    Ver detalles
+                </a>
+                {% if matricula.estado == 'PREMATRICULA' %}
+                <form method="POST" 
+                      action="{{ url_for('admin.matricular_aprendiz', matricula_id=matricula.id) }}"
+                      class="flex-1"
+                      onsubmit="return confirm('¿Matricular a {{ matricula.aprendiz.usuario.nombre_completo }}?');">
+                    <button type="submit" 
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-sena-green hover:bg-sena-green-dark text-white text-xs font-semibold rounded-lg transition-all duration-200">
+                        <i class="fas fa-check-circle"></i>
+                        Matricular
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="p-16 text-center">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-clipboard-list text-gray-400 text-5xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay matrículas registradas</h3>
+        <p class="text-gray-600">Las matrículas aparecerán aquí cuando los aprendices las completen</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+document.getElementById('programaFilter').addEventListener('change', filterTable);
+document.getElementById('colegioFilter').addEventListener('change', filterTable);
+document.getElementById('grupoFilter').addEventListener('change', function() {
+    const grupoId = this.value;
+    const btn = document.getElementById('descargarZipBtn');
+
+    if (grupoId) {
+        btn.disabled = false;
+        btn.onclick = function() {
+            window.location.href = '/admin/matriculas/descargar-documentos-grupo/' + grupoId;
+        };
+    } else {
+        btn.disabled = true;
+        btn.onclick = null;
+    }
+
+    filterTable();
+});
+
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const estado = document.getElementById('estadoFilter').value;
+    const programa = document.getElementById('programaFilter').value;
+    const colegio = document.getElementById('colegioFilter').value;
+    const grupo = document.getElementById('grupoFilter').value;
+    
+    // Filtrar filas de tabla (desktop)
+    const rows = document.querySelectorAll('#matriculasTable tbody tr');
+    // Filtrar cards (mobile)
+    const cards = document.querySelectorAll('.matricula-card');
+
+    let visibleCount = 0;
+
+    // Filtrar tabla
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowEstado = row.dataset.estado;
+        const rowPrograma = row.dataset.programa;
+        const rowColegio = row.dataset.colegio;
+        const rowGrupo = row.dataset.grupo;
+
+        const matchSearch = text.includes(search);
+        const matchEstado = !estado || rowEstado === estado;
+        const matchPrograma = !programa || rowPrograma === programa;
+        const matchColegio = !colegio || rowColegio === colegio;
+        const matchGrupo = !grupo || rowGrupo === grupo;
+
+        const visible = matchSearch && matchEstado && matchPrograma && matchColegio && matchGrupo;
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+    
+    // Filtrar cards
+    let visibleCardsCount = 0;
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const cardEstado = card.dataset.estado;
+        const cardPrograma = card.dataset.programa;
+        const cardColegio = card.dataset.colegio;
+        const cardGrupo = card.dataset.grupo;
+
+        const matchSearch = text.includes(search);
+        const matchEstado = !estado || cardEstado === estado;
+        const matchPrograma = !programa || cardPrograma === programa;
+        const matchColegio = !colegio || cardColegio === colegio;
+        const matchGrupo = !grupo || cardGrupo === grupo;
+
+        const visible = matchSearch && matchEstado && matchPrograma && matchColegio && matchGrupo;
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCardsCount++;
+    });
+
+    // Usar el conteo apropiado según la vista
+    const count = window.innerWidth >= 1024 ? visibleCount : visibleCardsCount;
+    document.getElementById('resultCount').textContent = count + ' resultado' + (count !== 1 ? 's' : '');
+}
+</script>
+
+<style>
+:root {
+    --mat-primary: #667eea;
+    --mat-success: #39A900;
+    --mat-warning: #FFA000;
+    --mat-danger: #D32F2F;
+    --mat-info: #1976D2;
+    --mat-secondary: #6c757d;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --bg-light: #f7fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Stats Grid */
+.stats-grid-matriculas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-mat {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--stat-color);
+}
+
+.stat-card-mat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-total { --stat-color: var(--mat-primary); }
+.stat-borrador { --stat-color: var(--mat-secondary); }
+.stat-enviado { --stat-color: var(--mat-info); }
+.stat-pendiente { --stat-color: var(--mat-warning); }
+.stat-completo { --stat-color: #5a6268; }
+.stat-prematricula { --stat-color: var(--mat-success); }
+
+.stat-icon-mat {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--stat-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-content-mat {
+    flex: 1;
+}
+
+.stat-value-mat {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label-mat {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Modern Card */
+.card-modern {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.card-header-modern {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.result-count {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.card-body-modern {
+    padding: 1.5rem;
+}
+
+/* Filters Grid */
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: var(--mat-primary);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-download {
+    padding: 0.625rem 0.875rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--mat-info);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-download:hover:not(:disabled) {
+    background: #1565C0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.btn-download:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+}
+
+/* Modern Table */
+.table-wrapper-modern {
+    overflow-x: auto;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-modern thead {
+    background: var(--bg-light);
+}
+
+.table-modern th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-modern tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    background: var(--bg-light);
+}
+
+.table-modern td {
+    padding: 1rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.user-info-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar-cell {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--mat-primary), #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.user-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.125rem;
+}
+
+.user-doc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.programa-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.date-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.status-badge-mat {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-borrador { background: #e2e8f0; color: #4a5568; }
+.status-enviado { background: #bee3f8; color: #2c5282; }
+.status-pendiente { background: #feebc8; color: #7c2d12; }
+.status-completo { background: #e2e8f0; color: #4a5568; }
+.status-prematricula { background: #c6f6d5; color: #22543d; }
+.status-matriculado { background: #38a169; color: white; }
+.status-rechazado { background: #fed7d7; color: #742a2a; }
+
+.docs-badge {
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.docs-complete {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.docs-incomplete {
+    background: #feebc8;
+    color: #7c2d12;
+}
+
+.btn-action-mat {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--mat-primary);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-action-mat:hover {
+    background: #764ba2;
+    transform: scale(1.1);
+}
+
+.btn-view-mat {
+    background: var(--mat-primary);
+}
+
+.btn-view-mat:hover {
+    background: #764ba2;
+}
+
+.btn-approve-mat {
+    background: #39A900;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-approve-mat:hover {
+    background: #2d8000;
+    transform: scale(1.1);
+}
+
+.btn-matricular-all {
+    background: linear-gradient(135deg, #39A900 0%, #2d8000 100%);
+    color: white;
+}
+
+.btn-matricular-all:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2d8000 0%, #1f5700 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+}
+
+.btn-download-all {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-download-all:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5568d3 0%, #5e3a7e 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.empty-state-mat {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state-mat i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid-matriculas {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-modern {
+        font-size: 0.75rem;
+    }
+
+    .table-modern th,
+    .table-modern td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+

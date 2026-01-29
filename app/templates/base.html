@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+    <link rel="alternate icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <!-- Meta Tags -->
+    <meta name="description" content="SIAM - Sistema Integrado de Articulación y Media Técnica. SENA CGMLTI">
+    <meta name="keywords" content="SENA, Matrícula, Articulación, Media Técnica, CGMLTI, SIAM">
+    <meta name="author" content="SENA">
+    <meta name="theme-color" content="#39A900">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sena-green': '#39A900',
+                        'sena-green-dark': '#2d8500',
+                        'sena-green-darker': '#1f6000',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Estilos personalizados (legacy) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <!-- Estilos adicionales con Tailwind -->
+    <style>
+        @keyframes slideIn {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Navbar Moderno con Tailwind -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50 border-b-4 border-sena-green">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo y Brand -->
+                <a href="{{ url_for('public.index') }}" class="flex items-center space-x-3 group">
+                    <div class="w-14 h-14 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-xl p-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                        <img src="{{ url_for('static', filename='img/siam.png') }}" alt="SIAM" class="w-full h-full object-contain">
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="text-2xl font-bold text-gray-900">SIAM</span>
+                        <p class="text-xs text-gray-600">Sistema Integrado de Articulación con la Media </p>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center space-x-1">
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin() %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ url_for('admin.usuarios') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-users"></i>
+                                <span>Usuarios</span>
+                            </a>
+                            <a href="{{ url_for('admin.matriculas') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Matrículas</span>
+                            </a>
+                        {% elif current_user.is_docente() %}
+                            <a href="{{ url_for('docente.dashboard') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                            <a href="{{ url_for('docente.matriculas') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Matrículas</span>
+                            </a>
+                        {% elif current_user.is_aprendiz() %}
+                            <a href="{{ url_for('aprendiz.dashboard') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Mi Dashboard</span>
+                            </a>
+                            <a href="{{ url_for('aprendiz.matricula') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-edit"></i>
+                                <span>Matrícula</span>
+                            </a>
+                            <a href="{{ url_for('aprendiz.documentos') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                                <i class="fas fa-file-upload"></i>
+                                <span>Documentos</span>
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('public.logout') }}" onclick="sessionStorage.setItem('just_logged_out', 'true');" class="ml-2 px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('public.index') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                            <i class="fas fa-home"></i>
+                            <span>Inicio</span>
+                        </a>
+                        <a href="{{ url_for('public.programas') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                            <i class="fas fa-book"></i>
+                            <span>Programas</span>
+                        </a>
+                        <a href="{{ url_for('public.contacto') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                            <i class="fas fa-envelope"></i>
+                            <span>Contacto</span>
+                        </a>
+                        <a href="{{ url_for('public.login') }}" class="px-4 py-2 text-gray-700 hover:text-sena-green hover:bg-green-50 rounded-lg transition-all duration-200 flex items-center space-x-2">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>Iniciar Sesión</span>
+                        </a>
+                        <a href="{{ url_for('public.registro') }}" class="ml-2 px-6 py-2 bg-gradient-to-r from-sena-green to-sena-green-dark text-white rounded-lg hover:from-sena-green-dark hover:to-sena-green-darker transition-all duration-200 flex items-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-105">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Registrarse</span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile menu button -->
+                <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-sena-green">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden lg:hidden bg-white border-t border-gray-200 animate-slide-in">
+            <div class="px-4 py-3 space-y-1">
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin() %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('admin.usuarios') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-users w-5"></i>
+                            <span>Usuarios</span>
+                        </a>
+                        <a href="{{ url_for('admin.matriculas') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-clipboard-list w-5"></i>
+                            <span>Matrículas</span>
+                        </a>
+                    {% elif current_user.is_docente() %}
+                        <a href="{{ url_for('docente.dashboard') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('docente.matriculas') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-clipboard-list w-5"></i>
+                            <span>Matrículas</span>
+                        </a>
+                    {% elif current_user.is_aprendiz() %}
+                        <a href="{{ url_for('aprendiz.dashboard') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-tachometer-alt w-5"></i>
+                            <span>Mi Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('aprendiz.matricula') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-edit w-5"></i>
+                            <span>Matrícula</span>
+                        </a>
+                        <a href="{{ url_for('aprendiz.documentos') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                            <i class="fas fa-file-upload w-5"></i>
+                            <span>Documentos</span>
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('public.logout') }}" onclick="sessionStorage.setItem('just_logged_out', 'true');" class="block px-4 py-3 bg-red-500 text-white hover:bg-red-600 rounded-lg transition-colors flex items-center space-x-3 mt-2">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('public.index') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                        <i class="fas fa-home w-5"></i>
+                        <span>Inicio</span>
+                    </a>
+                    <a href="{{ url_for('public.programas') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                        <i class="fas fa-book w-5"></i>
+                        <span>Programas</span>
+                    </a>
+                    <a href="{{ url_for('public.contacto') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                        <i class="fas fa-envelope w-5"></i>
+                        <span>Contacto</span>
+                    </a>
+                    <a href="{{ url_for('public.login') }}" class="block px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-sena-green rounded-lg transition-colors flex items-center space-x-3">
+                        <i class="fas fa-sign-in-alt w-5"></i>
+                        <span>Iniciar Sesión</span>
+                    </a>
+                    <a href="{{ url_for('public.registro') }}" class="block px-4 py-3 bg-sena-green text-white hover:bg-sena-green-dark rounded-lg transition-colors flex items-center space-x-3 mt-2">
+                        <i class="fas fa-user-plus w-5"></i>
+                        <span>Registrarse</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <main class="flex-1">
+        <!-- Mensajes flash con Tailwind -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="space-y-3">
+                        {% for category, message in messages %}
+                            <div class="animate-slide-in {% if category == 'success' %}bg-green-50 border-l-4 border-green-500 text-green-800{% elif category == 'error' or category == 'danger' %}bg-red-50 border-l-4 border-red-500 text-red-800{% elif category == 'warning' %}bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800{% else %}bg-blue-50 border-l-4 border-blue-500 text-blue-800{% endif %} p-4 rounded-r-lg shadow-md flex items-start space-x-3">
+                                <div class="flex-shrink-0">
+                                    {% if category == 'success' %}
+                                        <i class="fas fa-check-circle text-xl"></i>
+                                    {% elif category == 'error' or category == 'danger' %}
+                                        <i class="fas fa-exclamation-circle text-xl"></i>
+                                    {% elif category == 'warning' %}
+                                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                                    {% else %}
+                                        <i class="fas fa-info-circle text-xl"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">{{ message }}</p>
+                                </div>
+                                <button onclick="this.parentElement.remove()" class="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer Moderno -->
+    <footer class="bg-gray-900 text-white mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Columna 1: Logo y descripción -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-sena-green rounded-lg p-2">
+                            <img src="{{ url_for('static', filename='img/siam.png') }}" alt="SIAM" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-2xl font-bold">SIAM</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">Sistema Integrado de Articulación y Media Técnica del SENA CGMLTI</p>
+                </div>
+
+                <!-- Columna 2: Enlaces rápidos -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Enlaces Rápidos</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="{{ url_for('public.index') }}" class="hover:text-sena-green transition-colors">Inicio</a></li>
+                        <li><a href="{{ url_for('public.programas') }}" class="hover:text-sena-green transition-colors">Programas</a></li>
+                        <li><a href="{{ url_for('public.contacto') }}" class="hover:text-sena-green transition-colors">Contacto</a></li>
+                    </ul>
+                </div>
+
+                <!-- Columna 3: Contacto -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contacto</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-envelope text-sena-green"></i>
+                            <span>info@sena.edu.co</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-phone text-sena-green"></i>
+                            <span>+57 (1) 5925555</span>
+                        </li>
+                        <li class="flex items-center space-x-2">
+                            <i class="fas fa-map-marker-alt text-sena-green"></i>
+                            <span>Bogotá, Colombia</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+                <p>&copy; {{ current_year() }} SENA - Servicio Nacional de Aprendizaje. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Global Loading Spinner Moderno -->
+    <div id="globalSpinner" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 flex flex-col items-center space-y-4 shadow-2xl max-w-sm mx-4">
+            <div class="relative">
+                <div class="w-20 h-20 border-4 border-gray-200 rounded-full"></div>
+                <div class="absolute top-0 left-0 w-20 h-20 border-4 border-sena-green rounded-full border-t-transparent animate-spin"></div>
+                <img src="{{ url_for('static', filename='img/siam.png') }}" 
+                     alt="Cargando..."
+                     class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 animate-pulse">
+            </div>
+            <div class="text-center">
+                <p id="spinnerText" class="text-lg font-semibold text-gray-900">Procesando...</p>
+                <p class="text-sm text-gray-600">Por favor espera</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner2 - Alternative spinner -->
+    <div id="spinner2" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 flex flex-col items-center space-y-4 shadow-2xl max-w-sm mx-4">
+            <div class="relative w-20 h-20">
+                <img src="{{ url_for('static', filename='img/spinner2.png') }}" 
+                     alt="Cargando..." 
+                     class="w-full h-full animate-spin">
+            </div>
+            <div class="text-center">
+                <p id="spinner2Text" class="text-lg font-semibold text-gray-900">Procesando...</p>
+                <p class="text-sm text-gray-600">Por favor espera</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+    // Funciones globales para el spinner
+    function showSpinner(message = 'Procesando...') {
+        const spinner = document.getElementById('globalSpinner');
+        const spinnerText = document.getElementById('spinnerText');
+        if (spinnerText) spinnerText.textContent = message;
+        if (spinner) {
+            spinner.classList.remove('hidden');
+            spinner.classList.add('flex');
+        }
+    }
+
+    function hideSpinner() {
+        const spinner = document.getElementById('globalSpinner');
+        if (spinner) {
+            spinner.classList.add('hidden');
+            spinner.classList.remove('flex');
+        }
+    }
+
+    // Funciones para spinner2
+    function showSpinner2(message = 'Procesando...') {
+        const spinner = document.getElementById('spinner2');
+        const spinnerText = document.getElementById('spinner2Text');
+        if (spinnerText) spinnerText.textContent = message;
+        if (spinner) {
+            spinner.classList.remove('hidden');
+            spinner.classList.add('flex');
+        }
+    }
+
+    function hideSpinner2() {
+        const spinner = document.getElementById('spinner2');
+        if (spinner) {
+            spinner.classList.add('hidden');
+            spinner.classList.remove('flex');
+        }
+    }
+
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Cerrar menú al hacer click en un enlace
+            const menuLinks = mobileMenu.querySelectorAll('a');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Cerrar menú al hacer click fuera
+            document.addEventListener('click', function(event) {
+                if (!mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Auto-hide flash messages after 5 seconds
+        const flashMessages = document.querySelectorAll('[class*="border-l-4"]');
+        flashMessages.forEach(msg => {
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                msg.style.transform = 'translateX(100%)';
+                msg.style.transition = 'all 0.5s ease';
+                setTimeout(() => msg.remove(), 500);
+            }, 5000);
+        });
+    });
+
+    // Prevenir navegación hacia atrás después de logout
+    {% if current_user.is_authenticated %}
+    (function() {
+        sessionStorage.setItem('user_authenticated', 'true');
+        sessionStorage.removeItem('just_logged_out');
+    })();
+    {% else %}
+    (function() {
+        if (sessionStorage.getItem('user_authenticated') === 'true') {
+            sessionStorage.removeItem('user_authenticated');
+            // Forzar recarga sin caché solo si es navegación hacia atrás
+            if (performance.navigation.type === 2) {
+                window.location.reload(true);
+            }
+            if (window.history && window.history.pushState) {
+                window.history.pushState(null, '', window.location.href);
+                window.addEventListener('popstate', function() {
+                    window.history.pushState(null, '', window.location.href);
+                });
+            }
+        }
+        
+        // Solo limpiar caché si realmente se cerró sesión (no en carga normal de páginas públicas)
+        if (sessionStorage.getItem('just_logged_out') === 'true') {
+            sessionStorage.removeItem('just_logged_out');
+            // Limpiar completamente el caché
+            if (window.caches) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+        }
+    })();
+    {% endif %}
+    
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,456 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Grupos - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 mb-6 md:mb-8">
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <!-- Breadcrumb y Título -->
+        <div>
+            <!-- Breadcrumb -->
+            <nav class="text-white/80 text-xs md:text-sm mb-3 md:mb-4 flex items-center">
+                <a href="{{ url_for('admin.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+                    <i class="fas fa-home mr-1"></i> Dashboard
+                </a>
+                <span class="mx-2">/</span>
+                <span class="text-white font-semibold">Grupos</span>
+            </nav>
+            
+            <!-- Título e Ícono -->
+            <h1 class="text-2xl md:text-4xl font-bold text-white mb-2 flex items-center">
+                <i class="fas fa-users mr-2 md:mr-3"></i>
+                Gestión de Grupos
+            </h1>
+            <p class="text-sm md:text-lg text-white">
+                Administre los grupos académicos asociados a programas y colegios
+            </p>
+        </div>
+        
+        <!-- Botón de Acción -->
+        <a href="{{ url_for('admin.crear_grupo') }}" class="w-full lg:w-auto inline-flex items-center justify-center px-6 py-3 bg-white text-sena-green font-bold text-sm md:text-base rounded-lg hover:bg-white/95 transition-all duration-200 shadow-md hover:shadow-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Nuevo Grupo
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+    <!-- Total Grupos -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-users text-white text-lg md:text-2xl"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-gray-800">{{ grupos|length }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-semibold">Total Grupos</div>
+            </div>
+        </div>
+        <div class="h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
+    </div>
+
+    <!-- Grupos Activos -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-check-circle text-white text-lg md:text-2xl"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-gray-800">{{ grupos|selectattr('activo', 'equalto', True)|list|length }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-semibold">Grupos Activos</div>
+            </div>
+        </div>
+        <div class="h-2 bg-gradient-to-r from-sena-green to-sena-green-dark rounded-full"></div>
+    </div>
+
+    <!-- Total Aprendices -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-user-graduate text-white text-lg md:text-2xl"></i>
+            </div>
+            <div class="text-right">
+                {% set total_aprendices = namespace(count=0) %}
+                {% for grupo in grupos %}
+                    {% set total_aprendices.count = total_aprendices.count + grupo.aprendices|length %}
+                {% endfor %}
+                <div class="text-2xl md:text-3xl font-bold text-gray-800">{{ total_aprendices.count }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-semibold">Total Aprendices</div>
+            </div>
+        </div>
+        <div class="h-2 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
+    </div>
+
+    <!-- Colegios -->
+    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-2 border-gray-100 hover:border-sena-green transition-all duration-200 hover:shadow-xl">
+        <div class="flex items-center justify-between mb-3 md:mb-4">
+            <div class="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg md:rounded-xl flex items-center justify-center shadow-lg">
+                <i class="fas fa-school text-white text-lg md:text-2xl"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-gray-800">{{ colegios|length }}</div>
+                <div class="text-xs md:text-sm text-gray-600 font-semibold">Colegios</div>
+            </div>
+        </div>
+        <div class="h-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
+    </div>
+</div>
+
+<!-- Filtros y Búsqueda -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden mb-6 md:mb-8 border-2 border-gray-100">
+    <div class="bg-gradient-to-r from-sena-green to-sena-green-dark px-4 md:px-6 py-3 md:py-4 flex items-center">
+        <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+            <i class="fas fa-filter text-white text-sm md:text-base"></i>
+        </div>
+        <h3 class="text-base md:text-xl font-bold text-white">Filtros y Búsqueda</h3>
+    </div>
+    <div class="p-4 md:p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Buscar -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-search text-sena-green mr-1"></i> Buscar
+                </label>
+                <input type="text" 
+                       id="searchInput" 
+                       class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all" 
+                       placeholder="Nombre del grupo...">
+            </div>
+
+            <!-- Colegio -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-school text-sena-green mr-1"></i> Colegio
+                </label>
+                <select id="colegioFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos los colegios</option>
+                    {% for colegio in colegios %}
+                    <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Jornada -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-clock text-sena-green mr-1"></i> Jornada
+                </label>
+                <select id="jornadaFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todas las jornadas</option>
+                    <option value="MAÑANA">Mañana</option>
+                    <option value="TARDE">Tarde</option>
+                    <option value="NOCHE">Noche</option>
+                    <option value="UNICA">Única</option>
+                </select>
+            </div>
+
+            <!-- Estado -->
+            <div>
+                <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-toggle-on text-sena-green mr-1"></i> Estado
+                </label>
+                <select id="estadoFilter" class="w-full px-3 md:px-4 py-2 md:py-3 text-sm md:text-base border-2 border-gray-300 rounded-lg md:rounded-xl focus:outline-none focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all bg-white">
+                    <option value="">Todos</option>
+                    <option value="true">Activos</option>
+                    <option value="false">Inactivos</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Grupos -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden border-2 border-gray-100">
+    <div class="bg-gradient-to-r from-sena-green to-sena-green-dark px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+        <div class="flex items-center">
+            <div class="w-8 h-8 md:w-10 md:h-10 bg-white/20 rounded-lg flex items-center justify-center mr-2 md:mr-3">
+                <i class="fas fa-table text-white text-sm md:text-base"></i>
+            </div>
+            <h3 class="text-base md:text-xl font-bold text-white">Lista de Grupos</h3>
+        </div>
+        <span class="text-white text-xs md:text-base font-semibold bg-white/20 px-3 md:px-4 py-1 md:py-2 rounded-lg" id="resultCount">{{ grupos|length }} grupos</span>
+    </div>
+    
+    {% if grupos %}
+    <!-- Vista Desktop: Tabla -->
+    <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full" id="gruposTable">
+            <thead class="bg-gray-50 border-b-2 border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Grupo</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Colegio</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Programa</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Jornada</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Año Lectivo</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aprendices</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for grupo in grupos %}
+                <tr class="hover:bg-gray-50 transition-colors" data-colegio="{{ grupo.colegio_id }}" data-jornada="{{ grupo.jornada }}" data-activo="{{ grupo.activo }}">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-users text-white"></i>
+                            </div>
+                            <div class="font-semibold text-gray-800">{{ grupo.nombre }}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2 text-gray-700">
+                            <i class="fas fa-school text-gray-400"></i>
+                            <span class="text-sm">{{ grupo.colegio.nombre }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2 text-gray-700">
+                            <i class="fas fa-graduation-cap text-gray-400"></i>
+                            <span class="text-sm">{{ grupo.programa.nombre }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if grupo.jornada == 'MAÑANA' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                            {{ grupo.jornada }}
+                        </span>
+                        {% elif grupo.jornada == 'TARDE' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                            {{ grupo.jornada }}
+                        </span>
+                        {% elif grupo.jornada == 'NOCHE' %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                            {{ grupo.jornada }}
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
+                            {{ grupo.jornada }}
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-1 text-sm font-semibold text-gray-700">
+                            <i class="fas fa-calendar-alt text-gray-400"></i>
+                            {{ grupo.año_lectivo }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-lg text-sm font-bold border border-purple-200">
+                            <i class="fas fa-user-graduate"></i>
+                            {{ grupo.aprendices|length }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        {% if grupo.activo %}
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                            <i class="fas fa-circle text-xs"></i> Activo
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+                            <i class="fas fa-circle text-xs"></i> Inactivo
+                        </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <a href="{{ url_for('admin.editar_grupo', grupo_id=grupo.id) }}"
+                               class="inline-flex items-center justify-center w-9 h-9 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+                               title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if grupo.aprendices|length == 0 %}
+                            <form method="POST" action="{{ url_for('admin.eliminar_grupo', grupo_id=grupo.id) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar el grupo {{ grupo.nombre }}?')">
+                                <button type="submit" 
+                                        class="inline-flex items-center justify-center w-9 h-9 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-200 shadow-sm hover:shadow-md" 
+                                        title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="inline-flex items-center justify-center w-9 h-9 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
+                                    title="No se puede eliminar (tiene aprendices)"
+                                    disabled>
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Vista Mobile: Cards -->
+    <div class="lg:hidden divide-y divide-gray-200" id="gruposCards">
+        {% for grupo in grupos %}
+        <div class="p-4 hover:bg-gray-50 transition-colors grupo-card" data-colegio="{{ grupo.colegio_id }}" data-jornada="{{ grupo.jornada }}" data-activo="{{ grupo.activo }}">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center gap-3 flex-1">
+                    <div class="w-10 h-10 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-users text-white"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-gray-800 text-sm truncate">{{ grupo.nombre }}</div>
+                        <div class="text-xs text-gray-500 mt-0.5">
+                            <i class="fas fa-calendar-alt"></i> {{ grupo.año_lectivo }}
+                        </div>
+                    </div>
+                </div>
+                {% if grupo.activo %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800 border border-green-200">
+                    <i class="fas fa-circle text-xs"></i> Activo
+                </span>
+                {% else %}
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 border border-red-200">
+                    <i class="fas fa-circle text-xs"></i> Inactivo
+                </span>
+                {% endif %}
+            </div>
+            
+            <!-- Info Grid -->
+            <div class="grid grid-cols-1 gap-2 mb-3 text-xs">
+                <div class="flex items-center gap-2 text-gray-700">
+                    <i class="fas fa-school text-gray-400 w-4"></i>
+                    <span class="truncate">{{ grupo.colegio.nombre }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-700">
+                    <i class="fas fa-graduation-cap text-gray-400 w-4"></i>
+                    <span class="truncate">{{ grupo.programa.nombre }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-clock text-gray-400 w-4"></i>
+                    {% if grupo.jornada == 'MAÑANA' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                        {{ grupo.jornada }}
+                    </span>
+                    {% elif grupo.jornada == 'TARDE' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                        {{ grupo.jornada }}
+                    </span>
+                    {% elif grupo.jornada == 'NOCHE' %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+                        {{ grupo.jornada }}
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200">
+                        {{ grupo.jornada }}
+                    </span>
+                    {% endif %}
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-800 rounded-lg text-xs font-bold border border-purple-200 ml-auto">
+                        <i class="fas fa-user-graduate"></i>
+                        {{ grupo.aprendices|length }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex items-center gap-2 pt-3 border-t border-gray-200">
+                <a href="{{ url_for('admin.editar_grupo', grupo_id=grupo.id) }}"
+                   class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-xs font-semibold rounded-lg transition-all duration-200">
+                    <i class="fas fa-edit"></i>
+                    Editar
+                </a>
+                {% if grupo.aprendices|length == 0 %}
+                <form method="POST" action="{{ url_for('admin.eliminar_grupo', grupo_id=grupo.id) }}"
+                      class="flex-1"
+                      onsubmit="return confirm('¿Está seguro de eliminar el grupo {{ grupo.nombre }}?')">
+                    <button type="submit" 
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold rounded-lg transition-all duration-200">
+                        <i class="fas fa-trash"></i>
+                        Eliminar
+                    </button>
+                </form>
+                {% else %}
+                <button class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-300 text-gray-500 text-xs font-semibold rounded-lg cursor-not-allowed"
+                        disabled>
+                    <i class="fas fa-trash"></i>
+                    No eliminar
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="p-16 text-center">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-users text-gray-400 text-5xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay grupos registrados</h3>
+        <p class="text-gray-600 mb-6">Comience creando un nuevo grupo para organizar a los aprendices</p>
+        <a href="{{ url_for('admin.crear_grupo') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sena-green to-sena-green-dark text-white font-bold rounded-xl hover:shadow-lg transition-all duration-200">
+            <i class="fas fa-plus mr-2"></i> Crear Primer Grupo
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('colegioFilter').addEventListener('change', filterTable);
+document.getElementById('jornadaFilter').addEventListener('change', filterTable);
+document.getElementById('estadoFilter').addEventListener('change', filterTable);
+
+function filterTable() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const colegio = document.getElementById('colegioFilter').value;
+    const jornada = document.getElementById('jornadaFilter').value;
+    const estado = document.getElementById('estadoFilter').value;
+    
+    // Filtrar filas de tabla (desktop)
+    const rows = document.querySelectorAll('#gruposTable tbody tr');
+    // Filtrar cards (mobile)
+    const cards = document.querySelectorAll('.grupo-card');
+
+    let visibleCount = 0;
+
+    // Filtrar tabla
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const rowColegio = row.dataset.colegio;
+        const rowJornada = row.dataset.jornada;
+        const rowActivo = row.dataset.activo;
+
+        const matchSearch = text.includes(search);
+        const matchColegio = !colegio || rowColegio === colegio;
+        const matchJornada = !jornada || rowJornada === jornada;
+        const matchEstado = !estado || rowActivo === estado;
+
+        const visible = matchSearch && matchColegio && matchJornada && matchEstado;
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+    
+    // Filtrar cards
+    let visibleCardsCount = 0;
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const cardColegio = card.dataset.colegio;
+        const cardJornada = card.dataset.jornada;
+        const cardActivo = card.dataset.activo;
+
+        const matchSearch = text.includes(search);
+        const matchColegio = !colegio || cardColegio === colegio;
+        const matchJornada = !jornada || cardJornada === jornada;
+        const matchEstado = !estado || cardActivo === estado;
+
+        const visible = matchSearch && matchColegio && matchJornada && matchEstado;
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCardsCount++;
+    });
+
+    // Usar el conteo apropiado según la vista
+    const count = window.innerWidth >= 1024 ? visibleCount : visibleCardsCount;
+    document.getElementById('resultCount').textContent = count + ' grupo' + (count !== 1 ? 's' : '');
+}
+</script>
+
+{% endblock %}

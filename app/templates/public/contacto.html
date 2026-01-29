@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto - SIAM{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float-slow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(2deg); }
+    }
+    
+    .animate-float-slow {
+        animation: float-slow 4s ease-in-out infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-gray-50 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center space-x-2 bg-sena-green/10 text-sena-green px-4 py-2 rounded-full mb-4">
+                <i class="fas fa-envelope"></i>
+                <span class="font-semibold">Contáctenos</span>
+            </div>
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+                ¿Necesitas ayuda?
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Estamos aquí para ayudarte. Envíanos un mensaje y te responderemos lo antes posible.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Left Side - Info & Branding -->
+            <div class="bg-gradient-to-br from-sena-green via-sena-green-dark to-sena-green-darker rounded-3xl p-8 lg:p-12 text-white relative overflow-hidden shadow-2xl">
+                <!-- Decorative Background -->
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+                </div>
+                
+                <!-- Content -->
+                <div class="relative z-10 space-y-8">
+                    <!-- Logo y Título -->
+                    <div class="text-center lg:text-left">
+                        <div class="w-32 h-32 bg-white/20 backdrop-blur-md rounded-3xl p-4 mx-auto lg:mx-0 mb-6 inline-flex items-center justify-center shadow-2xl animate-float-slow">
+                            <img src="{{ url_for('static', filename='img/siam.png') }}" alt="Logo SIAM" class="w-full h-full object-contain">
+                        </div>
+                        <h2 class="text-4xl font-bold mb-3">SIAM</h2>
+                        <p class="text-xl text-white/90 mb-1">Sistema Integrado de Articulación</p>
+                        <p class="text-lg text-white/80">y Media Técnica</p>
+                        <div class="mt-4 inline-block px-6 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                            <p class="text-sm font-semibold">SENA CGMLTI</p>
+                        </div>
+                    </div>
+
+                    <!-- Información de Contacto -->
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold mb-4 flex items-center space-x-2">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Información de Contacto</span>
+                        </h3>
+                        
+                        <div class="flex items-start space-x-4 p-5 bg-white/10 backdrop-blur-md rounded-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20">
+                            <div class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Ubicación</h4>
+                                <p class="text-white/90 text-sm leading-relaxed">SENA CGMLTI - Centro de Gestión de Mercados, Logística y Tecnologías de la Información</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-5 bg-white/10 backdrop-blur-md rounded-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20">
+                            <div class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-phone text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Teléfono</h4>
+                                <p class="text-white/90 text-sm">Línea gratuita nacional</p>
+                                <p class="text-white font-semibold text-lg">018000 910682</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-5 bg-white/10 backdrop-blur-md rounded-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20">
+                            <div class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-envelope text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Correo Electrónico</h4>
+                                <p class="text-white/90 text-sm">Escríbenos a</p>
+                                <p class="text-white font-semibold">articulacion@sena.edu.co</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-5 bg-white/10 backdrop-blur-md rounded-2xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20">
+                            <div class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-clock text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Horario de Atención</h4>
+                                <p class="text-white/90 text-sm">Lunes a Viernes</p>
+                                <p class="text-white font-semibold">8:00 AM - 5:00 PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - Contact Form -->
+            <div class="bg-white rounded-3xl shadow-2xl p-8 lg:p-12 border border-gray-100">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3 flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-xl flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-white"></i>
+                        </div>
+                        <span>Envíanos un Mensaje</span>
+                    </h2>
+                    <p class="text-gray-600">Completa el formulario y nos pondremos en contacto contigo pronto</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('public.contacto') }}" class="space-y-6" onsubmit="showSpinner('Enviando mensaje...')">
+                    <!-- Nombre Completo -->
+                    <div class="group">
+                        <label for="nombre" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                            <i class="fas fa-user text-sena-green"></i>
+                            <span>Nombre Completo</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               id="nombre"
+                               name="nombre"
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none group-hover:border-gray-300 bg-gray-50 focus:bg-white"
+                               placeholder="Ej: Juan Pérez"
+                               required>
+                    </div>
+
+                    <!-- Correo Electrónico -->
+                    <div class="group">
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                            <i class="fas fa-envelope text-sena-green"></i>
+                            <span>Correo Electrónico</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none group-hover:border-gray-300 bg-gray-50 focus:bg-white"
+                               placeholder="correo@ejemplo.com"
+                               required>
+                    </div>
+
+                    <!-- Teléfono y Asunto -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label for="telefono" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-phone text-sena-green"></i>
+                                <span>Teléfono</span>
+                            </label>
+                            <input type="tel"
+                                   id="telefono"
+                                   name="telefono"
+                                   class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none group-hover:border-gray-300 bg-gray-50 focus:bg-white"
+                                   placeholder="3001234567">
+                        </div>
+
+                        <div class="group">
+                            <label for="asunto" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                                <i class="fas fa-tag text-sena-green"></i>
+                                <span>Asunto</span>
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text"
+                                   id="asunto"
+                                   name="asunto"
+                                   class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none group-hover:border-gray-300 bg-gray-50 focus:bg-white"
+                                   placeholder="¿Sobre qué nos escribes?"
+                                   required>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje -->
+                    <div class="group">
+                        <label for="mensaje" class="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                            <i class="fas fa-comment-alt text-sena-green"></i>
+                            <span>Mensaje</span>
+                            <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="mensaje"
+                                  name="mensaje"
+                                  rows="6"
+                                  class="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none resize-none group-hover:border-gray-300 bg-gray-50 focus:bg-white"
+                                  placeholder="Escribe tu mensaje aquí... Cuéntanos cómo podemos ayudarte"
+                                  required></textarea>
+                        <p class="mt-2 text-sm text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Mínimo 10 caracteres
+                        </p>
+                    </div>
+
+                    <!-- Botón Enviar -->
+                    <button type="submit"
+                            class="w-full bg-gradient-to-r from-sena-green to-sena-green-dark text-white font-bold py-4 px-8 rounded-xl hover:from-sena-green-dark hover:to-sena-green-darker focus:outline-none focus:ring-4 focus:ring-sena-green/50 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl flex items-center justify-center group text-lg">
+                        <i class="fas fa-paper-plane mr-3 group-hover:translate-x-1 transition-transform"></i>
+                        <span>Enviar Mensaje</span>
+                        <i class="fas fa-arrow-right ml-3 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+
+                    <p class="text-center text-sm text-gray-500 mt-4">
+                        <i class="fas fa-shield-alt text-sena-green mr-1"></i>
+                        Tus datos están protegidos y solo serán usados para contactarte
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

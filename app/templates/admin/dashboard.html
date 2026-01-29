@@ -1,0 +1,1192 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard - Panel Administrador{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- Welcome Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-2xl shadow-lg p-8 mb-8">
+    <div class="flex items-center justify-between">
+        <div class="flex-1">
+            <h1 class="text-4xl font-bold text-white mb-2">Panel de Administración</h1>
+            <p class="text-lg text-white">Bienvenido, <span class="font-bold">{{ current_user.nombre_completo }}</span> - Gestión del Sistema de Articulación SENA</p>
+        </div>
+        <div class="hidden md:flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-xl">
+            <i class="fas fa-user-shield text-4xl text-white"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Primary Metrics Grid with Modern Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Card 1: Usuarios -->
+    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-6 border-l-4 border-blue-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-xl shadow-md">
+                <i class="fas fa-users text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-bold text-blue-700">{{ stats.total_usuarios }}</div>
+                <div class="text-sm text-blue-600 font-medium">Usuarios Totales</div>
+            </div>
+        </div>
+        <div class="flex items-center text-green-600 text-sm font-semibold">
+            <i class="fas fa-arrow-up mr-1"></i>
+            <span>Sistema activo</span>
+        </div>
+    </div>
+
+    <!-- Card 2: Aprendices -->
+    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6 border-l-4 border-green-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center justify-center w-14 h-14 bg-green-500 rounded-xl shadow-md">
+                <i class="fas fa-user-graduate text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-bold text-green-700">{{ stats.total_aprendices }}</div>
+                <div class="text-sm text-green-600 font-medium">Aprendices Registrados</div>
+            </div>
+        </div>
+        <div class="flex items-center text-green-600 text-sm font-semibold">
+            <i class="fas fa-users mr-1"></i>
+            <span>Activos</span>
+        </div>
+    </div>
+
+    <!-- Card 3: Matrículas Pendientes -->
+    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-6 border-l-4 border-orange-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center justify-center w-14 h-14 bg-orange-500 rounded-xl shadow-md">
+                <i class="fas fa-file-alt text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-bold text-orange-700">{{ stats.matriculas_pendientes }}</div>
+                <div class="text-sm text-orange-600 font-medium">Matrículas Pendientes</div>
+            </div>
+        </div>
+        <div class="flex items-center text-sm font-semibold {% if stats.matriculas_pendientes > 0 %}text-red-600{% else %}text-green-600{% endif %}">
+            {% if stats.matriculas_pendientes > 0 %}
+            <i class="fas fa-exclamation-triangle mr-1"></i>
+            <span>Requieren atención</span>
+            {% else %}
+            <i class="fas fa-check-circle mr-1"></i>
+            <span>Todo al día</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card 4: Colegios -->
+    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-6 border-l-4 border-purple-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-start justify-between mb-4">
+            <div class="flex items-center justify-center w-14 h-14 bg-purple-500 rounded-xl shadow-md">
+                <i class="fas fa-school text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-3xl font-bold text-purple-700">{{ stats.total_colegios }}</div>
+                <div class="text-sm text-purple-600 font-medium">Colegios Activos</div>
+            </div>
+        </div>
+        <div class="flex items-center text-green-600 text-sm font-semibold">
+            <i class="fas fa-building mr-1"></i>
+            <span>Instituciones</span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section with Modern Cards -->
+<div class="mb-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <div class="w-10 h-10 bg-gradient-to-br from-sena-green to-sena-green-dark rounded-lg flex items-center justify-center mr-3 shadow-md">
+            <i class="fas fa-bolt text-white"></i>
+        </div>
+        <span>Acciones Rápidas de Administración</span>
+    </h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Gestionar Usuarios -->
+        <a href="{{ url_for('admin.usuarios') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-purple-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-users-cog text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Gestionar Usuarios</h3>
+            <p class="text-sm text-gray-600">Administrar cuentas y permisos</p>
+        </a>
+
+        <!-- Gestionar Colegios -->
+        <a href="{{ url_for('admin.colegios') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-green-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-school text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-green-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Gestionar Colegios</h3>
+            <p class="text-sm text-gray-600">Instituciones educativas</p>
+        </a>
+
+        <!-- Gestionar Programas -->
+        <a href="{{ url_for('admin.programas') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-blue-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-book-open text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Gestionar Programas</h3>
+            <p class="text-sm text-gray-600">Programas de formación</p>
+        </a>
+
+        <!-- Gestionar Grupos -->
+        <a href="{{ url_for('admin.grupos') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-orange-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-users-class text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-orange-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Gestionar Grupos</h3>
+            <p class="text-sm text-gray-600">Fichas y grupos de aprendices</p>
+        </a>
+
+        <!-- Revisar Matrículas -->
+        <a href="{{ url_for('admin.matriculas') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-teal-300 relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-clipboard-list text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-teal-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Revisar Matrículas</h3>
+            <p class="text-sm text-gray-600">Validación y seguimiento</p>
+            {% if stats.matriculas_pendientes > 0 %}
+            <div class="absolute top-3 right-3 w-7 h-7 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                {{ stats.matriculas_pendientes }}
+            </div>
+            {% endif %}
+        </a>
+
+        <!-- Generar Reportes -->
+        <a href="{{ url_for('admin.reportes') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-gray-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-chart-bar text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-gray-700 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Generar Reportes</h3>
+            <p class="text-sm text-gray-600">Estadísticas y análisis</p>
+        </a>
+
+        <!-- Formato SOFIA Plus -->
+        <a href="{{ url_for('admin.generar_sofia') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-green-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-green-600 to-green-700 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-file-excel text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Formato SOFIA Plus</h3>
+            <p class="text-sm text-gray-600">Exportar para carga masiva</p>
+        </a>
+
+        <!-- Gestionar Novedades -->
+        <a href="{{ url_for('admin.novedades') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-pink-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-bullhorn text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-pink-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Gestionar Novedades</h3>
+            <p class="text-sm text-gray-600">Anuncios y comunicados</p>
+        </a>
+
+        <!-- Ver Mensajes -->
+        <a href="{{ url_for('admin.mensajes') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-gray-300">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-envelope text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Ver Mensajes</h3>
+            <p class="text-sm text-gray-600">Mensajes de contacto</p>
+        </a>
+
+        <!-- Documentos SIMAT -->
+        <a href="{{ url_for('admin.simat') }}" class="group bg-white rounded-2xl shadow-lg p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-transparent hover:border-indigo-300 relative">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-file-alt text-2xl text-white"></i>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all duration-300"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-1">Documentos SIMAT</h3>
+            <p class="text-sm text-gray-600">Registro de matrícula estudiantil</p>
+            {% if stats.simat_pendientes is defined and stats.simat_pendientes > 0 %}
+            <div class="absolute top-3 right-3 w-7 h-7 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                {{ stats.simat_pendientes }}
+            </div>
+            {% endif %}
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="content-grid-admin">
+    <!-- Recent Enrollments Table -->
+    <div class="content-card-admin enrollments-card">
+        <div class="content-header-admin">
+            <h2 class="content-title-admin">
+                <i class="fas fa-history"></i> Matrículas Recientes
+            </h2>
+            <a href="{{ url_for('admin.matriculas') }}" class="btn-link-admin">
+                Ver todas <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="content-body-admin">
+            {% if matriculas_recientes %}
+            <div class="table-modern-wrapper">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Aprendiz</th>
+                            <th>Programa</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for matricula in matriculas_recientes %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar-small">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-info-small">
+                                        <div class="user-name-small">{{ matricula.aprendiz.usuario.nombre_completo }}</div>
+                                        <div class="user-meta-small">{{ matricula.aprendiz.usuario.documento }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="program-cell">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    {{ matricula.aprendiz.programa.nombre[:30] if matricula.aprendiz.programa else 'Sin asignar' }}...
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge-modern status-{{ matricula.estado|lower }}">
+                                    {{ matricula.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="date-cell">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ matricula.created_at.strftime('%d/%m/%Y') }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin.ver_matricula', matricula_id=matricula.id) }}"
+                                   class="btn-view-modern" title="Ver detalles">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state-admin">
+                <i class="fas fa-inbox"></i>
+                <p>No hay matrículas recientes</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sidebar Widgets -->
+    <div class="sidebar-widgets">
+        <!-- Messages Widget -->
+        <div class="content-card-admin messages-card">
+            <div class="content-header-admin">
+                <h2 class="content-title-admin">
+                    <i class="fas fa-envelope"></i> Mensajes
+                </h2>
+            </div>
+            <div class="content-body-admin">
+                {% if mensajes_pendientes %}
+                <div class="messages-list">
+                    {% for mensaje in mensajes_pendientes %}
+                    <div class="message-item">
+                        <div class="message-icon">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-sender">{{ mensaje.nombre }}</div>
+                            <div class="message-subject">{{ mensaje.asunto[:30] }}...</div>
+                            <div class="message-time">
+                                <i class="fas fa-clock"></i>
+                                {{ mensaje.created_at.strftime('%d/%m/%Y %H:%M') }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <a href="{{ url_for('admin.mensajes') }}" class="btn-full-admin">
+                    Ver todos los mensajes
+                </a>
+                {% else %}
+                <div class="no-messages">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No hay mensajes pendientes</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Programs Distribution Widget -->
+        <div class="content-card-admin programs-card">
+            <div class="content-header-admin">
+                <h2 class="content-title-admin">
+                    <i class="fas fa-chart-pie"></i> Distribución por Programa
+                </h2>
+            </div>
+            <div class="content-body-admin">
+                {% if stats.programas %}
+                <div class="programs-list">
+                    {% for programa in stats.programas %}
+                    <div class="program-item">
+                        <div class="program-header">
+                            <span class="program-name">{{ programa.nombre[:25] }}...</span>
+                            <strong class="program-count">{{ programa.aprendices_count }}</strong>
+                        </div>
+                        <div class="program-progress">
+                            <div class="program-progress-bar"
+                                 style="width: {{ (programa.aprendices_count / stats.total_aprendices * 100)|round }}%">
+                            </div>
+                        </div>
+                        <div class="program-percentage">
+                            {{ (programa.aprendices_count / stats.total_aprendices * 100)|round|int }}%
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-data-admin">
+                    <i class="fas fa-info-circle"></i>
+                    <p>No hay datos de programas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Stats Bar -->
+<div class="system-stats-bar">
+    <div class="system-stat">
+        <i class="fas fa-database"></i>
+        <div class="system-stat-content">
+            <div class="system-stat-label">Sistema</div>
+            <div class="system-stat-value">Online</div>
+        </div>
+        <div class="system-stat-indicator online"></div>
+    </div>
+    <div class="system-stat">
+        <i class="fas fa-server"></i>
+        <div class="system-stat-content">
+            <div class="system-stat-label">Estado</div>
+            <div class="system-stat-value">Operativo</div>
+        </div>
+        <div class="system-stat-indicator online"></div>
+    </div>
+    <div class="system-stat">
+        <i class="fas fa-clock"></i>
+        <div class="system-stat-content">
+            <div class="system-stat-label">Último Acceso</div>
+            <div class="system-stat-value">Ahora</div>
+        </div>
+        <div class="system-stat-indicator online"></div>
+    </div>
+</div>
+
+<style>
+:root {
+    --admin-primary: #667eea;
+    --admin-secondary: #764ba2;
+    --admin-success: #39A900;
+    --admin-warning: #FFA000;
+    --admin-danger: #D32F2F;
+    --admin-info: #1976D2;
+    --admin-purple: #7B1FA2;
+    --admin-teal: #00897B;
+    --admin-orange: #F57C00;
+    --admin-pink: #E91E63;
+    --admin-gray: #546E7A;
+    --admin-indigo: #3F51B5;
+    --text-primary: #1a202c;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --bg-light: #f7fafc;
+    --border-color: #e2e8f0;
+}
+
+/* Welcome Section */
+.welcome-section-admin {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    animation: fadeInDown 0.6s ease;
+}
+
+.welcome-content-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text-admin {
+    flex: 1;
+}
+
+.welcome-title-admin {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-subtitle-admin {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    margin: 0;
+}
+
+.welcome-icon-admin {
+    font-size: 5rem;
+    opacity: 0.2;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Metrics Grid */
+.metrics-grid-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card-admin {
+    background: white;
+    padding: 1.75rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease;
+}
+
+.metric-card-admin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--metric-color);
+}
+
+.metric-card-admin:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.metric-primary-admin { --metric-color: var(--admin-primary); }
+.metric-success-admin { --metric-color: var(--admin-success); }
+.metric-warning-admin { --metric-color: var(--admin-warning); }
+.metric-info-admin { --metric-color: var(--admin-info); }
+
+.metric-icon-wrapper-admin {
+    flex-shrink: 0;
+}
+
+.metric-icon-admin {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    background: var(--metric-color);
+}
+
+.metric-content-admin {
+    flex: 1;
+}
+
+.metric-value-admin {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label-admin {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.metric-change-admin {
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+}
+
+.metric-change-admin.positive {
+    background: #e6f4ea;
+    color: #1e8e3e;
+}
+
+.metric-change-admin.alert {
+    background: #fef7e0;
+    color: #f9ab00;
+}
+
+.metric-chart-admin {
+    font-size: 2rem;
+    color: var(--metric-color);
+    opacity: 0.15;
+}
+
+/* Action Section */
+.action-section-admin {
+    margin-bottom: 2rem;
+}
+
+.section-title-admin {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title-admin i {
+    color: var(--admin-primary);
+}
+
+.action-grid-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.action-card-admin {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid var(--action-color);
+}
+
+.action-card-admin::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--action-color);
+    transition: width 0.3s ease;
+}
+
+.action-card-admin:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.action-card-admin:hover::before {
+    width: 100%;
+    opacity: 0.05;
+}
+
+.action-purple { --action-color: var(--admin-purple); }
+.action-green { --action-color: var(--admin-success); }
+.action-blue { --action-color: var(--admin-info); }
+.action-orange { --action-color: var(--admin-orange); }
+.action-teal { --action-color: var(--admin-teal); }
+.action-dark { --action-color: #424242; }
+.action-pink { --action-color: var(--admin-pink); }
+.action-gray { --action-color: var(--admin-gray); }
+.action-indigo { --action-color: var(--admin-indigo); }
+
+.action-icon-admin {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--action-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.action-content-admin {
+    flex: 1;
+    position: relative;
+}
+
+.action-content-admin h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+}
+
+.action-content-admin p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.action-notification-admin {
+    position: absolute;
+    top: -0.5rem;
+    right: 0;
+    background: var(--admin-danger);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.action-arrow-admin {
+    font-size: 1.25rem;
+    color: var(--action-color);
+    transition: transform 0.3s ease;
+}
+
+.action-card-admin:hover .action-arrow-admin {
+    transform: translateX(4px);
+}
+
+/* Content Grid */
+.content-grid-admin {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.content-card-admin {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.content-header-admin {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-title-admin {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-link-admin {
+    color: var(--admin-primary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-link-admin:hover {
+    gap: 0.5rem;
+}
+
+.content-body-admin {
+    padding: 1.5rem;
+}
+
+/* Modern Table */
+.table-modern-wrapper {
+    overflow-x: auto;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-modern thead {
+    background: var(--bg-light);
+}
+
+.table-modern th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.table-modern tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s ease;
+}
+
+.table-modern tbody tr:hover {
+    background: var(--bg-light);
+}
+
+.table-modern td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.user-info-small {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name-small {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.125rem;
+}
+
+.user-meta-small {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.program-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.date-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.status-badge-modern {
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-borrador { background: #e2e8f0; color: #4a5568; }
+.status-enviado { background: #bee3f8; color: #2c5282; }
+.status-pendiente { background: #feebc8; color: #7c2d12; }
+.status-completo { background: #c6f6d5; color: #22543d; }
+.status-prematricula { background: #9ae6b4; color: #22543d; }
+.status-rechazado { background: #fed7d7; color: #742a2a; }
+
+.btn-view-modern {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--admin-primary);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-view-modern:hover {
+    background: var(--admin-secondary);
+    transform: scale(1.1);
+}
+
+/* Empty State */
+.empty-state-admin {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.empty-state-admin i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Sidebar Widgets */
+.sidebar-widgets {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Messages Widget */
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.message-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--bg-light);
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    background: #edf2f7;
+}
+
+.message-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--admin-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-sender {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.message-subject {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-full-admin {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--admin-primary);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-full-admin:hover {
+    background: var(--admin-secondary);
+}
+
+.no-messages {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+}
+
+.no-messages i {
+    font-size: 3rem;
+    color: var(--admin-success);
+    margin-bottom: 0.5rem;
+}
+
+/* Programs Widget */
+.programs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.program-item {
+    position: relative;
+}
+
+.program-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.program-name {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.program-count {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.program-progress {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.program-progress-bar {
+    height: 100%;
+    background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.program-percentage {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-align: right;
+}
+
+.no-data-admin {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+}
+
+.no-data-admin i {
+    font-size: 3rem;
+    opacity: 0.3;
+    margin-bottom: 0.5rem;
+}
+
+/* System Stats Bar */
+.system-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.system-stat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--bg-light);
+}
+
+.system-stat > i {
+    font-size: 2rem;
+    color: var(--admin-primary);
+    opacity: 0.7;
+}
+
+.system-stat-content {
+    flex: 1;
+}
+
+.system-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.system-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.system-stat-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.system-stat-indicator.online {
+    background: var(--admin-success);
+    box-shadow: 0 0 0 4px rgba(57, 169, 0, 0.2);
+    animation: pulse 2s infinite;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .content-grid-admin {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-title-admin {
+        font-size: 1.75rem;
+    }
+
+    .welcome-subtitle-admin {
+        font-size: 1rem;
+    }
+
+    .welcome-icon-admin {
+        font-size: 3rem;
+    }
+
+    .metrics-grid-admin {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+
+    .metric-value-admin {
+        font-size: 1.5rem;
+    }
+
+    .action-grid-admin {
+        grid-template-columns: 1fr;
+    }
+
+    .system-stats-bar {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Error de Base de Datos - SIAM{% endblock %}
+
+{% block extra_css %}
+<style>
+    .error-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .error-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .error-header {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        padding: 2.5rem;
+        text-align: center;
+        color: white;
+    }
+
+    .error-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.6;
+        }
+    }
+
+    .error-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .error-body {
+        padding: 2.5rem;
+    }
+
+    .error-message {
+        font-size: 1.1rem;
+        color: #374151;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .error-details {
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .error-details h3 {
+        color: #dc2626;
+        font-size: 1.1rem;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .error-details ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #6b7280;
+    }
+
+    .error-details li {
+        margin-bottom: 0.5rem;
+    }
+
+    .solution-box {
+        background: #f0fdf4;
+        border-left: 4px solid #10b981;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+
+    .solution-box h3 {
+        color: #059669;
+        font-size: 1.1rem;
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .solution-box ol {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #374151;
+    }
+
+    .solution-box li {
+        margin-bottom: 0.75rem;
+        line-height: 1.6;
+    }
+
+    .solution-box li strong {
+        color: #059669;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-error {
+        padding: 0.9rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-retry {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-retry:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-home {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-home:hover {
+        background: #e5e7eb;
+    }
+
+    .xampp-logo {
+        width: 80px;
+        height: auto;
+        margin: 1rem auto;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-card">
+        <div class="error-header">
+            <div class="error-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <h1 class="error-title">Error de {{ error_type|title }}</h1>
+        </div>
+
+        <div class="error-body">
+            <p class="error-message">
+                <strong>No se pudo conectar a la base de datos MySQL</strong>
+            </p>
+
+            <div class="error-details">
+                <h3>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ¿Qué pasó?
+                </h3>
+                <ul>
+                    <li>El servidor MySQL no está ejecutándose</li>
+                    <li>XAMPP no está iniciado o MySQL está detenido</li>
+                    <li>El puerto de MySQL (3306) puede estar bloqueado</li>
+                    <li>Las credenciales de conexión pueden ser incorrectas</li>
+                </ul>
+            </div>
+
+            <div class="solution-box">
+                <h3>
+                    <i class="fas fa-lightbulb"></i>
+                    Solución: Inicia MySQL en XAMPP
+                </h3>
+                <ol>
+                    <li><strong>Abre XAMPP Control Panel</strong> desde el menú de inicio o escritorio</li>
+                    <li><strong>Busca el módulo "MySQL"</strong> en la lista de servicios</li>
+                    <li><strong>Haz clic en el botón "Start"</strong> junto a MySQL</li>
+                    <li><strong>Espera el indicador verde</strong> que confirma que MySQL está ejecutándose</li>
+                    <li><strong>Recarga esta página</strong> o reinicia la aplicación Flask</li>
+                </ol>
+
+                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iODAiIGhlaWdodD0iODAiIGZpbGw9IiNmZjk5MDAiIHJ4PSI4Ii8+CiAgPHRleHQgeD0iNDAiIHk9IjQ1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZvbnQtd2VpZ2h0PSJib2xkIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+WDwvdGV4dD4KPC9zdmc+" alt="XAMPP" class="xampp-logo">
+            </div>
+
+            <div class="action-buttons">
+                <a href="javascript:location.reload()" class="btn-error btn-retry">
+                    <i class="fas fa-sync-alt"></i>
+                    Reintentar Conexión
+                </a>
+                <a href="{{ url_for('public.index') }}" class="btn-error btn-home">
+                    <i class="fas fa-home"></i>
+                    Ir al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

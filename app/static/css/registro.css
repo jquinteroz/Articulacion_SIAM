@@ -1,0 +1,536 @@
+/* Modern Registration Container */
+.registro-modern-container {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    background: #f8fafc;
+}
+
+/* Left Side - Branding */
+.registro-left-side {
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+.registro-branding {
+    margin-bottom: 3rem;
+    animation: fadeInLeft 0.8s ease-out;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.registro-logo-siam {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 1.5rem;
+    animation: floatRegistro 6s ease-in-out infinite;
+}
+
+.registro-logo-siam img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 15px rgba(102, 126, 234, 0.3));
+}
+
+.registro-brand-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.registro-brand-subtitle {
+    font-size: 1rem;
+    color: #4a5568;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.registro-brand-description {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 500;
+}
+
+.registro-info {
+    margin-top: 2rem;
+}
+
+.registro-info-item {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeInLeft 0.8s ease-out;
+    animation-delay: 0.2s;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.registro-info-item:nth-child(2) {
+    animation-delay: 0.4s;
+}
+
+.registro-info-item:nth-child(3) {
+    animation-delay: 0.6s;
+}
+
+.registro-info-icon {
+    width: 45px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.registro-info-text h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.registro-info-text p {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.registro-decoration {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.decoration-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: floatCircles 20s infinite ease-in-out;
+}
+
+.decoration-1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+}
+
+.decoration-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -50px;
+    left: -50px;
+    animation-delay: 5s;
+}
+
+.decoration-3 {
+    width: 150px;
+    height: 150px;
+    top: 40%;
+    left: -75px;
+    animation-delay: 10s;
+}
+
+/* Right Side - Form */
+.registro-right-side {
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+.registro-form-container {
+    width: 100%;
+    max-width: 600px;
+    animation: fadeInRight 0.8s ease-out;
+}
+
+.registro-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.registro-form-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+}
+
+.registro-form-subtitle {
+    color: #718096;
+    font-size: 1rem;
+}
+
+.registro-form {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Form Groups */
+.form-row-modern {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group-registro {
+    margin-bottom: 1.5rem;
+}
+
+.form-label-registro {
+    display: block;
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-label-registro i {
+    margin-right: 0.5rem;
+    color: #39A900;
+}
+
+.input-wrapper-registro {
+    position: relative;
+}
+
+.form-input-registro,
+.form-select-registro {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+}
+
+.form-input-registro:focus,
+.form-select-registro:focus {
+    outline: none;
+    border-color: #39A900;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.password-wrapper-registro {
+    position: relative;
+}
+
+.password-toggle-registro {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #a0aec0;
+    transition: color 0.3s ease;
+}
+
+.password-toggle-registro:hover {
+    color: #39A900;
+}
+
+.form-text-info {
+    display: block;
+    color: #718096;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.form-text-info i {
+    margin-right: 0.25rem;
+}
+
+/* Error States */
+.error-field-registro {
+    border-color: #e53e3e !important;
+    background-color: #fff5f5 !important;
+    animation: shake 0.3s ease-in-out;
+}
+
+.error-field-registro:focus {
+    border-color: #c53030 !important;
+    box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2) !important;
+}
+
+.error-message-registro {
+    display: block;
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.error-message-registro i {
+    margin-right: 0.25rem;
+}
+
+/* Submit Button */
+.btn-registro-modern {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-registro-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-registro-modern:active {
+    transform: translateY(0);
+}
+
+.btn-icon-registro {
+    font-size: 1.2rem;
+}
+
+/* Login Link */
+.registro-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 2px solid #e2e8f0;
+}
+
+.login-text {
+    color: #718096;
+    margin: 0;
+}
+
+.login-link {
+    color: #39A900;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-link:hover {
+    color: #2D8700;
+    text-decoration: underline;
+}
+
+/* Animations */
+@keyframes fadeInLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes floatRegistro {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes floatCircles {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Loading Spinner para Registro */
+.registro-spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.registro-spinner-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.registro-spinner-container {
+    text-align: center;
+    animation: fadeInScale 0.5s ease-out;
+}
+
+.registro-spinner-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+}
+
+.registro-spinner-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: spinPulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(57, 169, 0, 0.8));
+}
+
+.registro-spinner-ring {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 140px;
+    height: 140px;
+    border: 4px solid transparent;
+    border-top-color: #39A900;
+    border-right-color: #2D8700;
+    border-radius: 50%;
+    animation: spinRotate 1.5s linear infinite;
+}
+
+.registro-spinner-ring::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 140px;
+    height: 140px;
+    border: 4px solid transparent;
+    border-bottom-color: #39A900;
+    border-left-color: rgba(57, 169, 0, 0.3);
+    border-radius: 50%;
+    animation: spinRotateReverse 2s linear infinite;
+}
+
+.registro-spinner-text {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.registro-spinner-subtext {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+@keyframes spinRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes spinRotateReverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+@keyframes spinPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 20px rgba(102, 126, 234, 0.8));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 30px rgba(118, 75, 162, 1));
+    }
+}
+
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+    .registro-modern-container {
+        grid-template-columns: 1fr;
+    }
+
+    .registro-left-side {
+        display: none;
+    }
+
+    .registro-right-side {
+        padding: 2rem 1.5rem;
+    }
+
+    .registro-form {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-row-modern {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}

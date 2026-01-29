@@ -1,0 +1,393 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Reportes - Administrador{% endblock %}
+
+{% block page_title %}<i class="fas fa-chart-bar"></i> Reportes y Estadísticas{% endblock %}
+
+{% block breadcrumb_items %}
+<span class="breadcrumb-separator">/</span>
+<span>Reportes</span>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 mb-4 md:mb-8">
+    <!-- Breadcrumb -->
+    <nav class="text-white/80 text-xs md:text-sm mb-3 md:mb-4 flex items-center">
+        <a href="{{ url_for('admin.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+            <i class="fas fa-home mr-1"></i> Dashboard
+        </a>
+        <span class="mx-2">/</span>
+        <span class="text-white font-semibold">Reportes</span>
+    </nav>
+    
+    <!-- Título -->
+    <h1 class="text-2xl md:text-4xl font-bold text-white mb-1 md:mb-2 flex items-center">
+        <i class="fas fa-chart-bar mr-2 md:mr-3"></i>
+        Generar Reportes
+    </h1>
+    <p class="text-sm md:text-lg text-white">
+        Genere y descargue reportes personalizados en formato Excel
+    </p>
+</div>
+
+
+<!-- Main Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
+    <!-- Generator Form Card -->
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden">
+            <div class="px-4 md:px-6 py-3 md:py-4 border-b border-gray-200">
+                <h2 class="text-base md:text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-sliders-h text-sena-green"></i> Configurar Reporte Personalizado
+                </h2>
+            </div>
+            <div class="p-4 md:p-6">
+                <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}" class="space-y-3 md:space-y-5">
+                    <!-- Tipo de Reporte -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-file-alt text-sena-green"></i> Tipo de Reporte *
+                        </label>
+                        <select name="tipo_reporte" id="tipo_reporte" class="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-sm md:text-base" required>
+                            <option value="">-- Seleccione un tipo --</option>
+                            <option value="matriculas">📋 Matrículas</option>
+                            <option value="aprendices">👨‍🎓 Aprendices</option>
+                            <option value="documentos">📁 Estado de Documentos</option>
+                            <option value="colegios">🏫 Por Colegio</option>
+                            <option value="programas">📚 Por Programa</option>
+                            <option value="sofia">🟧 Formato SENA (SOFIA Plus)</option>
+                            <option value="completo">📊 Reporte Completo</option>
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Colegio -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-school text-sena-green"></i> Colegio
+                        </label>
+                        <select name="colegio_id" id="colegio_id" class="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-sm md:text-base">
+                            <option value="">Todos los colegios</option>
+                            {% for colegio in colegios %}
+                            <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Programa -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-graduation-cap text-sena-green"></i> Programa
+                        </label>
+                        <select name="programa_id" id="programa_id" class="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-sm md:text-base">
+                            <option value="">Todos los programas</option>
+                            {% for programa in programas %}
+                            <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Grupo -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-users text-sena-green"></i> Grupo
+                        </label>
+                        <select name="grupo_id" id="grupo_id" class="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-sm md:text-base">
+                            <option value="">Todos los grupos</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}">{{ grupo.nombre }} - {{ grupo.programa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Filtro por Estado -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-flag text-sena-green"></i> Estado
+                        </label>
+                        <select name="estado" id="estado" class="w-full px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-sm md:text-base">
+                            <option value="">Todos los estados</option>
+                            <option value="BORRADOR">Borrador</option>
+                            <option value="ENVIADO">Enviado</option>
+                            <option value="PENDIENTE">Pendiente</option>
+                            <option value="COMPLETO">Completo</option>
+                            <option value="PREMATRICULA">Pre-matrícula</option>
+                            <option value="MATRICULADO">Matriculado</option>
+                            <option value="RECHAZADO">Rechazado</option>
+                        </select>
+                    </div>
+
+                    <!-- Rango de Fechas -->
+                    <div>
+                        <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                            <i class="fas fa-calendar text-sena-green"></i> Rango de Fechas
+                        </label>
+                        <div class="grid grid-cols-2 gap-2 md:gap-3">
+                            <input type="date" name="fecha_desde" class="px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-xs md:text-sm" placeholder="Desde">
+                            <input type="date" name="fecha_hasta" class="px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sena-green focus:border-transparent transition-all text-xs md:text-sm" placeholder="Hasta">
+                        </div>
+                    </div>
+
+                    <!-- Botón de Generar -->
+                    <button type="submit" class="w-full bg-gradient-to-r from-sena-green to-sena-green-dark text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all font-semibold flex items-center justify-center gap-2 text-sm md:text-base">
+                        <i class="fas fa-file-excel"></i> Generar Reporte Excel
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Quick Reports Section -->
+    <div class="lg:col-span-3 space-y-4 md:space-y-6">
+        <!-- Quick Reports Card -->
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-md overflow-hidden">
+            <div class="px-4 md:px-6 py-3 md:py-4 border-b border-gray-200">
+                <h2 class="text-base md:text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-bolt text-sena-green"></i> Reportes Rápidos
+                </h2>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    <!-- Todas las Matrículas -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-blue-500 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-blue-500 rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Todas las Matrículas</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Listado completo</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Matrículas Pendientes -->
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-orange-500 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-orange-500 rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Pendientes</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Requieren revisión</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <input type="hidden" name="estado" value="PENDIENTE">
+                            <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Matrículas Completas -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-sena-green hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-sena-green rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Completas</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Proceso finalizado</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="matriculas">
+                            <input type="hidden" name="estado" value="COMPLETO">
+                            <button type="submit" class="w-full bg-sena-green hover:bg-sena-green-dark text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Todos los Aprendices -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-indigo-500 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-indigo-500 rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Aprendices</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Base de datos completa</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="aprendices">
+                            <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Estado de Documentos -->
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-gray-500 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-gray-600 rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Documentos</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Estado por matrícula</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="documentos">
+                            <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Por Colegios -->
+                    <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg md:rounded-xl p-3 md:p-4 border-2 border-transparent hover:border-slate-600 hover:shadow-lg transition-all transform hover:-translate-y-1">
+                        <div class="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                            <div class="w-10 h-10 md:w-14 md:h-14 bg-slate-600 rounded-lg md:rounded-xl flex items-center justify-center text-white text-lg md:text-2xl flex-shrink-0">
+                                <i class="fas fa-school"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm md:text-base font-semibold text-gray-800">Por Colegio</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Estadísticas institucionales</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="colegios">
+                            <button type="submit" class="w-full bg-slate-600 hover:bg-slate-700 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all text-xs md:text-sm">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Reporte SENA - Ocupa 3 columnas completas -->
+                    <div class="md:col-span-2 lg:col-span-3 bg-gradient-to-br from-red-50 to-orange-50 rounded-lg md:rounded-xl p-4 md:p-5 border-2 border-red-400 hover:shadow-xl transition-all">
+                        <div class="flex items-center gap-3 md:gap-4 mb-3 md:mb-4">
+                            <div class="w-12 h-12 md:w-16 md:h-16 bg-red-500 rounded-lg md:rounded-xl flex items-center justify-center text-white text-xl md:text-3xl flex-shrink-0">
+                                <i class="fas fa-file-excel"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base md:text-lg font-bold text-gray-800">Formato SENA (SOFIA Plus)</h3>
+                                <p class="text-xs md:text-sm text-gray-600">Seleccione colegio o grupo específico</p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('admin.generar_reporte_excel') }}">
+                            <input type="hidden" name="tipo_reporte" value="sofia">
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
+                                <!-- Filtro Colegio -->
+                                <div>
+                                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                                        <i class="fas fa-school text-red-500"></i> Colegio
+                                    </label>
+                                    <select name="colegio_id" id="colegio_sena" class="w-full px-3 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-xs md:text-sm" onchange="filterGruposSena(this.value)">
+                                        <option value="">Todos los colegios</option>
+                                        {% for colegio in colegios %}
+                                        <option value="{{ colegio.id }}">{{ colegio.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Filtro Programa -->
+                                <div>
+                                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                                        <i class="fas fa-graduation-cap text-red-500"></i> Programa
+                                    </label>
+                                    <select name="programa_id" id="programa_sena" class="w-full px-3 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-xs md:text-sm">
+                                        <option value="">Todos los programas</option>
+                                        {% for programa in programas %}
+                                        <option value="{{ programa.id }}">{{ programa.nombre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Filtro Grupo -->
+                                <div>
+                                    <label class="block text-xs md:text-sm font-semibold text-gray-700 mb-1.5 md:mb-2">
+                                        <i class="fas fa-users text-red-500"></i> Grupo/Ficha
+                                    </label>
+                                    <select name="grupo_id" id="grupo_sena" class="w-full px-3 py-2 md:py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all text-xs md:text-sm">
+                                        <option value="">Todos los grupos</option>
+                                        {% for grupo in grupos %}
+                                        <option value="{{ grupo.id }}" data-colegio="{{ grupo.colegio_id }}">
+                                            {{ grupo.nombre }} - {{ grupo.programa.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-4 md:px-6 py-2.5 md:py-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg text-sm md:text-base">
+                                <i class="fas fa-download"></i> Generar Formato SOFIA
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl md:rounded-2xl shadow-md overflow-hidden">
+            <div class="px-4 md:px-6 py-3 md:py-4 border-b border-blue-200">
+                <h2 class="text-base md:text-xl font-semibold text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-info-circle text-blue-500"></i> Información
+                </h2>
+            </div>
+            <div class="p-4 md:p-6">
+                <ul class="space-y-2 md:space-y-3">
+                    <li class="flex items-start gap-2 md:gap-3">
+                        <i class="fas fa-check text-sena-green text-base md:text-lg mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm md:text-base text-gray-700">Los reportes se generan en formato Excel (.xlsx)</span>
+                    </li>
+                    <li class="flex items-start gap-2 md:gap-3">
+                        <i class="fas fa-check text-sena-green text-base md:text-lg mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm md:text-base text-gray-700">Puede aplicar múltiples filtros para personalizar el reporte</span>
+                    </li>
+                    <li class="flex items-start gap-2 md:gap-3">
+                        <i class="fas fa-check text-sena-green text-base md:text-lg mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm md:text-base text-gray-700">Los reportes rápidos generan datos sin configuración adicional</span>
+                    </li>
+                    <li class="flex items-start gap-2 md:gap-3">
+                        <i class="fas fa-check text-sena-green text-base md:text-lg mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm md:text-base text-gray-700">Use el rango de fechas para limitar por período</span>
+                    </li>
+                    <li class="flex items-start gap-2 md:gap-3">
+                        <i class="fas fa-check text-sena-green text-base md:text-lg mt-0.5 flex-shrink-0"></i>
+                        <span class="text-sm md:text-base text-gray-700">Los datos incluyen toda la información disponible</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterGruposSena(colegioId) {
+    const grupoSelect = document.getElementById('grupo_sena');
+    const options = grupoSelect.querySelectorAll('option');
+
+    options.forEach(option => {
+        if (option.value === '') {
+            option.style.display = '';
+            return;
+        }
+
+        const optionColegioId = option.getAttribute('data-colegio');
+        if (!colegioId || optionColegioId === colegioId) {
+            option.style.display = '';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+
+    grupoSelect.value = '';
+}
+</script>
+
+{% endblock %}

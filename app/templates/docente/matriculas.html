@@ -1,0 +1,724 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Matrículas - Docente{% endblock %}
+
+{% block page_title %}Matrículas{% endblock %}
+
+{% block content %}
+<style>
+:root {
+    --docente-primary: #39A900;
+    --docente-dark: #2D8700;
+    --docente-darker: #1F5C00;
+    --docente-secondary: #424242;
+    --docente-success: #2e7d32;
+    --docente-warning: #f57c00;
+    --docente-danger: #c62828;
+    --docente-info: #39A900;
+}
+
+/* Header */
+.matriculas-header-doc {
+    background: linear-gradient(135deg, #39A900 0%, #2D8700 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(57, 169, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.matriculas-header-doc::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    transform: translate(100px, -100px);
+}
+
+.header-content-mat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.header-text-mat h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-text-mat h1 i {
+    font-size: 2.8rem;
+}
+
+.header-text-mat p {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.95;
+    font-size: 1.1rem;
+}
+
+.header-icon-mat {
+    font-size: 4rem;
+    opacity: 0.2;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Stats Grid */
+.stats-grid-mat {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card-mat {
+    background: white;
+    padding: 1.75rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border-left: 4px solid var(--stat-color);
+    transition: all 0.3s ease;
+}
+
+.stat-card-mat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.stat-icon-wrapper-mat {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: var(--stat-gradient);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+}
+
+.stat-total-mat { --stat-color: #39A900; --stat-gradient: linear-gradient(135deg, #39A900 0%, #2D8700 100%); }
+.stat-enviado-mat { --stat-color: #FFA000; --stat-gradient: linear-gradient(135deg, #FFA000 0%, #FF8C00 100%); }
+.stat-pendiente-mat { --stat-color: #D32F2F; --stat-gradient: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); }
+.stat-prematricula-mat { --stat-color: #1976D2; --stat-gradient: linear-gradient(135deg, #1976D2 0%, #1565C0 100%); }
+.stat-completo-mat { --stat-color: #39A900; --stat-gradient: linear-gradient(135deg, #39A900 0%, #2D8700 100%); }
+.stat-rechazado-mat { --stat-color: #D32F2F; --stat-gradient: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%); }
+
+.stat-content-mat {
+    flex: 1;
+}
+
+.stat-value-mat {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.stat-label-mat {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Filters */
+.filters-card-mat {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.filters-header-mat {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.filters-header-mat i {
+    color: var(--docente-primary);
+    font-size: 1.3rem;
+}
+
+.filters-header-mat h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.filters-grid-mat {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.filter-group-mat label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.filter-select-mat {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.filter-select-mat:focus {
+    outline: none;
+    border-color: var(--docente-primary);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+}
+
+.filter-actions-mat {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn-filter-mat {
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-download-mat {
+    background: linear-gradient(135deg, #39A900, #2D8700);
+    color: white;
+}
+
+.btn-download-mat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.4);
+    color: white;
+}
+
+.btn-clear-mat {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn-clear-mat:hover {
+    background: #d1d5db;
+    color: #1f2937;
+}
+
+/* Matriculas List */
+.matriculas-list-card-mat {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.list-header-mat {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-header-mat h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.list-header-mat h4 i {
+    color: var(--docente-primary);
+}
+
+.count-badge-mat {
+    background: var(--docente-primary);
+    color: white;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Table */
+.table-container-mat {
+    overflow-x: auto;
+}
+
+.table-mat {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-mat thead {
+    background: #f9fafb;
+}
+
+.table-mat thead th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 700;
+    color: #374151;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table-mat tbody tr {
+    border-bottom: 1px solid #f3f4f6;
+    transition: all 0.2s ease;
+}
+
+.table-mat tbody tr:hover {
+    background: #f9fafb;
+}
+
+.table-mat tbody td {
+    padding: 1.25rem 1.5rem;
+    color: #1f2937;
+}
+
+.matricula-id-mat {
+    font-weight: 700;
+    color: var(--docente-primary);
+}
+
+.aprendiz-name-mat {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.documento-mat {
+    font-family: 'Courier New', monospace;
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.grupo-mat {
+    color: #374151;
+    font-weight: 500;
+}
+
+.programa-mat {
+    color: #6b7280;
+    font-size: 0.9rem;
+    max-width: 200px;
+}
+
+/* Badges */
+.badge-mat {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-docs-mat {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.badge-docs-complete-mat {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-borrador-mat {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.badge-enviado-mat {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-pendiente-mat {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-prematricula-mat {
+    background: #e0f2f1;
+    color: #00796b;
+}
+
+.badge-completo-mat {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-rechazado-mat {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Action Button */
+.btn-view-mat {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #39A900, #2D8700);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.btn-view-mat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(57, 169, 0, 0.3);
+    color: white;
+}
+
+/* Empty State */
+.empty-state-mat {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon-mat {
+    font-size: 5rem;
+    color: #d1d5db;
+    margin-bottom: 1.5rem;
+}
+
+.empty-title-mat {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6b7280;
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-text-mat {
+    font-size: 1.1rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .filters-grid-mat {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions-mat {
+        flex-direction: column;
+    }
+
+    .btn-filter-mat {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content-mat {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-text-mat h1 {
+        font-size: 2rem;
+    }
+
+    .header-icon-mat {
+        font-size: 3rem;
+        margin-top: 1rem;
+    }
+
+    .stats-grid-mat {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .table-mat {
+        font-size: 0.85rem;
+    }
+
+    .table-mat thead th,
+    .table-mat tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid-mat {
+        grid-template-columns: 1fr;
+    }
+
+    .matriculas-header-doc {
+        padding: 1.5rem;
+    }
+
+    .header-text-mat h1 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="matriculas-header-doc">
+        <div class="header-content-mat">
+            <div class="header-text-mat">
+                <h1>Gestión de Matrículas</h1>
+                <p>Administra y revisa las matrículas de los aprendices</p>
+            </div>
+            <div class="header-icon-mat">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid-mat">
+        <div class="stat-card-mat stat-total-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-list"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|length }}</div>
+                <div class="stat-label-mat">Total Matrículas</div>
+            </div>
+        </div>
+
+        <div class="stat-card-mat stat-enviado-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-paper-plane"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|selectattr('estado', 'equalto', 'ENVIADO')|list|length }}</div>
+                <div class="stat-label-mat">Enviadas</div>
+            </div>
+        </div>
+
+        <div class="stat-card-mat stat-pendiente-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|selectattr('estado', 'equalto', 'PENDIENTE')|list|length }}</div>
+                <div class="stat-label-mat">Pendientes</div>
+            </div>
+        </div>
+
+        <div class="stat-card-mat stat-prematricula-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|selectattr('estado', 'equalto', 'PREMATRICULA')|list|length }}</div>
+                <div class="stat-label-mat">Pre-matrícula</div>
+            </div>
+        </div>
+
+        <div class="stat-card-mat stat-completo-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|selectattr('estado', 'equalto', 'COMPLETO')|list|length }}</div>
+                <div class="stat-label-mat">Completas</div>
+            </div>
+        </div>
+
+        <div class="stat-card-mat stat-rechazado-mat">
+            <div class="stat-icon-wrapper-mat">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-content-mat">
+                <div class="stat-value-mat">{{ matriculas|selectattr('estado', 'equalto', 'RECHAZADO')|list|length }}</div>
+                <div class="stat-label-mat">Rechazadas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card-mat">
+        <div class="filters-header-mat">
+            <i class="fas fa-filter"></i>
+            <h3>Filtrar Matrículas</h3>
+        </div>
+
+        <form method="GET">
+            <div class="filters-grid-mat">
+                <div class="filter-group-mat">
+                    <label for="estado">Estado</label>
+                    <select name="estado" id="estado" class="filter-select-mat" onchange="this.form.submit()">
+                        <option value="todos" {{ 'selected' if estado_filtro == 'todos' }}>Todos los estados</option>
+                        <option value="BORRADOR" {{ 'selected' if estado_filtro == 'BORRADOR' }}>Borrador</option>
+                        <option value="ENVIADO" {{ 'selected' if estado_filtro == 'ENVIADO' }}>Enviado</option>
+                        <option value="PENDIENTE" {{ 'selected' if estado_filtro == 'PENDIENTE' }}>Pendiente</option>
+                        <option value="PREMATRICULA" {{ 'selected' if estado_filtro == 'PREMATRICULA' }}>Pre-matrícula</option>
+                        <option value="COMPLETO" {{ 'selected' if estado_filtro == 'COMPLETO' }}>Completo</option>
+                        <option value="RECHAZADO" {{ 'selected' if estado_filtro == 'RECHAZADO' }}>Rechazado</option>
+                    </select>
+                </div>
+
+                <div class="filter-group-mat">
+                    <label for="grupo">Grupo</label>
+                    <select name="grupo" id="grupo" class="filter-select-mat" onchange="this.form.submit()">
+                        <option value="todos" {{ 'selected' if grupo_filtro == 'todos' }}>Todos los grupos</option>
+                        {% for grupo in grupos %}
+                        <option value="{{ grupo.id }}" {{ 'selected' if grupo_filtro == grupo.id|string }}>
+                            {{ grupo.nombre }} - {{ grupo.programa.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-actions-mat">
+                    {% if grupo_filtro != 'todos' %}
+                    <a href="{{ url_for('docente.descargar_documentos_grupo', grupo_id=grupo_filtro) }}"
+                       class="btn-filter-mat btn-download-mat"
+                       title="Descargar documentos del grupo seleccionado en PDF">
+                        <i class="fas fa-file-pdf"></i> Descargar PDF
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('docente.matriculas') }}" class="btn-filter-mat btn-clear-mat">
+                        <i class="fas fa-times"></i> Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Matriculas List -->
+    <div class="matriculas-list-card-mat">
+        <div class="list-header-mat">
+            <h4>
+                <i class="fas fa-list-ul"></i>
+                Listado de Matrículas
+            </h4>
+            <span class="count-badge-mat">{{ matriculas|length }} resultados</span>
+        </div>
+
+        {% if matriculas %}
+        <div class="table-container-mat">
+            <table class="table-mat">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Aprendiz</th>
+                        <th>Documento</th>
+                        <th>Grupo</th>
+                        <th>Programa</th>
+                        <th>Documentos</th>
+                        <th>Estado</th>
+                        <th>Fecha Envío</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for matricula in matriculas %}
+                    <tr>
+                        <td>
+                            <span class="matricula-id-mat">#{{ matricula.id }}</span>
+                        </td>
+                        <td>
+                            <span class="aprendiz-name-mat">{{ matricula.aprendiz.usuario.nombre_completo }}</span>
+                        </td>
+                        <td>
+                            <span class="documento-mat">{{ matricula.aprendiz.usuario.documento }}</span>
+                        </td>
+                        <td>
+                            <span class="grupo-mat">{{ matricula.aprendiz.grupo.nombre if matricula.aprendiz.grupo else '-' }}</span>
+                        </td>
+                        <td>
+                            <span class="programa-mat">
+                                {% if matricula.aprendiz.programa %}
+                                {{ matricula.aprendiz.programa.nombre }}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% set num_docs = matricula.documentos|selectattr('reemplazado_por', 'none')|list|length %}
+                            <span class="badge-mat {{ 'badge-docs-complete-mat' if num_docs == 8 else 'badge-docs-mat' }}">
+                                {{ num_docs }}/8
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge-mat badge-{{ matricula.estado.lower() }}-mat">
+                                {{ matricula.estado }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if matricula.fecha_envio %}
+                            {{ matricula.fecha_envio.strftime('%d/%m/%Y') }}
+                            {% else %}
+                            <span style="color: #9ca3af;">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('docente.ver_matricula', matricula_id=matricula.id) }}"
+                               class="btn-view-mat">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state-mat">
+            <div class="empty-icon-mat">
+                <i class="fas fa-inbox"></i>
+            </div>
+            <h3 class="empty-title-mat">No hay matrículas</h3>
+            <p class="empty-text-mat">No se encontraron matrículas con los filtros aplicados</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

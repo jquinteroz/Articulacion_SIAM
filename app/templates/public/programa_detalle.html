@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ programa.nombre }} - SIAM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/programas.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="programa-detalle-container">
+    <div class="programa-detalle-wrapper">
+        <!-- Hero Header Moderno -->
+        <div class="programa-detalle-hero">
+            <div class="programa-hero-background"></div>
+            <div class="programa-hero-content">
+                <a href="{{ url_for('public.programas') }}" class="btn-volver-modern">
+                    <i class="fas fa-arrow-left"></i> Volver a Programas
+                </a>
+
+                <div class="programa-hero-title-section">
+                    <div class="programa-hero-logo">
+                        <img src="{{ url_for('static', filename='img/sena.png') }}" alt="SENA" class="programa-hero-logo-img">
+                    </div>
+                    <div class="programa-hero-text">
+                        <h1 class="programa-detalle-titulo">{{ programa.nombre }}</h1>
+                        <p class="programa-centro-nombre">Centro de Gestión de Mercados, Logística y TI</p>
+                    </div>
+                </div>
+
+                <div class="programa-detalle-badges">
+                    {% if programa.activo %}
+                    <span class="badge-detalle badge-activo">
+                        <i class="fas fa-check-circle"></i> Programa Activo
+                    </span>
+                    {% else %}
+                    <span class="badge-detalle badge-inactivo">
+                        <i class="fas fa-times-circle"></i> Programa Inactivo
+                    </span>
+                    {% endif %}
+                    <span class="badge-detalle badge-info">
+                        <i class="fas fa-graduation-cap"></i> Formación Técnica
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body con información - Cards Grid Moderno -->
+        <div class="programa-detalle-body">
+            <!-- Quick Info Cards -->
+            <div class="quick-info-grid">
+                <div class="quick-info-card">
+                    <div class="quick-info-icon">
+                        <i class="fas fa-barcode"></i>
+                    </div>
+                    <div class="quick-info-content">
+                        <span class="quick-info-label">Código</span>
+                        <span class="quick-info-value">{{ programa.codigo }}</span>
+                    </div>
+                </div>
+
+                <div class="quick-info-card">
+                    <div class="quick-info-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="quick-info-content">
+                        <span class="quick-info-label">Duración</span>
+                        <span class="quick-info-value">{{ programa.duracion_horas }} hrs</span>
+                    </div>
+                </div>
+
+                <div class="quick-info-card">
+                    <div class="quick-info-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="quick-info-content">
+                        <span class="quick-info-label">Nivel</span>
+                        <span class="quick-info-value">Técnico</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción Card -->
+            <div class="descripcion-card-modern">
+                <div class="descripcion-card-header">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>Descripción del Programa</h3>
+                </div>
+                <div class="descripcion-card-body">
+                    <p class="programa-descripcion-text">{{ programa.descripcion }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action Moderno -->
+        {% if not current_user.is_authenticated %}
+        <div class="programa-cta-modern">
+            <div class="cta-modern-content">
+                <div class="cta-modern-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3 class="cta-modern-title">¿Listo para comenzar tu formación?</h3>
+                <p class="cta-modern-description">Regístrate ahora y da el primer paso hacia una carrera técnica exitosa con el SENA</p>
+                <a href="{{ url_for('public.registro') }}" class="btn-cta-modern">
+                    <span>Registrarse Ahora</span>
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

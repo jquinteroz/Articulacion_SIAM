@@ -1,0 +1,346 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Usuarios - Admin{% endblock %}
+
+{% block content %}
+
+<!-- Header Section - Estilo limpio y profesional -->
+<div class="bg-sena-green rounded-xl md:rounded-2xl shadow-lg p-4 md:p-8 mb-6 md:mb-8">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <!-- Breadcrumb y Título -->
+        <div class="w-full md:w-auto">
+            <!-- Breadcrumb -->
+            <nav class="text-white/80 text-xs md:text-sm mb-3 md:mb-4 flex items-center">
+                <a href="{{ url_for('admin.dashboard') }}" class="hover:text-white transition-colors flex items-center">
+                    <i class="fas fa-home mr-1"></i> Dashboard
+                </a>
+                <span class="mx-2">/</span>
+                <span class="text-white font-semibold">Gestión de Usuarios</span>
+            </nav>
+            
+            <!-- Título e Ícono -->
+            <h1 class="text-2xl md:text-4xl font-bold text-white mb-1 md:mb-2 flex items-center">
+                <i class="fas fa-users mr-2 md:mr-3"></i> Gestión de Usuarios
+            </h1>
+            <p class="text-sm md:text-lg text-white/90">Administre los usuarios del sistema y sus roles</p>
+        </div>
+        
+        <!-- Botón de Acción Desktop -->
+        <a href="{{ url_for('admin.crear_usuario') }}" class="hidden md:inline-flex items-center px-6 py-3 bg-white text-sena-green font-bold rounded-lg hover:bg-white/95 transition-all duration-200 shadow-md hover:shadow-lg whitespace-nowrap">
+            <i class="fas fa-plus mr-2"></i> Nuevo Usuario
+        </a>
+    </div>
+</div>
+
+<!-- Mobile Add Button -->
+<div class="md:hidden mb-6">
+    <a href="{{ url_for('admin.crear_usuario') }}" class="w-full flex items-center justify-center px-6 py-3 bg-gradient-to-r from-sena-green to-sena-green-dark text-white font-bold rounded-xl hover:from-sena-green-dark hover:to-sena-green-darker transition-all duration-300 shadow-lg">
+        <i class="fas fa-plus mr-2"></i> Nuevo Usuario
+    </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+    <!-- Total Usuarios -->
+    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-l-4 border-blue-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-blue-500 rounded-xl shadow-md">
+                <i class="fas fa-users text-xl md:text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-blue-700">{{ usuarios|length }}</div>
+                <div class="text-xs md:text-sm text-blue-600 font-medium">Total Usuarios</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aprendices -->
+    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-l-4 border-green-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-green-500 rounded-xl shadow-md">
+                <i class="fas fa-user-graduate text-xl md:text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-green-700">{{ usuarios|selectattr('rol', 'equalto', 'APRENDIZ')|list|length }}</div>
+                <div class="text-xs md:text-sm text-green-600 font-medium">Aprendices</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Docentes -->
+    <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-l-4 border-teal-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-teal-500 rounded-xl shadow-md">
+                <i class="fas fa-chalkboard-teacher text-xl md:text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-teal-700">{{ usuarios|selectattr('rol', 'equalto', 'DOCENTE')|list|length }}</div>
+                <div class="text-xs md:text-sm text-teal-600 font-medium">Docentes</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Administradores -->
+    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 border-l-4 border-orange-500 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-orange-500 rounded-xl shadow-md">
+                <i class="fas fa-user-shield text-xl md:text-2xl text-white"></i>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl md:text-3xl font-bold text-orange-700">{{ usuarios|selectattr('rol', 'equalto', 'ADMINISTRADOR')|list|length }}</div>
+                <div class="text-xs md:text-sm text-orange-600 font-medium">Administradores</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-6 md:mb-8">
+    <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+        <label for="rol" class="flex items-center text-gray-700 font-semibold text-sm md:text-base whitespace-nowrap">
+            <i class="fas fa-filter mr-2 text-sena-green"></i> Filtrar por rol:
+        </label>
+        <select name="rol" id="rol" class="flex-1 px-3 md:px-4 py-2 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:ring-2 focus:ring-sena-green focus:border-sena-green transition-all duration-200 outline-none bg-gray-50 hover:border-gray-300 text-sm md:text-base" onchange="this.form.submit()">
+            <option value="todos" {% if rol_filtro == 'todos' %}selected{% endif %}>Todos los roles</option>
+            <option value="APRENDIZ" {% if rol_filtro == 'APRENDIZ' %}selected{% endif %}>Aprendices</option>
+            <option value="DOCENTE" {% if rol_filtro == 'DOCENTE' %}selected{% endif %}>Docentes</option>
+            <option value="ADMINISTRADOR" {% if rol_filtro == 'ADMINISTRADOR' %}selected{% endif %}>Administradores</option>
+            <option value="RECTOR" {% if rol_filtro == 'RECTOR' %}selected{% endif %}>Rectores</option>
+        </select>
+    </form>
+</div>
+
+<!-- Table Section -->
+<div class="bg-white rounded-xl md:rounded-2xl shadow-lg overflow-hidden">
+    {% if usuarios %}
+    
+    <!-- Vista de Tabla (Desktop) -->
+    <div class="hidden lg:block overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b-2 border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-id-card mr-2 text-sena-green"></i> Documento
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-user mr-2 text-sena-green"></i> Nombre Completo
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-envelope mr-2 text-sena-green"></i> Email
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-user-tag mr-2 text-sena-green"></i> Rol
+                    </th>
+                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-toggle-on mr-2 text-sena-green"></i> Estado
+                    </th>
+                    <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        <i class="fas fa-cogs mr-2 text-sena-green"></i> Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for usuario in usuarios %}
+                <tr class="hover:bg-gray-50 transition-colors duration-200">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 mr-2">
+                                {{ usuario.tipo_documento }}
+                            </span>
+                            <span class="text-sm font-medium text-gray-900">{{ usuario.documento }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
+                                {% if usuario.rol == 'APRENDIZ' %}bg-blue-100 text-blue-600
+                                {% elif usuario.rol == 'DOCENTE' %}bg-green-100 text-green-600
+                                {% elif usuario.rol == 'ADMINISTRADOR' %}bg-orange-100 text-orange-600
+                                {% elif usuario.rol == 'RECTOR' %}bg-purple-100 text-purple-600
+                                {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                {% if usuario.rol == 'APRENDIZ' %}
+                                    <i class="fas fa-user-graduate"></i>
+                                {% elif usuario.rol == 'DOCENTE' %}
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                {% elif usuario.rol == 'ADMINISTRADOR' %}
+                                    <i class="fas fa-user-shield"></i>
+                                {% elif usuario.rol == 'RECTOR' %}
+                                    <i class="fas fa-user-tie"></i>
+                                {% else %}
+                                    <i class="fas fa-user"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">{{ usuario.nombre_completo }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-600">{{ usuario.email }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                            {% if usuario.rol == 'APRENDIZ' %}bg-blue-100 text-blue-700
+                            {% elif usuario.rol == 'DOCENTE' %}bg-green-100 text-green-700
+                            {% elif usuario.rol == 'ADMINISTRADOR' %}bg-orange-100 text-orange-700
+                            {% elif usuario.rol == 'RECTOR' %}bg-purple-100 text-purple-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ usuario.rol }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if usuario.activo %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                <i class="fas fa-check-circle mr-1"></i> Activo
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                <i class="fas fa-times-circle mr-1"></i> Inactivo
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <a href="{{ url_for('admin.editar_usuario', user_id=usuario.id) }}"
+                               class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors duration-200"
+                               title="Editar usuario">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            {% if usuario.id != current_user.id %}
+                            <form method="POST"
+                                  action="{{ url_for('admin.eliminar_usuario', user_id=usuario.id) }}"
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar este usuario?\n\nEsta acción no se puede deshacer.')">
+                                <button type="submit"
+                                        class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-200"
+                                        title="Eliminar usuario">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed"
+                                    title="No puedes eliminar tu propio usuario"
+                                    disabled>
+                                <i class="fas fa-ban"></i>
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Vista de Cards (Mobile/Tablet) -->
+    <div class="lg:hidden divide-y divide-gray-200">
+        {% for usuario in usuarios %}
+        <div class="p-4 hover:bg-gray-50 transition-colors duration-200">
+            <!-- Header del Card -->
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center flex-1">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center
+                        {% if usuario.rol == 'APRENDIZ' %}bg-blue-100 text-blue-600
+                        {% elif usuario.rol == 'DOCENTE' %}bg-green-100 text-green-600
+                        {% elif usuario.rol == 'ADMINISTRADOR' %}bg-orange-100 text-orange-600
+                        {% elif usuario.rol == 'RECTOR' %}bg-purple-100 text-purple-600
+                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                        {% if usuario.rol == 'APRENDIZ' %}
+                            <i class="fas fa-user-graduate text-lg"></i>
+                        {% elif usuario.rol == 'DOCENTE' %}
+                            <i class="fas fa-chalkboard-teacher text-lg"></i>
+                        {% elif usuario.rol == 'ADMINISTRADOR' %}
+                            <i class="fas fa-user-shield text-lg"></i>
+                        {% elif usuario.rol == 'RECTOR' %}
+                            <i class="fas fa-user-tie text-lg"></i>
+                        {% else %}
+                            <i class="fas fa-user text-lg"></i>
+                        {% endif %}
+                    </div>
+                    <div class="ml-3 flex-1 min-w-0">
+                        <div class="text-base font-bold text-gray-900 truncate">{{ usuario.nombre_completo }}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-700">
+                                {{ usuario.tipo_documento }}
+                            </span>
+                            <span class="text-sm text-gray-600">{{ usuario.documento }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info del Usuario -->
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center text-sm text-gray-600">
+                    <i class="fas fa-envelope w-5 text-sena-green"></i>
+                    <span class="ml-2 truncate">{{ usuario.email }}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold
+                            {% if usuario.rol == 'APRENDIZ' %}bg-blue-100 text-blue-700
+                            {% elif usuario.rol == 'DOCENTE' %}bg-green-100 text-green-700
+                            {% elif usuario.rol == 'ADMINISTRADOR' %}bg-orange-100 text-orange-700
+                            {% elif usuario.rol == 'RECTOR' %}bg-purple-100 text-purple-700
+                            {% else %}bg-gray-100 text-gray-700{% endif %}">
+                            {{ usuario.rol }}
+                        </span>
+                        {% if usuario.activo %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                <i class="fas fa-check-circle mr-1"></i> Activo
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                                <i class="fas fa-times-circle mr-1"></i> Inactivo
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex gap-2 pt-3 border-t border-gray-100">
+                <a href="{{ url_for('admin.editar_usuario', user_id=usuario.id) }}"
+                   class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors duration-200 font-medium text-sm">
+                    <i class="fas fa-edit mr-2"></i> Editar
+                </a>
+                {% if usuario.id != current_user.id %}
+                <form method="POST"
+                      action="{{ url_for('admin.eliminar_usuario', user_id=usuario.id) }}"
+                      class="flex-1"
+                      onsubmit="return confirm('¿Está seguro de eliminar este usuario?\n\nEsta acción no se puede deshacer.')">
+                    <button type="submit"
+                            class="w-full inline-flex items-center justify-center px-4 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors duration-200 font-medium text-sm">
+                        <i class="fas fa-trash mr-2"></i> Eliminar
+                    </button>
+                </form>
+                {% else %}
+                <button class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium text-sm"
+                        title="No puedes eliminar tu propio usuario"
+                        disabled>
+                    <i class="fas fa-ban mr-2"></i> Eliminar
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <div class="text-center py-16">
+        <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gray-100 mb-6">
+            <i class="fas fa-users-slash text-5xl text-gray-400"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No hay usuarios</h3>
+        <p class="text-gray-600 mb-6">No se encontraron usuarios con los filtros aplicados</p>
+        <a href="{{ url_for('admin.usuarios') }}" class="inline-flex items-center px-6 py-3 bg-sena-green text-white font-semibold rounded-lg hover:bg-sena-green-dark transition-colors duration-200">
+            <i class="fas fa-redo mr-2"></i> Ver todos los usuarios
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Documentos SIMAT - Panel Docente{% endblock %}
+
+{% block content %}
+
+<!-- Header Section -->
+<div class="header-section-simat">
+    <div class="header-content-simat">
+        <nav class="breadcrumb-simat">
+            <a href="{{ url_for('docente.dashboard') }}" class="breadcrumb-link-simat">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <span class="breadcrumb-sep-simat">/</span>
+            <span class="breadcrumb-active-simat">Documentos SIMAT</span>
+        </nav>
+        <h1 class="page-title-simat">
+            <i class="fas fa-file-upload"></i> Gestión de Documentos SIMAT
+        </h1>
+        <p class="page-subtitle-simat">Registro del Sistema de Matrícula Estudiantil - {{ colegio.nombre }}</p>
+    </div>
+</div>
+
+<div class="content-wrapper-simat">
+    <!-- Formulario de Subida -->
+    <div class="card-simat upload-card">
+        <div class="card-header-simat">
+            <i class="fas fa-cloud-upload-alt"></i> Subir Nuevo Documento SIMAT
+        </div>
+        <div class="card-body-simat">
+            <form method="POST" action="{{ url_for('docente.subir_simat') }}" enctype="multipart/form-data" id="formSubirSIMAT">
+                <div class="form-row-simat">
+                    <!-- Tipo de Documento -->
+                    <div class="form-group-simat">
+                        <label class="form-label-simat">
+                            <i class="fas fa-list-alt"></i> Tipo de Registro
+                            <span class="required-simat">*</span>
+                        </label>
+                        <select name="tipo" id="tipo" class="form-select-simat" required>
+                            <option value="COLEGIO">Por Colegio (Todos los estudiantes)</option>
+                            <option value="GRUPO">Por Grupo/Ficha Específica</option>
+                        </select>
+                        <small class="form-hint-simat">
+                            <i class="fas fa-info-circle"></i> Seleccione si el registro es para todo el colegio o un grupo específico
+                        </small>
+                    </div>
+
+                    <!-- Grupo (solo si tipo = GRUPO) -->
+                    <div class="form-group-simat" id="grupo_container" style="display: none;">
+                        <label class="form-label-simat">
+                            <i class="fas fa-users"></i> Grupo/Ficha
+                            <span class="required-simat">*</span>
+                        </label>
+                        <select name="grupo_id" id="grupo_id" class="form-select-simat">
+                            <option value="">Seleccione un grupo...</option>
+                            {% for grupo in grupos %}
+                            <option value="{{ grupo.id }}">{{ grupo.nombre }} - {{ grupo.programa.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Archivo -->
+                <div class="form-group-simat">
+                    <label class="form-label-simat">
+                        <i class="fas fa-file"></i> Archivo SIMAT
+                        <span class="required-simat">*</span>
+                    </label>
+                    <div class="file-upload-simat">
+                        <input type="file" name="archivo" id="archivo" class="file-input-simat" required accept=".pdf,.xlsx,.xls,.doc,.docx">
+                        <label for="archivo" class="file-label-simat">
+                            <i class="fas fa-paperclip"></i>
+                            <span id="file-name">Seleccionar archivo...</span>
+                        </label>
+                    </div>
+                    <small class="form-hint-simat">
+                        <i class="fas fa-check-circle"></i> Formatos permitidos: PDF, Excel (.xlsx, .xls), Word (.doc, .docx)
+                    </small>
+                </div>
+
+                <button type="submit" class="btn-submit-simat">
+                    <i class="fas fa-upload"></i> Subir Documento SIMAT
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Historial de Documentos -->
+    <div class="card-simat history-card">
+        <div class="card-header-simat">
+            <i class="fas fa-history"></i> Historial de Documentos SIMAT
+        </div>
+        <div class="card-body-simat">
+            {% if documentos %}
+            <div class="table-responsive-simat">
+                <table class="table-simat">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Grupo/Ficha</th>
+                            <th>Archivo</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Observaciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documentos %}
+                        <tr>
+                            <td>
+                                <span class="badge-tipo badge-{{ doc.tipo.lower() }}">
+                                    {% if doc.tipo == 'COLEGIO' %}
+                                    <i class="fas fa-school"></i> Colegio
+                                    {% else %}
+                                    <i class="fas fa-users"></i> Grupo
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                {% if doc.grupo %}
+                                {{ doc.grupo.nombre }}
+                                {% else %}
+                                <span class="text-muted-simat">Todo el colegio</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <i class="fas fa-file"></i>
+                                {{ doc.nombre_archivo_original }}
+                            </td>
+                            <td>{{ doc.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if doc.estado == 'PENDIENTE' %}
+                                <span class="badge-estado badge-pendiente">
+                                    <i class="fas fa-clock"></i> Pendiente
+                                </span>
+                                {% elif doc.estado == 'APROBADO' %}
+                                <span class="badge-estado badge-aprobado">
+                                    <i class="fas fa-check-circle"></i> Aprobado
+                                </span>
+                                {% else %}
+                                <span class="badge-estado badge-rechazado">
+                                    <i class="fas fa-times-circle"></i> Rechazado
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if doc.observaciones %}
+                                <span class="observaciones-simat" title="{{ doc.observaciones }}">
+                                    {{ doc.observaciones[:50] }}{% if doc.observaciones|length > 50 %}...{% endif %}
+                                </span>
+                                {% else %}
+                                <span class="text-muted-simat">Sin observaciones</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('docente.descargar_simat', simat_id=doc.id) }}"
+                                   class="btn-action-simat btn-download"
+                                   title="Descargar">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state-simat">
+                <i class="fas fa-inbox"></i>
+                <h3>No hay documentos SIMAT</h3>
+                <p>Aún no ha subido ningún documento SIMAT. Use el formulario arriba para subir uno.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información -->
+    <div class="info-box-simat">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <h3>¿Qué es el documento SIMAT?</h3>
+            <p>El SIMAT (Sistema de Matrícula Estudiantil) es el registro oficial de estudiantes que participarán en el proceso de formación con el SENA.</p>
+            <ul>
+                <li><strong>Por Colegio:</strong> Incluye todos los estudiantes de su institución</li>
+                <li><strong>Por Grupo:</strong> Específico para una ficha/grupo determinado</li>
+                <li>El administrador debe aprobar el documento antes de que sea oficial</li>
+                <li>Puede subir actualizaciones si hay cambios en el registro</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('tipo');
+    const grupoContainer = document.getElementById('grupo_container');
+    const grupoSelect = document.getElementById('grupo_id');
+    const fileInput = document.getElementById('archivo');
+    const fileName = document.getElementById('file-name');
+
+    // Mostrar/ocultar selector de grupo
+    tipoSelect.addEventListener('change', function() {
+        if (this.value === 'GRUPO') {
+            grupoContainer.style.display = 'block';
+            grupoSelect.required = true;
+        } else {
+            grupoContainer.style.display = 'none';
+            grupoSelect.required = false;
+            grupoSelect.value = '';
+        }
+    });
+
+    // Mostrar nombre de archivo seleccionado
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            fileName.textContent = this.files[0].name;
+        } else {
+            fileName.textContent = 'Seleccionar archivo...';
+        }
+    });
+
+    // Validar formulario antes de enviar
+    document.getElementById('formSubirSIMAT').addEventListener('submit', function(e) {
+        const tipo = tipoSelect.value;
+        const grupo = grupoSelect.value;
+
+        if (tipo === 'GRUPO' && !grupo) {
+            e.preventDefault();
+            alert('Debe seleccionar un grupo cuando el tipo es "Por Grupo"');
+            return false;
+        }
+    });
+});
+</script>
+
+{% endblock %}

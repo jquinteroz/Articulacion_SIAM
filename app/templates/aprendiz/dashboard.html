@@ -1,0 +1,273 @@
+{% extends 'aprendiz/base_aprendiz.html' %}
+
+{% block title %}Panel del Aprendiz - {{ current_user.nombres }}{% endblock %}
+
+{% block content %}
+{% set docs_requeridos = 5 if (current_user.tipo_documento == 'CC' and current_user.edad >= 18) else 8 %}
+<div class="dashboard-modern">
+    <!-- Sección de Bienvenida -->
+    <div class="welcome-section">
+        <div class="welcome-header">
+            <h1 class="welcome-title">¡Bienvenido, {{ current_user.nombres }}! 👋</h1>
+            <p class="welcome-subtitle">
+                {% if matricula and matricula.estado == 'COMPLETADO' %}
+                    Tu proceso de articulación está completo
+                {% elif matricula and matricula.estado == 'ENVIADO' %}
+                    Tu solicitud de matrícula está en revisión
+                {% else %}
+                    Completa tu proceso de articulación SENA
+                {% endif %}
+            </p>
+        </div>
+        {% if matricula and matricula.estado == 'COMPLETADO' %}
+        <a href="{{ url_for('aprendiz.descargar_reporte_pdf') }}" class="btn-download">
+            <i class="fas fa-file-pdf"></i>
+            Descargar PDF
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Alerta Documento Desactualizado -->
+    {% if current_user.tipo_documento == 'TI' %}
+    <div class="alert-documento-desactualizado">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="alert-content">
+            <strong>Documento desactualizado:</strong>
+            Tu Tarjeta de Identidad (TI) debe ser actualizada a Cédula de Ciudadanía (CC). 
+            Por favor, contacta al administrador para actualizar tu información.
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Métricas Principales -->
+    <div class="metrics-grid">
+        <!-- Estado de Matrícula -->
+        <div class="metric-card metric-primary">
+            <div class="metric-icon">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+            <div class="metric-content">
+                <h3 class="metric-label">Estado de Matrícula</h3>
+                <p class="metric-value">
+                    {% if matricula %}
+                        {% if matricula.estado == 'BORRADOR' %}
+                            BORRADOR
+                        {% elif matricula.estado == 'ENVIADO' %}
+                            ENVIADO
+                        {% elif matricula.estado == 'COMPLETADO' %}
+                            COMPLETADO
+                        {% else %}
+                            {{ matricula.estado }}
+                        {% endif %}
+                    {% else %}
+                        NO INICIADO
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Documentos Subidos -->
+        <div class="metric-card metric-success">
+            <div class="metric-icon">
+                <i class="fas fa-file-upload"></i>
+            </div>
+            <div class="metric-content">
+                <h3 class="metric-label">Documentos Subidos</h3>
+                <p class="metric-value">
+                    {{ documentos_subidos }} de {{ docs_requeridos }}
+                </p>
+                <div class="metric-progress">
+                    <div class="metric-progress-bar" style="width: {{ (documentos_subidos / docs_requeridos * 100) if docs_requeridos > 0 else 0 }}%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programa Técnico -->
+        <div class="metric-card metric-info">
+            <div class="metric-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="metric-content">
+                <h3 class="metric-label">Programa Técnico</h3>
+                <p class="metric-value">
+                    {% if aprendiz.programa %}
+                        {{ aprendiz.programa.nombre }}
+                    {% else %}
+                        Sin asignar
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Línea de Tiempo del Proceso -->
+    <div class="progress-timeline">
+        <h2 class="section-title">Progreso del Proceso</h2>
+        <div class="timeline-horizontal">
+            <!-- Paso 1: Completa tu información -->
+            <div class="timeline-step {% if not aprendiz.perfil_completo %}active{% elif aprendiz.perfil_completo %}completed{% endif %}">
+                <div class="timeline-icon">
+                    <i class="fas {% if aprendiz.perfil_completo %}fa-check{% else %}fa-user-edit{% endif %}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 class="timeline-title">Completa tu información</h4>
+                    <p class="timeline-subtitle">Datos personales y académicos</p>
+                    {% if aprendiz.perfil_completo %}
+                        <span class="timeline-badge badge-completed">Completado</span>
+                    {% else %}
+                        <span class="timeline-badge badge-pending">Pendiente</span>
+                    {% endif %}
+                </div>
+                <div class="timeline-connector"></div>
+            </div>
+
+            <!-- Paso 2: Sube tus documentos -->
+            <div class="timeline-step {% if matricula and documentos_subidos > 0 and matricula.estado == 'BORRADOR' %}active{% elif matricula and matricula.estado not in ['BORRADOR', None] %}completed{% endif %}">
+                <div class="timeline-icon">
+                    <i class="fas {% if matricula and matricula.estado not in ['BORRADOR', None] %}fa-check{% else %}fa-file-upload{% endif %}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 class="timeline-title">Sube tus documentos</h4>
+                    <p class="timeline-subtitle">Documentación requerida</p>
+                    {% if matricula and matricula.estado == 'ENVIADO' %}
+                        <span class="timeline-badge badge-completed">Completado</span>
+                    {% elif matricula and matricula.estado == 'BORRADOR' %}
+                        <span class="timeline-badge badge-pending">En progreso</span>
+                    {% else %}
+                        <span class="timeline-badge badge-inactive">Por hacer</span>
+                    {% endif %}
+                </div>
+                <div class="timeline-connector"></div>
+            </div>
+
+            <!-- Paso 3: Revisión Docente -->
+            <div class="timeline-step {% if matricula and matricula.estado == 'ENVIADO' and not matricula.validado_por_docente %}active{% elif matricula and matricula.validado_por_docente %}completed{% endif %}">
+                <div class="timeline-icon">
+                    <i class="fas {% if matricula and matricula.validado_por_docente %}fa-check{% else %}fa-chalkboard-teacher{% endif %}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 class="timeline-title">Revisión Docente</h4>
+                    <p class="timeline-subtitle">Validación del profesor</p>
+                    {% if matricula and matricula.validado_por_docente %}
+                        <span class="timeline-badge badge-completed">Validado</span>
+                    {% elif matricula and matricula.estado == 'ENVIADO' %}
+                        <span class="timeline-badge badge-active">En revisión</span>
+                    {% else %}
+                        <span class="timeline-badge badge-inactive">Por hacer</span>
+                    {% endif %}
+                </div>
+                <div class="timeline-connector"></div>
+            </div>
+
+            <!-- Paso 4: Revisión Admin -->
+            <div class="timeline-step {% if matricula and matricula.validado_por_docente and not matricula.validado_por_admin %}active{% elif matricula and matricula.estado == 'COMPLETADO' %}completed{% endif %}">
+                <div class="timeline-icon">
+                    <i class="fas {% if matricula and matricula.estado == 'COMPLETADO' %}fa-check{% else %}fa-user-shield{% endif %}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4 class="timeline-title">Revisión Final</h4>
+                    <p class="timeline-subtitle">Aprobación administrativa</p>
+                    {% if matricula and matricula.estado == 'COMPLETADO' %}
+                        <span class="timeline-badge badge-completed">Aprobado</span>
+                    {% elif matricula and matricula.validado_por_docente %}
+                        <span class="timeline-badge badge-active">En revisión</span>
+                    {% else %}
+                        <span class="timeline-badge badge-inactive">Por hacer</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="actions-section">
+        <h2 class="section-title">Acciones Rápidas</h2>
+        <div class="actions-grid">
+            <!-- Completar Datos -->
+            <a href="{{ url_for('aprendiz.perfil') }}" class="action-card {% if aprendiz.perfil_completo %}action-card-success{% endif %}">
+                <div class="action-icon action-icon-primary">
+                    <i class="fas fa-user-edit"></i>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">{% if aprendiz.perfil_completo %}Datos Completos{% else %}Completa tus Datos{% endif %}</h3>
+                    <p class="action-description">
+                        {% if aprendiz.perfil_completo %}
+                            Tu perfil está completo
+                        {% else %}
+                            Actualiza tu información personal
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <!-- Subir Documentos -->
+            <a href="{{ url_for('aprendiz.documentos') }}" class="action-card {% if documentos_subidos == docs_requeridos %}action-card-success{% endif %}">
+                <div class="action-icon action-icon-info">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">Subir Documentos</h3>
+                    <p class="action-description">{{ documentos_subidos }} de {{ docs_requeridos }} documentos subidos</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+            <!-- Ver Matrícula -->
+            <a href="{{ url_for('aprendiz.matricula') }}" class="action-card">
+                <div class="action-icon action-icon-success">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">Mi Matrícula</h3>
+                    <p class="action-description">Ver estado de matrícula</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Notificaciones y Observaciones -->
+    {% if matricula and (matricula.observaciones_docente or matricula.observaciones_admin) %}
+    <div class="progress-timeline">
+        <h2 class="section-title">Observaciones</h2>
+        
+        {% if matricula.observaciones_docente %}
+        <div class="notification-card notification-info">
+            <div class="notification-icon">
+                <i class="fas fa-comment-dots"></i>
+            </div>
+            <div class="notification-content">
+                <h3 class="notification-title">Observaciones del Docente</h3>
+                <p class="notification-text">{{ matricula.observaciones_docente }}</p>
+                {% if matricula.fecha_validacion_docente %}
+                <span class="notification-date">{{ matricula.fecha_validacion_docente.strftime('%d/%m/%Y %H:%M') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if matricula.observaciones_admin %}
+        <div class="notification-card notification-warning">
+            <div class="notification-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="notification-content">
+                <h3 class="notification-title">Observaciones del Administrador</h3>
+                <p class="notification-text">{{ matricula.observaciones_admin }}</p>
+                {% if matricula.fecha_validacion_admin %}
+                <span class="notification-date">{{ matricula.fecha_validacion_admin.strftime('%d/%m/%Y %H:%M') }}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

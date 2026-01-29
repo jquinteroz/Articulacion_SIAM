@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Página No Encontrada - 404{% endblock %}
+
+{% block content %}
+<div class="text-center" style="padding: 4rem 0;">
+    <h1 style="font-size: 6rem; color: var(--sena-verde-principal);">404</h1>
+    <h2>Página No Encontrada</h2>
+    <p class="text-muted">La página que está buscando no existe o ha sido movida.</p>
+
+    <div class="mt-4">
+        <a href="{{ url_for('public.index') }}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Volver al Inicio
+        </a>
+    </div>
+</div>
+{% endblock %}

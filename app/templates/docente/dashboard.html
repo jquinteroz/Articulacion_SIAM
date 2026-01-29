@@ -1,0 +1,328 @@
+{% extends "docente/base_docente.html" %}
+
+{% block title %}Panel Docente - Dashboard{% endblock %}
+
+{% block page_title %}Dashboard Docente{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="welcome-section">
+    <div class="welcome-content">
+        <div class="welcome-text">
+            <h1 class="welcome-title">¡Bienvenido, {{ current_user.nombres }}!</h1>
+            <p class="welcome-subtitle">Panel de Gestión Docente - {{ current_user.docente.colegio.nombre if current_user.docente and current_user.docente.colegio else 'Sistema de Articulación' }}</p>
+        </div>
+        <div class="welcome-icon">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Cards -->
+<div class="metrics-grid">
+    <div class="metric-card metric-info">
+        <div class="metric-icon-wrapper">
+            <div class="metric-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">{{ stats.total_matriculas }}</div>
+            <div class="metric-label">Total Matrículas</div>
+        </div>
+        <div class="metric-trend">
+            <i class="fas fa-chart-line"></i>
+        </div>
+    </div>
+
+    <div class="metric-card metric-warning">
+        <div class="metric-icon-wrapper">
+            <div class="metric-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">{{ stats.matriculas_pendientes }}</div>
+            <div class="metric-label">Pendientes de Revisión</div>
+        </div>
+        <div class="metric-trend">
+            {% if stats.matriculas_pendientes > 0 %}
+            <i class="fas fa-exclamation-circle"></i>
+            {% else %}
+            <i class="fas fa-check-circle"></i>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="metric-card metric-success">
+        <div class="metric-icon-wrapper">
+            <div class="metric-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">{{ stats.matriculas_validadas }}</div>
+            <div class="metric-label">Validadas</div>
+        </div>
+        <div class="metric-trend">
+            <i class="fas fa-thumbs-up"></i>
+        </div>
+    </div>
+
+    <div class="metric-card metric-primary">
+        <div class="metric-icon-wrapper">
+            <div class="metric-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+        </div>
+        <div class="metric-content">
+            <div class="metric-value">{{ stats.documentos_pendientes }}</div>
+            <div class="metric-label">Documentos por Validar</div>
+        </div>
+        <div class="metric-trend">
+            <i class="fas fa-folder-open"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Action Cards Grid -->
+<div class="action-cards-section">
+    <h2 class="section-title">
+        <i class="fas fa-bolt"></i> Acciones Rápidas
+    </h2>
+    <div class="action-cards-grid">
+        <a href="{{ url_for('docente.matriculas', estado='ENVIADO') }}" class="action-card action-warning">
+            <div class="action-card-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Revisar Pendientes</h3>
+                <p>Validar matrículas en espera</p>
+                {% if stats.matriculas_pendientes > 0 %}
+                <span class="action-badge">{{ stats.matriculas_pendientes }}</span>
+                {% endif %}
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.aprendices') }}" class="action-card action-info">
+            <div class="action-card-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Gestionar Aprendices</h3>
+                <p>Ver y administrar estudiantes</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.cargar_excel_aprendices') }}" class="action-card action-success">
+            <div class="action-card-icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Carga Masiva</h3>
+                <p>Importar aprendices desde Excel</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.matriculas') }}" class="action-card action-primary">
+            <div class="action-card-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Todas las Matrículas</h3>
+                <p>Ver listado completo</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.reportes') }}" class="action-card action-purple">
+            <div class="action-card-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Reportes</h3>
+                <p>Estadísticas y análisis</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.generar_sofia') }}" class="action-card action-success">
+            <div class="action-card-icon">
+                <i class="fas fa-file-excel"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Formato SOFIA</h3>
+                <p>Exportar para SENA</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+
+        <a href="{{ url_for('docente.simat') }}" class="action-card action-teal">
+            <div class="action-card-icon">
+                <i class="fas fa-file-upload"></i>
+            </div>
+            <div class="action-card-content">
+                <h3>Documentos SIMAT</h3>
+                <p>Registro de matrícula estudiantil</p>
+            </div>
+            <div class="action-card-arrow">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Grid -->
+<div class="content-grid">
+    <!-- Recent Enrollments -->
+    <div class="content-card recent-enrollments">
+        <div class="content-card-header">
+            <h2 class="content-card-title">
+                <i class="fas fa-history"></i> Matrículas Recientes
+            </h2>
+            <a href="{{ url_for('docente.matriculas') }}" class="btn-link">
+                Ver todas <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="content-card-body">
+            {% if matriculas_recientes %}
+            <div class="enrollments-list">
+                {% for matricula in matriculas_recientes %}
+                <div class="enrollment-item">
+                    <div class="enrollment-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="enrollment-info">
+                        <div class="enrollment-name">{{ matricula.aprendiz.usuario.nombre_completo }}</div>
+                        <div class="enrollment-program">
+                            <i class="fas fa-graduation-cap"></i>
+                            {{ matricula.aprendiz.programa.nombre[:40] if matricula.aprendiz.programa else 'Sin programa' }}...
+                        </div>
+                        <div class="enrollment-meta">
+                            <span class="enrollment-date">
+                                <i class="fas fa-calendar"></i> {{ matricula.created_at.strftime('%d/%m/%Y') }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="enrollment-status">
+                        <span class="status-badge status-{{ matricula.estado|lower }}">
+                            {{ matricula.estado }}
+                        </span>
+                        <a href="{{ url_for('docente.ver_matricula', matricula_id=matricula.id) }}"
+                           class="btn-view" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No hay matrículas recientes</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Pending Tasks -->
+    <div class="content-card pending-tasks">
+        <div class="content-card-header">
+            <h2 class="content-card-title">
+                <i class="fas fa-list-check"></i> Tareas Pendientes
+            </h2>
+        </div>
+        <div class="content-card-body">
+            {% if stats.matriculas_pendientes > 0 or stats.documentos_pendientes > 0 %}
+            <div class="tasks-list">
+                {% if stats.matriculas_pendientes > 0 %}
+                <div class="task-item task-warning">
+                    <div class="task-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Matrículas por Revisar</div>
+                        <div class="task-description">Hay {{ stats.matriculas_pendientes }} matrícula(s) esperando validación</div>
+                    </div>
+                    <div class="task-badge">{{ stats.matriculas_pendientes }}</div>
+                </div>
+                {% endif %}
+
+                {% if stats.documentos_pendientes > 0 %}
+                <div class="task-item task-info">
+                    <div class="task-icon">
+                        <i class="fas fa-file-check"></i>
+                    </div>
+                    <div class="task-content">
+                        <div class="task-title">Documentos por Validar</div>
+                        <div class="task-description">{{ stats.documentos_pendientes }} documento(s) requieren revisión</div>
+                    </div>
+                    <div class="task-badge">{{ stats.documentos_pendientes }}</div>
+                </div>
+                {% endif %}
+
+                <div class="task-cta">
+                    <a href="{{ url_for('docente.matriculas', estado='ENVIADO') }}" class="btn-primary-custom">
+                        <i class="fas fa-tasks"></i> Revisar Ahora
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-tasks">
+                <div class="no-tasks-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="no-tasks-title">¡Todo al día!</div>
+                <div class="no-tasks-description">No hay tareas pendientes por el momento</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Bar -->
+<div class="quick-stats-bar">
+    <div class="quick-stat">
+        <i class="fas fa-users"></i>
+        <div class="quick-stat-content">
+            <div class="quick-stat-label">Aprendices Activos</div>
+            <div class="quick-stat-value">{{ stats.total_aprendices if stats.total_aprendices is defined else '-' }}</div>
+        </div>
+    </div>
+    <div class="quick-stat">
+        <i class="fas fa-percentage"></i>
+        <div class="quick-stat-content">
+            <div class="quick-stat-label">Tasa de Aprobación</div>
+            <div class="quick-stat-value">
+                {% if stats.total_matriculas > 0 %}
+                {{ ((stats.matriculas_validadas / stats.total_matriculas) * 100)|round|int }}%
+                {% else %}
+                0%
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="quick-stat">
+        <i class="fas fa-clock"></i>
+        <div class="quick-stat-content">
+            <div class="quick-stat-label">Tiempo Promedio</div>
+            <div class="quick-stat-value">{{ stats.tiempo_promedio if stats.tiempo_promedio is defined else '2 días' }}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

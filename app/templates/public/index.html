@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}SIAM - Sistema Integrado de Articulación y Media Técnica SENA{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes gradient-shift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .gradient-animate {
+        background-size: 200% 200%;
+        animation: gradient-shift 5s ease infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section Moderno -->
+<section class="relative overflow-hidden bg-gradient-to-br from-sena-green via-sena-green-dark to-sena-green-darker gradient-animate py-20 lg:py-32">
+    <!-- Decorative Elements -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Left Content -->
+            <div class="text-white space-y-8">
+                <div class="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-md rounded-full px-4 py-2">
+                    <i class="fas fa-graduation-cap text-yellow-300"></i>
+                    <span class="font-semibold">SENA CGMLTI</span>
+                </div>
+                
+                <h1 class="text-5xl lg:text-7xl font-bold leading-tight">
+                    Sistema <span class="text-yellow-300">SIAM</span>
+                </h1>
+                
+                <h2 class="text-3xl lg:text-4xl font-light">
+                    Articulación con la Media Técnica
+                </h2>
+                <h2 class="text-3xl lg:text-4xl font-light">
+                    Centro de Gestión de Mercados, Logística y Tecnologías de la Información
+                </h2>
+                <p class="text-xl text-gray-100 max-w-xl">
+                    Plataforma integral para la gestión de matrícula, documentos y seguimiento académico.
+                    Conectando estudiantes con su futuro profesional.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{{ url_for('public.login') }}" 
+                       class="inline-flex items-center justify-center space-x-2 bg-white text-sena-green px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Iniciar Sesión</span>
+                    </a>
+                    <a href="{{ url_for('public.registro') }}" 
+                       class="inline-flex items-center justify-center space-x-2 bg-white/10 backdrop-blur-md text-white border-2 border-white px-8 py-4 rounded-xl hover:bg-white/20 transition-all duration-300 font-semibold text-lg">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Registrarse</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Right Content - Logo -->
+            <div class="flex justify-center lg:justify-end">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-white/20 rounded-full blur-3xl"></div>
+                    <div class="relative bg-white/10 backdrop-blur-md p-12 rounded-3xl border border-white/20 shadow-2xl">
+                        <img src="{{ url_for('static', filename='img/siam.png') }}" 
+                             alt="Logo SIAM" 
+                             class="w-64 h-64 object-contain animate-float drop-shadow-2xl">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Estadísticas -->
+<section class="py-12 bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                <div class="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-book text-white text-2xl"></i>
+                </div>
+                <h3 class="text-4xl font-bold text-blue-900 mb-2">{{ estadisticas.programas or '6' }}</h3>
+                <p class="text-blue-700 font-medium">Programas Técnicos</p>
+            </div>
+            
+            <div class="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                <div class="w-16 h-16 bg-sena-green rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-user-graduate text-white text-2xl"></i>
+                </div>
+                <h3 class="text-4xl font-bold text-green-900 mb-2">{{ estadisticas.estudiantes or '500+' }}</h3>
+                <p class="text-green-700 font-medium">Estudiantes Activos</p>
+            </div>
+            
+            <div class="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                <div class="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-school text-white text-2xl"></i>
+                </div>
+                <h3 class="text-4xl font-bold text-purple-900 mb-2">{{ estadisticas.colegios or '10+' }}</h3>
+                <p class="text-purple-700 font-medium">Instituciones Aliadas</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center space-x-2 bg-sena-green/10 text-sena-green px-4 py-2 rounded-full mb-4">
+                <i class="fas fa-star"></i>
+                <span class="font-semibold">Beneficios</span>
+            </div>
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">¿Por qué usar SIAM?</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Una plataforma completa diseñada para facilitar tu proceso educativo
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fas fa-file-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">Gestión Digital</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Carga y gestiona todos tus documentos en un solo lugar de forma segura y organizada.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chart-line text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">Seguimiento</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Monitorea tu progreso académico en tiempo real con dashboards intuitivos y reportes detallados.
+                </p>
+            </div>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group hover:-translate-y-2">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                    <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">Acceso Móvil</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    Accede desde cualquier dispositivo, en cualquier momento y lugar con diseño responsive.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Programas Section -->
+<section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center space-x-2 bg-sena-green/10 text-sena-green px-4 py-2 rounded-full mb-4">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="font-semibold">Formación</span>
+            </div>
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Programas Disponibles</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Descubre los programas técnicos en articulación con el SENA
+            </p>
+        </div>
+        
+        {% if programas and programas|length > 0 %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {% for programa in programas[:3] %}
+            <div class="bg-gradient-to-br from-sena-green to-sena-green-dark p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 text-white group hover:-translate-y-2">
+                <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">{{ programa.nombre }}</h3>
+                {% if programa.duracion_horas %}
+                <div class="flex items-center space-x-2 text-white/90">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ programa.duracion_horas }} horas</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center">
+            <a href="{{ url_for('public.programas') }}" 
+               class="inline-flex items-center space-x-2 bg-sena-green text-white px-8 py-4 rounded-xl hover:bg-sena-green-dark transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                <span>Ver todos los programas</span>
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-12 bg-gray-50 rounded-2xl">
+            <i class="fas fa-info-circle text-gray-400 text-5xl mb-4"></i>
+            <p class="text-gray-600 text-lg">Próximamente publicaremos los programas disponibles.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <div class="absolute top-0 left-0 w-96 h-96 bg-sena-green rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-sena-green rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-4xl lg:text-5xl font-bold text-white mb-6">
+            ¿Listo para comenzar?
+        </h2>
+        <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+            Únete a cientos de estudiantes que están construyendo su futuro con el SENA
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('public.registro') }}" 
+               class="inline-flex items-center justify-center space-x-2 bg-sena-green text-white px-8 py-4 rounded-xl hover:bg-sena-green-dark transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:scale-105">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrarse Ahora</span>
+            </a>
+            <a href="{{ url_for('public.contacto') }}" 
+               class="inline-flex items-center justify-center space-x-2 bg-white/10 backdrop-blur-md text-white border-2 border-white px-8 py-4 rounded-xl hover:bg-white/20 transition-all duration-300 font-semibold text-lg">
+                <i class="fas fa-envelope"></i>
+                <span>Contactar</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
