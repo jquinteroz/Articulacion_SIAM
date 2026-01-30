@@ -776,7 +776,10 @@ def rechazar_documento(documento_id):
         flash('No tiene permisos para rechazar este documento', 'danger')
         return redirect(url_for('docente.dashboard'))
 
-    observaciones = request.form.get('observaciones', '')
+    observaciones = (request.form.get('observaciones') or '').strip()
+    # Aceptar también el campo 'motivo' si el formulario lo envía con ese nombre
+    if not observaciones:
+        observaciones = (request.form.get('motivo') or '').strip()
 
     if not observaciones:
         flash('Debe proporcionar observaciones al rechazar un documento', 'warning')

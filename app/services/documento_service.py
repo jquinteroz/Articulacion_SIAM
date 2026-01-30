@@ -85,7 +85,8 @@ class DocumentoService:
                 ruta_archivo=file_path,
                 tamaño_bytes=os.path.getsize(file_path),
                 extension=file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else '',
-                validado=False
+                # Al crear un reemplazo debe quedar como pendiente de revisión
+                validado=None
             )
             db.session.add(nuevo_doc)
             db.session.flush()

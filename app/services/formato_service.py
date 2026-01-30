@@ -258,9 +258,8 @@ def generar_formato_tratamiento_datos(aprendiz):
 
         doc.save(output_path)
 
-        # Convertir a PDF
-        pdf_path = convert_docx_to_pdf(output_path)
-        return pdf_path
+        # Retornar el archivo DOCX (más rápido que convertir a PDF)
+        return output_path
 
     except Exception as e:
         raise Exception(f"Error al generar formato de tratamiento de datos: {str(e)}")
@@ -424,9 +423,8 @@ def generar_formato_compromiso_aprendiz(aprendiz):
 
         doc.save(output_path)
 
-        # Convertir a PDF
-        pdf_path = convert_docx_to_pdf(output_path)
-        return pdf_path
+        # Retornar el archivo DOCX (más rápido que convertir a PDF)
+        return output_path
 
     except Exception as e:
         raise Exception(f"Error al generar formato de compromiso del aprendiz: {str(e)}")

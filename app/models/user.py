@@ -52,7 +52,18 @@ class Usuario(UserMixin, db.Model):
     @property
     def tiene_documento_desactualizado(self):
         """Retorna True si tiene TI pero ya es mayor de edad"""
-        return self.tipo_documento == 'TI' and self.es_mayor_de_edad
+        # Verificación robusta: asegurarse de que la fecha de nacimiento esté definida
+        # y que la edad sea un entero válido antes de decidir que el documento está desactualizado
+        try:
+            edad = self.edad
+            if edad is None:
+                return False
+            # Evitar valores imposibles
+            if not isinstance(edad, int) or edad < 0 or edad > 150:
+                return False
+            return self.tipo_documento == 'TI' and edad >= 18
+        except Exception:
+            return False
 
     @property
     def requiere_acudiente(self):

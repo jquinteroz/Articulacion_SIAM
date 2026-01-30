@@ -5,12 +5,14 @@ Versión: 1.0.0
 Fecha: 2025-12-18
 
 Desarrollado por: Johann Quintero (jsquinteroz)
+Ingeniero de Servidores: Julian Pamplona
+Tester: Edwin Cañon
 GitHub: @jsquinteroz
 Email: jsquinteroz@example.com
 
 Copyright (c) 2025 - Todos los derechos reservados
 """
-print("=== INICIO DEL SCRIPT ===", flush=True)
+print("=== INICIO DE SIAM ===", flush=True)
 
 import os
 import sys
